@@ -13,6 +13,7 @@
   width: 100%;
   max-width: 400px;
   overflow: visible;
+  pointer-events: none;
 }
 
 .app.overlay-mode .header-wrapper {
@@ -20,6 +21,7 @@
   z-index: 1000;
   width: 100%;
   max-width: 400px;
+  pointer-events: auto;
 }
 
 .app.overlay-mode .header-wrapper::before {
@@ -32,20 +34,24 @@
   height: 60px;
   background: transparent;
   z-index: 998;
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .app.overlay-mode .header {
-  display: none;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: visibility 0.3s, opacity 0.3s ease;
   background-color: rgba(42, 42, 62, 0.95);
   backdrop-filter: blur(10px);
   z-index: 999;
-  pointer-events: auto;
   padding: 8px 16px;
 }
 
 .app.overlay-mode .header-wrapper:hover .header {
-  display: flex;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .app.overlay-mode .main-content {
@@ -285,7 +291,6 @@
   padding: 16px;
   max-width: 400px;
   width: 100%;
-  pointer-events: none;
 }
 
 .overlay-stats {
@@ -297,7 +302,6 @@
   border-radius: 8px;
   padding: 12px;
   border: 1px solid rgba(74, 74, 94, 0.3);
-  pointer-events: auto;
 }
 
 .overlay-stat-item {
@@ -306,11 +310,6 @@
   align-items: center;
   padding: 6px 8px;
   border-radius: 4px;
-  transition: background-color 0.2s ease;
-}
-
-.overlay-stat-item:hover {
-  background-color: rgba(62, 62, 86, 0.7);
 }
 
 .overlay-stat-item .label {
