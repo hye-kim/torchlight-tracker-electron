@@ -93,6 +93,7 @@ function App() {
   const [isInMap, setIsInMap] = useState(false);
   const [currentMap, setCurrentMap] = useState<CurrentMapData | null>(null);
   const [selectedMapNumber, setSelectedMapNumber] = useState<number | null>(null);
+  const [showHeader, setShowHeader] = useState(false);
 
   useEffect(() => {
     // Load initial config
@@ -226,6 +227,12 @@ function App() {
     // Apply click-through immediately
     if (window.electronAPI) {
       await window.electronAPI.toggleClickThrough(newClickThrough);
+
+      // If we just enabled click-through, immediately disable it for the header area
+      // so the user can click the button again without moving the mouse
+      if (newClickThrough) {
+        window.electronAPI.setIgnoreMouseEvents(false);
+      }
     }
   };
 
@@ -314,12 +321,37 @@ function App() {
     }
   };
 
+  const handleTopHoverEnter = () => {
+    if (overlayMode) {
+      setShowHeader(true);
+    }
+  };
+
+  const handleTopHoverLeave = () => {
+    if (overlayMode) {
+      setShowHeader(false);
+    }
+  };
+
   return (
     <div className={`app ${overlayMode ? 'overlay-mode' : ''}`} style={{ fontSize: `${fontSize}px` }}>
+      {overlayMode && (
+        <div
+          className="header-hover-trigger"
+          onMouseEnter={handleTopHoverEnter}
+          onMouseLeave={handleTopHoverLeave}
+        />
+      )}
       <div
-        className="header"
-        onMouseEnter={handleHeaderMouseEnter}
-        onMouseLeave={handleHeaderMouseLeave}
+        className={`header ${overlayMode && showHeader ? 'visible' : ''}`}
+        onMouseEnter={(e) => {
+          handleHeaderMouseEnter();
+          if (overlayMode) setShowHeader(true);
+        }}
+        onMouseLeave={(e) => {
+          handleHeaderMouseLeave();
+          if (overlayMode) setShowHeader(false);
+        }}
       >
         <div className="title-bar">
           <h1>Torchlight Tracker</h1>

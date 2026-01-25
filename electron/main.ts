@@ -30,8 +30,8 @@ function createWindow() {
   const config = configManager.getConfig();
   const overlayMode = config.overlayMode ?? false;
 
-  const width = overlayMode ? (config.overlay_width || 400) : (config.window_width || 1200);
-  const height = overlayMode ? (config.overlay_height || 600) : (config.window_height || 800);
+  const width = overlayMode ? (config.overlay_width || 400) : (config.window_width || 1300);
+  const height = overlayMode ? (config.overlay_height || 1000) : (config.window_height || 900);
 
   mainWindow = new BrowserWindow({
     width,

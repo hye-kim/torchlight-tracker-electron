@@ -50,7 +50,7 @@ function ControlCard({
           Settings
         </button>
 
-        <button className="control-btn primary" onClick={onToggleOverlay}>
+        <button className="control-btn" onClick={onToggleOverlay}>
           <span className="btn-icon">📐</span>
           Enable Overlay Mode
         </button>

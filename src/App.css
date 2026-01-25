@@ -14,34 +14,30 @@
   max-width: 400px;
 }
 
-.app.overlay-mode .header {
-  position: absolute;
+.app.overlay-mode .header-hover-trigger {
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 1000;
+  height: 40px;
+  z-index: 999;
+  background: transparent;
+}
+
+.app.overlay-mode .header {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
   background-color: rgba(42, 42, 62, 0.95);
   backdrop-filter: blur(10px);
 }
 
-.app.overlay-mode .header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  z-index: -1;
-}
-
-.app.overlay-mode .header:hover {
-  opacity: 1;
+.app.overlay-mode .header.visible {
+  max-height: 100px;
 }
 
 .app.overlay-mode .main-content {
-  margin-top: 0;
+  flex: 1;
 }
 
 .header {
