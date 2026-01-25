@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import StatsCard from './components/StatsCard';
 import DropsCard from './components/DropsCard';
 import ControlCard from './components/ControlCard';
@@ -94,6 +94,7 @@ function App() {
   const [currentMap, setCurrentMap] = useState<CurrentMapData | null>(null);
   const [selectedMapNumber, setSelectedMapNumber] = useState<number | null>(null);
   const [showHeader, setShowHeader] = useState(false);
+  const hideHeaderTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Load initial config
@@ -137,6 +138,15 @@ function App() {
       document.body.style.backgroundColor = '#1e1e2e';
     }
   }, [config.overlayMode]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (hideHeaderTimerRef.current) {
+        clearTimeout(hideHeaderTimerRef.current);
+      }
+    };
+  }, []);
 
   // Auto-select current map when in map
   useEffect(() => {
@@ -302,19 +312,33 @@ function App() {
   };
 
   // Handle mouse events for click-through mode and header visibility
+  const startHideHeaderTimer = () => {
+    // Clear existing timer
+    if (hideHeaderTimerRef.current) {
+      clearTimeout(hideHeaderTimerRef.current);
+    }
+
+    // Start new timer to hide header after 3 seconds
+    hideHeaderTimerRef.current = setTimeout(() => {
+      setShowHeader(false);
+      // Re-enable click-through if any dialog is open
+      if (config.clickThrough && window.electronAPI && !showOverlaySettings && !showSettingsDialog && !showInitDialog) {
+        window.electronAPI.setIgnoreMouseEvents(true);
+      }
+    }, 3000);
+  };
+
   const handleHeaderMouseEnter = () => {
     setShowHeader(true);
     if (config.clickThrough && window.electronAPI) {
       window.electronAPI.setIgnoreMouseEvents(false);
     }
+    startHideHeaderTimer();
   };
 
-  const handleHeaderMouseLeave = () => {
-    setShowHeader(false);
-    // Don't enable click-through if any dialog is open
-    if (config.clickThrough && window.electronAPI && !showOverlaySettings && !showSettingsDialog && !showInitDialog) {
-      window.electronAPI.setIgnoreMouseEvents(true);
-    }
+  const handleHeaderMouseMove = () => {
+    // Refresh the timer on any mouse movement
+    startHideHeaderTimer();
   };
 
   return (
@@ -323,7 +347,7 @@ function App() {
         <div
           className="header-hover-container"
           onMouseEnter={handleHeaderMouseEnter}
-          onMouseLeave={handleHeaderMouseLeave}
+          onMouseMove={handleHeaderMouseMove}
         >
           <div className="header-hover-zone" />
           <div className="header-wrapper">

@@ -17,7 +17,7 @@
 .app.overlay-mode .header-hover-container {
   position: relative;
   width: 100%;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .app.overlay-mode .header-hover-zone {
@@ -54,6 +54,10 @@
 .app.overlay-mode .header.visible {
   visibility: visible;
   opacity: 1;
+}
+
+.app.overlay-mode .header .icon-btn {
+  pointer-events: auto;
 }
 
 .app.overlay-mode .main-content {
