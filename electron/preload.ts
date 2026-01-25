@@ -18,6 +18,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
   resetStats: () => ipcRenderer.invoke('reset-stats'),
   exportDebugLog: () => ipcRenderer.invoke('export-debug-log'),
 
+  // Overlay mode controls
+  toggleOverlayMode: (enabled: boolean) => ipcRenderer.invoke('toggle-overlay-mode', enabled),
+  toggleClickThrough: (enabled: boolean) => ipcRenderer.invoke('toggle-click-through', enabled),
+  setFontSize: (fontSize: number) => ipcRenderer.invoke('set-font-size', fontSize),
+  setDisplayItems: (displayItems: any) => ipcRenderer.invoke('set-display-items', displayItems),
+
+  // Window controls
+  windowMinimize: () => ipcRenderer.invoke('window-minimize'),
+  windowMaximize: () => ipcRenderer.invoke('window-maximize'),
+  windowClose: () => ipcRenderer.invoke('window-close'),
+
   // Listen for updates
   onUpdateDisplay: (callback: (data: any) => void) => {
     ipcRenderer.on('update-display', (_, data) => callback(data));
@@ -41,6 +52,13 @@ declare global {
       exportExcel: () => Promise<{ success: boolean; filePath?: string }>;
       resetStats: () => Promise<{ success: boolean }>;
       exportDebugLog: () => Promise<{ success: boolean; filePath?: string }>;
+      toggleOverlayMode: (enabled: boolean) => Promise<{ success: boolean }>;
+      toggleClickThrough: (enabled: boolean) => Promise<{ success: boolean }>;
+      setFontSize: (fontSize: number) => Promise<{ success: boolean }>;
+      setDisplayItems: (displayItems: any) => Promise<{ success: boolean }>;
+      windowMinimize: () => Promise<{ success: boolean }>;
+      windowMaximize: () => Promise<{ success: boolean }>;
+      windowClose: () => Promise<{ success: boolean }>;
       onUpdateDisplay: (callback: (data: any) => void) => void;
       onInitializationComplete: (callback: () => void) => void;
     };

@@ -27,14 +27,18 @@ const excelExporter = new ExcelExporter(fileManager);
 
 function createWindow() {
   const config = configManager.getConfig();
+  const overlayMode = config.overlayMode ?? false;
 
   mainWindow = new BrowserWindow({
     width: config.window_width || 800,
     height: config.window_height || 600,
     x: config.window_x,
     y: config.window_y,
-    frame: true,
-    transparent: false,
+    frame: false, // Frameless for custom title bar and rounded corners
+    transparent: overlayMode, // Transparent in overlay mode
+    alwaysOnTop: overlayMode, // Always on top in overlay mode
+    backgroundColor: overlayMode ? '#00000000' : '#1e1e2e',
+    roundedCorners: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -42,6 +46,11 @@ function createWindow() {
     },
     icon: path.join(__dirname, '../build-resources/icon.ico'),
   });
+
+  // Apply click-through if enabled
+  if (config.clickThrough) {
+    mainWindow.setIgnoreMouseEvents(true, { forward: true });
+  }
 
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173');
@@ -291,4 +300,62 @@ ipcMain.handle('export-debug-log', async () => {
     return { success: true, filePath };
   }
   return { success: false };
+});
+
+// Overlay mode IPC handlers
+ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
+  configManager.setOverlayMode(enabled);
+  if (mainWindow) {
+    mainWindow.setAlwaysOnTop(enabled);
+    // Restart app to apply transparent background
+    if (enabled !== (configManager.getConfig().overlayMode ?? false)) {
+      app.relaunch();
+      app.exit();
+    }
+  }
+  return { success: true };
+});
+
+ipcMain.handle('toggle-click-through', (_, enabled: boolean) => {
+  configManager.setClickThrough(enabled);
+  if (mainWindow) {
+    mainWindow.setIgnoreMouseEvents(enabled, { forward: true });
+  }
+  return { success: true };
+});
+
+ipcMain.handle('set-font-size', (_, fontSize: number) => {
+  configManager.setFontSize(fontSize);
+  return { success: true };
+});
+
+ipcMain.handle('set-display-items', (_, displayItems) => {
+  configManager.setDisplayItems(displayItems);
+  return { success: true };
+});
+
+// Window controls
+ipcMain.handle('window-minimize', () => {
+  if (mainWindow) {
+    mainWindow.minimize();
+  }
+  return { success: true };
+});
+
+ipcMain.handle('window-maximize', () => {
+  if (mainWindow) {
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  }
+  return { success: true };
+});
+
+ipcMain.handle('window-close', () => {
+  if (mainWindow) {
+    mainWindow.close();
+  }
+  return { success: true };
 });

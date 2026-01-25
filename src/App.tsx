@@ -3,13 +3,26 @@ import StatsCard from './components/StatsCard';
 import DropsCard from './components/DropsCard';
 import ControlCard from './components/ControlCard';
 import SettingsDialog from './components/SettingsDialog';
+import OverlaySettings from './components/OverlaySettings';
+import LootSummaryDropdown from './components/LootSummaryDropdown';
 import InitializationDialog from './components/InitializationDialog';
 import MapLogTable from './components/MapLogTable';
 import './App.css';
 
+interface DisplayItem {
+  id: string;
+  label: string;
+  enabled: boolean;
+  order: number;
+}
+
 interface Config {
   tax: number;
   user: string;
+  overlayMode?: boolean;
+  clickThrough?: boolean;
+  fontSize?: number;
+  displayItems?: DisplayItem[];
 }
 
 interface Stats {
@@ -73,6 +86,7 @@ function App() {
   const [costs, setCosts] = useState<Drop[]>([]);
   const [mapLogs, setMapLogs] = useState<MapLog[]>([]);
   const [showSettings, setShowSettings] = useState(false);
+  const [showOverlaySettings, setShowOverlaySettings] = useState(false);
   const [showInitDialog, setShowInitDialog] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isWaitingForInit, setIsWaitingForInit] = useState(false);
@@ -159,8 +173,26 @@ function App() {
     setShowSettings(false);
   };
 
+  const handleSaveOverlaySettings = async (updates: Partial<Config>) => {
+    const newConfig = await window.electronAPI.updateConfig(updates);
+    setConfig(newConfig);
+    setShowOverlaySettings(false);
+  };
+
   const handleSelectMap = (mapNumber: number | null) => {
     setSelectedMapNumber(mapNumber);
+  };
+
+  const handleWindowMinimize = () => {
+    window.electronAPI.windowMinimize();
+  };
+
+  const handleWindowMaximize = () => {
+    window.electronAPI.windowMaximize();
+  };
+
+  const handleWindowClose = () => {
+    window.electronAPI.windowClose();
   };
 
   // Get the selected map data (current map or from map logs)
@@ -223,47 +255,166 @@ function App() {
   const totalPickedUp = selectedMapDrops.reduce((sum: number, d: Drop) => sum + d.price * d.quantity, 0);
   const totalCost = selectedMapCosts.reduce((sum: number, c: Drop) => sum + c.price * c.quantity, 0);
 
+  const overlayMode = config.overlayMode ?? false;
+  const fontSize = config.fontSize ?? 14;
+  const displayItems = config.displayItems ?? [];
+  const sortedDisplayItems = [...displayItems].sort((a, b) => a.order - b.order);
+
+  // Helper function to check if a display item is enabled
+  const isItemEnabled = (id: string) => {
+    const item = displayItems.find(item => item.id === id);
+    return item?.enabled ?? true;
+  };
+
   return (
-    <div className="app">
+    <div className={`app ${overlayMode ? 'overlay-mode' : ''}`} style={{ fontSize: `${fontSize}px` }}>
       <div className="header">
-        <h1>Torchlight Tracker</h1>
+        <div className="title-bar">
+          <h1>Torchlight Tracker</h1>
+          <div className="window-controls">
+            <button className="settings-btn" onClick={() => setShowOverlaySettings(true)} title="Overlay Settings">
+              ⚙️
+            </button>
+            <button className="window-btn minimize" onClick={handleWindowMinimize} title="Minimize">
+              −
+            </button>
+            <button className="window-btn maximize" onClick={handleWindowMaximize} title="Maximize">
+              □
+            </button>
+            <button className="window-btn close" onClick={handleWindowClose} title="Close">
+              ✕
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="main-content">
-        <div className="sidebar">
-          <StatsCard stats={stats} />
-          <ControlCard
-            onInitialize={handleInitializeTracker}
-            onExportExcel={handleExportExcel}
-            onExportDebugLog={handleExportDebugLog}
-            onOpenSettings={() => setShowSettings(true)}
-            onResetStats={handleResetStats}
-            isInitialized={isInitialized}
-            isWaitingForInit={isWaitingForInit}
-          />
-        </div>
+        {overlayMode ? (
+          <div className="overlay-content">
+            <div className="overlay-stats">
+              {sortedDisplayItems.map((item) => {
+                if (!item.enabled) return null;
 
-        <div className="center-panel">
-          <MapLogTable
-            mapLogs={mapLogs}
-            isInitialized={isInitialized}
-            isInMap={isInMap}
-            currentMap={currentMap}
-            mapCount={stats?.total.mapCount || 0}
-            selectedMapNumber={selectedMapNumber}
-            onSelectMap={handleSelectMap}
-          />
-        </div>
+                switch (item.id) {
+                  case 'status':
+                    return (
+                      <div key={item.id} className="overlay-stat-item">
+                        <span className="label">Status:</span>
+                        <span className={`value ${isInMap ? 'recording' : ''}`}>
+                          {isInMap ? '● Recording' : '○ Not Recording'}
+                        </span>
+                      </div>
+                    );
+                  case 'currentMap':
+                    return (
+                      <div key={item.id} className="overlay-stat-item">
+                        <span className="label">Current Map:</span>
+                        <span className="value">{currentMap?.mapName || 'N/A'}</span>
+                      </div>
+                    );
+                  case 'currentProfitPerMin':
+                    return (
+                      <div key={item.id} className="overlay-stat-item">
+                        <span className="label">Current Profit/min:</span>
+                        <span className="value">{stats?.currentMap.incomePerMinute.toFixed(2) || '0.00'} FE</span>
+                      </div>
+                    );
+                  case 'currentProfit':
+                    return (
+                      <div key={item.id} className="overlay-stat-item">
+                        <span className="label">Current Profit:</span>
+                        <span className="value">{stats?.currentMap.feIncome.toFixed(2) || '0.00'} FE</span>
+                      </div>
+                    );
+                  case 'totalProfitPerMin':
+                    return (
+                      <div key={item.id} className="overlay-stat-item">
+                        <span className="label">Total Profit/min:</span>
+                        <span className="value">{stats?.total.incomePerMinute.toFixed(2) || '0.00'} FE</span>
+                      </div>
+                    );
+                  case 'totalProfit':
+                    return (
+                      <div key={item.id} className="overlay-stat-item">
+                        <span className="label">Total Profit:</span>
+                        <span className="value">{stats?.total.feIncome.toFixed(2) || '0.00'} FE</span>
+                      </div>
+                    );
+                  case 'mapDuration':
+                    return (
+                      <div key={item.id} className="overlay-stat-item">
+                        <span className="label">Map Duration:</span>
+                        <span className="value">
+                          {Math.floor((stats?.currentMap.duration || 0) / 60)}m {(stats?.currentMap.duration || 0) % 60}s
+                        </span>
+                      </div>
+                    );
+                  case 'totalDuration':
+                    return (
+                      <div key={item.id} className="overlay-stat-item">
+                        <span className="label">Total Duration:</span>
+                        <span className="value">
+                          {Math.floor((stats?.total.duration || 0) / 60)}m {(stats?.total.duration || 0) % 60}s
+                        </span>
+                      </div>
+                    );
+                  case 'mapCount':
+                    return (
+                      <div key={item.id} className="overlay-stat-item">
+                        <span className="label">Map Count:</span>
+                        <span className="value">{stats?.total.mapCount || 0}</span>
+                      </div>
+                    );
+                  default:
+                    return null;
+                }
+              })}
+            </div>
+            <LootSummaryDropdown
+              drops={selectedMapDrops}
+              costs={selectedMapCosts}
+              totalPickedUp={totalPickedUp}
+              totalCost={totalCost}
+            />
+          </div>
+        ) : (
+          <>
+            <div className="sidebar">
+              <StatsCard stats={stats} />
+              <ControlCard
+                onInitialize={handleInitializeTracker}
+                onExportExcel={handleExportExcel}
+                onExportDebugLog={handleExportDebugLog}
+                onOpenSettings={() => setShowSettings(true)}
+                onResetStats={handleResetStats}
+                isInitialized={isInitialized}
+                isWaitingForInit={isWaitingForInit}
+              />
+            </div>
 
-        <div className="right-panel">
-          <DropsCard
-            drops={selectedMapDrops}
-            costs={selectedMapCosts}
-            totalPickedUp={totalPickedUp}
-            totalCost={totalCost}
-            selectedMapName={selectedMapData?.mapName}
-          />
-        </div>
+            <div className="center-panel">
+              <MapLogTable
+                mapLogs={mapLogs}
+                isInitialized={isInitialized}
+                isInMap={isInMap}
+                currentMap={currentMap}
+                mapCount={stats?.total.mapCount || 0}
+                selectedMapNumber={selectedMapNumber}
+                onSelectMap={handleSelectMap}
+              />
+            </div>
+
+            <div className="right-panel">
+              <DropsCard
+                drops={selectedMapDrops}
+                costs={selectedMapCosts}
+                totalPickedUp={totalPickedUp}
+                totalCost={totalCost}
+                selectedMapName={selectedMapData?.mapName}
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {showSettings && (
@@ -271,6 +422,14 @@ function App() {
           config={config}
           onSave={handleSaveSettings}
           onClose={() => setShowSettings(false)}
+        />
+      )}
+
+      {showOverlaySettings && (
+        <OverlaySettings
+          config={config}
+          onSave={handleSaveOverlaySettings}
+          onClose={() => setShowOverlaySettings(false)}
         />
       )}
 
