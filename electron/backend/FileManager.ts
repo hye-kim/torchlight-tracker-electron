@@ -34,7 +34,6 @@ export class FileManager {
   private resourcePath: string;
   private itemDatabase: Record<string, ComprehensiveItemEntry> | null = null;
   private apiClient: APIClient;
-  private apiEnabled: boolean = true;
 
   constructor() {
     this.userDataPath = app.getPath('userData');
@@ -191,8 +190,8 @@ export class FileManager {
 
     const localSuccess = this.saveFullTable(fullTable);
 
-    // Sync to API if enabled and enough time has passed since last API sync
-    if (this.apiEnabled && localSuccess && timeSinceApiSync >= API_UPDATE_THROTTLE) {
+    // Sync to API if enough time has passed since last API sync
+    if (localSuccess && timeSinceApiSync >= API_UPDATE_THROTTLE) {
       try {
         const apiUpdates = {
           price: updates.price,
@@ -254,10 +253,6 @@ export class FileManager {
    * Updates the local table if a price is found.
    */
   async fetchPriceFromAPI(itemId: string): Promise<number | null> {
-    if (!this.apiEnabled) {
-      return null;
-    }
-
     try {
       const apiItem = await this.apiClient.getItem(itemId);
       if (apiItem && apiItem.price !== undefined) {
@@ -283,11 +278,6 @@ export class FileManager {
    * This fetches the latest prices for all items.
    */
   async syncAllPricesFromAPI(): Promise<number> {
-    if (!this.apiEnabled) {
-      logger.warn('API is disabled, skipping price sync');
-      return 0;
-    }
-
     try {
       logger.info('Fetching all items from API...');
       const apiItems = await this.apiClient.getAllItems(undefined, false);
@@ -322,11 +312,4 @@ export class FileManager {
     }
   }
 
-  /**
-   * Enable or disable API integration.
-   */
-  setAPIEnabled(enabled: boolean): void {
-    this.apiEnabled = enabled;
-    logger.info(`API integration ${enabled ? 'enabled' : 'disabled'}`);
-  }
 }
