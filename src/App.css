@@ -12,32 +12,46 @@
   background-color: transparent;
   width: 100%;
   max-width: 400px;
+  overflow: visible;
 }
 
-.app.overlay-mode .header-hover-trigger {
-  position: fixed;
+.app.overlay-mode .header-wrapper {
+  position: relative;
+  height: 0;
+  z-index: 1000;
+}
+
+.app.overlay-mode .header-wrapper::before {
+  content: '';
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 40px;
-  z-index: 999;
+  height: 30px;
   background: transparent;
+  z-index: 998;
 }
 
 .app.overlay-mode .header {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
   background-color: rgba(42, 42, 62, 0.95);
   backdrop-filter: blur(10px);
+  z-index: 999;
 }
 
-.app.overlay-mode .header.visible {
-  max-height: 100px;
+.app.overlay-mode .header-wrapper:hover .header {
+  transform: translateY(0);
 }
 
 .app.overlay-mode .main-content {
   flex: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .header {
