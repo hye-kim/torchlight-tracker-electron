@@ -35,6 +35,13 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
     ]
   );
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
+  const [canClose, setCanClose] = useState(false);
+
+  // Prevent closing immediately after opening
+  useEffect(() => {
+    const timer = setTimeout(() => setCanClose(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Apply changes in real-time
   useEffect(() => {
@@ -113,8 +120,8 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
   };
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Only close if clicking directly on the overlay, not on child elements
-    if (e.target === e.currentTarget) {
+    // Only close if clicking directly on the overlay, not on child elements, and after initial render
+    if (canClose && e.target === e.currentTarget) {
       handleClose();
     }
   };
