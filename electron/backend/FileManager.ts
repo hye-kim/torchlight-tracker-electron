@@ -183,12 +183,7 @@ export class FileManager {
 
     logger.debug(`Updating item ${itemId}: last_update=${localLastUpdate}, time_since=${timeSinceUpdate}s, throttle=${API_UPDATE_THROTTLE}s`);
 
-    if (timeSinceUpdate < API_UPDATE_THROTTLE) {
-      logger.debug(`Item ${itemId} updated recently (${timeSinceUpdate}s ago), skipping update`);
-      return true;
-    }
-
-    // Update locally
+    // Always update locally with fresh game data
     fullTable[itemId] = {
       ...currentItem,
       ...updates,
@@ -198,9 +193,11 @@ export class FileManager {
     const localSuccess = this.saveFullTable(fullTable);
     logger.debug(`Local save for item ${itemId}: ${localSuccess ? 'success' : 'failed'}`);
 
-    // Update API if enabled
-    logger.debug(`API sync check: apiEnabled=${this.apiEnabled}, localSuccess=${localSuccess}`);
-    if (this.apiEnabled && localSuccess) {
+    // Update API if enabled, but respect throttle to avoid spamming API
+    const shouldSyncToAPI = this.apiEnabled && localSuccess && timeSinceUpdate >= API_UPDATE_THROTTLE;
+    logger.debug(`API sync check: apiEnabled=${this.apiEnabled}, localSuccess=${localSuccess}, timeSince=${timeSinceUpdate}s >= throttle=${API_UPDATE_THROTTLE}s = ${shouldSyncToAPI}`);
+
+    if (shouldSyncToAPI) {
       try {
         logger.info(`Attempting to sync price update to API for item ${itemId} with price ${updates.price}`);
         const apiUpdates = {
@@ -217,8 +214,8 @@ export class FileManager {
         logger.error(`Error syncing price update to API for item ${itemId}:`, error);
         // Don't fail the local update if API fails
       }
-    } else {
-      logger.debug(`Skipping API sync for item ${itemId}`);
+    } else if (timeSinceUpdate < API_UPDATE_THROTTLE) {
+      logger.debug(`Skipping API sync for item ${itemId} - throttled (${timeSinceUpdate}s < ${API_UPDATE_THROTTLE}s)`);
     }
 
     return localSuccess;
