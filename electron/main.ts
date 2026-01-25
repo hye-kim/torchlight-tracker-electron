@@ -15,6 +15,7 @@ const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow: BrowserWindow | null = null;
 let logMonitor: LogMonitor | null = null;
+let isSwitchingModes = false; // Flag to prevent close handler from interfering during mode switch
 
 // Core components
 const configManager = new ConfigManager();
@@ -60,7 +61,8 @@ function createWindow() {
   }
 
   mainWindow.on('close', () => {
-    if (mainWindow) {
+    // Don't save dimensions if we're switching modes - the toggle handler already saved them
+    if (mainWindow && !isSwitchingModes) {
       const bounds = mainWindow.getBounds();
       const currentConfig = configManager.getConfig();
       const isOverlay = currentConfig.overlayMode ?? false;
@@ -318,6 +320,9 @@ ipcMain.handle('export-debug-log', async () => {
 // Overlay mode IPC handlers
 ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
   if (mainWindow) {
+    // Set flag to prevent close handler from overwriting dimensions
+    isSwitchingModes = true;
+
     const config = configManager.getConfig();
     const currentBounds = mainWindow.getBounds();
 
@@ -326,7 +331,7 @@ ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
       overlayMode: enabled,
     };
 
-    // Save current dimensions based on current mode
+    // Save current dimensions based on CURRENT mode (before switching)
     if (config.overlayMode) {
       // Currently in overlay mode, save overlay dimensions
       configUpdate.overlay_width = currentBounds.width;
@@ -339,19 +344,8 @@ ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
 
     // Apply all config updates at once
     configManager.updateConfig(configUpdate);
-    mainWindow.setAlwaysOnTop(enabled);
 
-    // Resize window to saved dimensions for the new mode
-    const updatedConfig = configManager.getConfig();
-    if (enabled) {
-      // Switching to overlay mode
-      mainWindow.setSize(updatedConfig.overlay_width || 400, updatedConfig.overlay_height || 600);
-    } else {
-      // Switching to normal mode
-      mainWindow.setSize(updatedConfig.window_width || 1200, updatedConfig.window_height || 800);
-    }
-
-    // Restart app to apply changes (increased timeout to ensure config is written)
+    // Restart app - createWindow will use the new overlayMode and appropriate dimensions
     setTimeout(() => {
       app.relaunch();
       app.exit();
