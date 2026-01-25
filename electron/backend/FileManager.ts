@@ -11,6 +11,7 @@ const logger = Logger.getInstance();
 export interface ItemData {
   price?: number;
   last_update?: number;
+  last_api_sync?: number;
   name?: string;
   name_en?: string;
   type?: string;
@@ -177,11 +178,9 @@ export class FileManager {
     }
 
     const currentItem = fullTable[itemId];
-    const localLastUpdate = currentItem.last_update || 0;
     const currentTime = Math.floor(Date.now() / 1000);
-    const timeSinceUpdate = currentTime - localLastUpdate;
-
-    logger.debug(`Updating item ${itemId}: last_update=${localLastUpdate}, time_since=${timeSinceUpdate}s, throttle=${API_UPDATE_THROTTLE}s`);
+    const lastApiSync = currentItem.last_api_sync || 0;
+    const timeSinceApiSync = currentTime - lastApiSync;
 
     // Always update locally with fresh game data
     fullTable[itemId] = {
@@ -191,31 +190,25 @@ export class FileManager {
     };
 
     const localSuccess = this.saveFullTable(fullTable);
-    logger.debug(`Local save for item ${itemId}: ${localSuccess ? 'success' : 'failed'}`);
 
-    // Update API if enabled, but respect throttle to avoid spamming API
-    const shouldSyncToAPI = this.apiEnabled && localSuccess && timeSinceUpdate >= API_UPDATE_THROTTLE;
-    logger.debug(`API sync check: apiEnabled=${this.apiEnabled}, localSuccess=${localSuccess}, timeSince=${timeSinceUpdate}s >= throttle=${API_UPDATE_THROTTLE}s = ${shouldSyncToAPI}`);
-
-    if (shouldSyncToAPI) {
+    // Sync to API if enabled and enough time has passed since last API sync
+    if (this.apiEnabled && localSuccess && timeSinceApiSync >= API_UPDATE_THROTTLE) {
       try {
-        logger.info(`Attempting to sync price update to API for item ${itemId} with price ${updates.price}`);
         const apiUpdates = {
           price: updates.price,
           last_update: currentTime,
         };
         const apiResult = await this.apiClient.updateItem(itemId, apiUpdates);
         if (apiResult) {
-          logger.info(`Successfully synced price update to API for item ${itemId}`);
-        } else {
-          logger.warn(`Failed to sync price update to API for item ${itemId}`);
+          // Update last_api_sync timestamp after successful sync
+          fullTable[itemId].last_api_sync = currentTime;
+          this.saveFullTable(fullTable);
+          logger.info(`Synced price update to API for item ${itemId}: ${updates.price}`);
         }
       } catch (error) {
         logger.error(`Error syncing price update to API for item ${itemId}:`, error);
         // Don't fail the local update if API fails
       }
-    } else if (timeSinceUpdate < API_UPDATE_THROTTLE) {
-      logger.debug(`Skipping API sync for item ${itemId} - throttled (${timeSinceUpdate}s < ${API_UPDATE_THROTTLE}s)`);
     }
 
     return localSuccess;
@@ -271,7 +264,9 @@ export class FileManager {
         const fullTable = this.loadFullTable(true);
         if (fullTable[itemId]) {
           fullTable[itemId].price = apiItem.price;
-          fullTable[itemId].last_update = Math.floor(Date.now() / 1000);
+          fullTable[itemId].last_update = apiItem.last_update || Math.floor(Date.now() / 1000);
+          // Mark as synced with API since we just got this data from API
+          fullTable[itemId].last_api_sync = apiItem.last_update || Math.floor(Date.now() / 1000);
           this.saveFullTable(fullTable);
           logger.info(`Fetched price from API for ${itemId}: ${apiItem.price}`);
           return apiItem.price;
@@ -309,6 +304,8 @@ export class FileManager {
         if (fullTable[itemId] && apiItem.price !== undefined) {
           fullTable[itemId].price = apiItem.price;
           fullTable[itemId].last_update = apiItem.last_update || Math.floor(Date.now() / 1000);
+          // Mark as synced with API since we just got this data from API
+          fullTable[itemId].last_api_sync = apiItem.last_update || Math.floor(Date.now() / 1000);
           updateCount++;
         }
       }
