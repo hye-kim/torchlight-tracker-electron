@@ -114,9 +114,8 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
   };
 
   const handleMouseLeave = () => {
-    if (window.electronAPI && config.clickThrough) {
-      window.electronAPI.setIgnoreMouseEvents(true);
-    }
+    // Don't enable click-through while dialog is open
+    // This prevents the dialog from becoming unresponsive
   };
 
   return (

@@ -298,7 +298,8 @@ function App() {
   };
 
   const handleHeaderMouseLeave = () => {
-    if (config.clickThrough && window.electronAPI) {
+    // Don't enable click-through if any dialog is open
+    if (config.clickThrough && window.electronAPI && !showOverlaySettings && !showSettingsDialog && !showInitDialog) {
       window.electronAPI.setIgnoreMouseEvents(true);
     }
   };
