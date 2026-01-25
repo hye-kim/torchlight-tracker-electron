@@ -176,7 +176,7 @@ function App() {
   const handleSaveOverlaySettings = async (updates: Partial<Config>) => {
     const newConfig = await window.electronAPI.updateConfig(updates);
     setConfig(newConfig);
-    setShowOverlaySettings(false);
+    // Don't close dialog - settings are applied in real-time
   };
 
   const handleSelectMap = (mapNumber: number | null) => {
