@@ -112,10 +112,17 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
     }
   };
 
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Only close if clicking directly on the overlay, not on child elements
+    if (e.target === e.currentTarget) {
+      handleClose();
+    }
+  };
+
   return (
     <div
       className="dialog-overlay"
-      onClick={handleClose}
+      onClick={handleOverlayClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

@@ -5,8 +5,15 @@ interface InitializationDialogProps {
 }
 
 function InitializationDialog({ onClose }: InitializationDialogProps) {
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Only close if clicking directly on the overlay, not on child elements
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="dialog-overlay" onClick={onClose}>
+    <div className="dialog-overlay" onClick={handleOverlayClick}>
       <div className="init-dialog-content" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
           <h2>🎯 Tracker Initialization</h2>
