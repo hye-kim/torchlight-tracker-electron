@@ -260,8 +260,6 @@ export class FileManager {
         if (fullTable[itemId]) {
           fullTable[itemId].price = apiItem.price;
           fullTable[itemId].last_update = apiItem.last_update || Math.floor(Date.now() / 1000);
-          // Mark as synced with API since we just got this data from API
-          fullTable[itemId].last_api_sync = apiItem.last_update || Math.floor(Date.now() / 1000);
           this.saveFullTable(fullTable);
           logger.info(`Fetched price from API for ${itemId}: ${apiItem.price}`);
           return apiItem.price;
@@ -294,8 +292,6 @@ export class FileManager {
         if (fullTable[itemId] && apiItem.price !== undefined) {
           fullTable[itemId].price = apiItem.price;
           fullTable[itemId].last_update = apiItem.last_update || Math.floor(Date.now() / 1000);
-          // Mark as synced with API since we just got this data from API
-          fullTable[itemId].last_api_sync = apiItem.last_update || Math.floor(Date.now() / 1000);
           updateCount++;
         }
       }
