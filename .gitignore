@@ -1,0 +1,69 @@
+# =====================
+# Dependencies
+# =====================
+node_modules/
+
+# =====================
+# Environment
+# =====================
+.env
+.env.*
+!.env.example
+
+# =====================
+# Vite
+# =====================
+dist/
+dist-electron/
+dist-react/
+.vite/
+.vite-*
+
+# =====================
+# Electron / electron-builder
+# =====================
+release/
+release-builds/
+out/
+build/
+app.asar
+*.blockmap
+*-unpacked/
+
+# =====================
+# TypeScript
+# =====================
+*.tsbuildinfo
+
+# =====================
+# Cache
+# =====================
+.cache/
+.parcel-cache/
+.eslintcache
+
+# =====================
+# Logs
+# =====================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# =====================
+# Coverage
+# =====================
+coverage/
+
+# =====================
+# IDE
+# =====================
+.vscode/
+.idea/
+
+# =====================
+# OS junk
+# =====================
+.DS_Store
+Thumbs.db

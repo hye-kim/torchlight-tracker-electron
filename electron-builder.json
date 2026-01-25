@@ -1,0 +1,48 @@
+{
+  "appId": "com.torchlight.tracker",
+  "productName": "Torchlight Tracker",
+  "copyright": "Copyright © 2024",
+  "directories": {
+    "output": "release",
+    "buildResources": "build-resources"
+  },
+  "files": [
+    "dist-electron/**/*",
+    "dist-react/**/*",
+    "comprehensive_item_mapping.json",
+    "package.json"
+  ],
+  "extraResources": [
+    {
+      "from": "comprehensive_item_mapping.json",
+      "to": "comprehensive_item_mapping.json"
+    }
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "build-resources/icon.ico",
+    "artifactName": "${productName}-${version}-Setup.${ext}",
+    "publisherName": "Torchlight Tracker Team"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Torchlight Tracker",
+    "installerIcon": "build-resources/icon.ico",
+    "uninstallerIcon": "build-resources/icon.ico",
+    "installerHeaderIcon": "build-resources/icon.ico",
+    "license": "LICENSE.txt"
+  },
+  "portable": {
+    "artifactName": "${productName}-${version}-Portable.${ext}"
+  },
+  "compression": "maximum",
+  "asar": true
+}
