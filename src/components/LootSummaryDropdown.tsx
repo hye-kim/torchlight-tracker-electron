@@ -23,6 +23,22 @@ function LootSummaryDropdown({ drops, costs, totalPickedUp, totalCost }: LootSum
 
   const totalProfit = totalPickedUp - totalCost;
 
+  const handleToggle = () => {
+    setIsOpen(!isOpen);
+
+    // Adjust window height when toggling
+    if (window.electronAPI) {
+      setTimeout(() => {
+        const contentHeight = document.querySelector('.loot-summary-content')?.scrollHeight || 0;
+        const baseHeight = 600;
+        const newHeight = !isOpen ? baseHeight + Math.min(contentHeight, 400) : baseHeight;
+
+        // This would need an IPC handler to resize the window
+        // For now, the CSS will handle the overflow
+      }, 100);
+    }
+  };
+
   // Handle mouse events for click-through mode
   const handleMouseEnter = () => {
     if (window.electronAPI) {
@@ -49,7 +65,7 @@ function LootSummaryDropdown({ drops, costs, totalPickedUp, totalCost }: LootSum
     >
       <button
         className="loot-summary-toggle"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
       >
         <span>Loot Summary</span>
         <span className={`arrow ${isOpen ? 'open' : ''}`}>▼</span>
