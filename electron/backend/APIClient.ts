@@ -212,19 +212,9 @@ export class APIClient {
   async updateItem(itemId: string, updates: Partial<ItemData>): Promise<ItemData | null> {
     const putResponse = await this.makeRequest<ItemData>('PUT', `/items/${itemId}`, updates);
     if (putResponse) {
+      this.cache.set(itemId, putResponse);
       logger.debug(`Updated item ${itemId} via API`);
-
-      // Fetch fresh data from server to get most accurate prices
-      const freshData = await this.makeRequest<ItemData>('GET', `/items/${itemId}`);
-      if (freshData) {
-        this.cache.set(itemId, freshData);
-        logger.debug(`Refreshed item ${itemId} data after update`);
-        return freshData;
-      } else {
-        // Fall back to PUT response data
-        this.cache.set(itemId, putResponse);
-        return putResponse;
-      }
+      return putResponse;
     }
     return null;
   }
