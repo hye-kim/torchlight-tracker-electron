@@ -21,16 +21,22 @@ export interface ProcessedItem {
 export interface MapStats {
   drops: Record<string, number>;
   income: number;
+  cost: number;
+  profit: number;
   duration: number;
   incomePerMinute: number;
+  profitPerMinute: number;
 }
 
 export interface TotalStats {
   drops: Record<string, number>;
   income: number;
+  cost: number;
+  profit: number;
   duration: number;
   mapCount: number;
   incomePerMinute: number;
+  profitPerMinute: number;
 }
 
 export interface MapItemData {
@@ -59,9 +65,11 @@ export class StatisticsTracker extends EventEmitter {
   private dropList: Map<string, number> = new Map();
   private dropListAll: Map<string, number> = new Map();
   private costList: Map<string, number> = new Map();
+  private costListAll: Map<string, number> = new Map();
   private income: number = 0.0;
   private incomeAll: number = 0.0;
   private currentMapCost: number = 0.0;
+  private totalCost: number = 0.0;
 
   private excludeList: Set<string> = new Set();
   private pendingItems: Map<string, number> = new Map();
@@ -85,9 +93,11 @@ export class StatisticsTracker extends EventEmitter {
     this.dropList.clear();
     this.dropListAll.clear();
     this.costList.clear();
+    this.costListAll.clear();
     this.income = 0.0;
     this.incomeAll = 0.0;
     this.currentMapCost = 0.0;
+    this.totalCost = 0.0;
     this.totalTime = 0.0;
     this.mapCount = 0;
     this.isInMap = false;
@@ -247,6 +257,16 @@ export class StatisticsTracker extends EventEmitter {
       }
     }
 
+    // Recalculate total costs
+    this.totalCost = 0.0;
+    for (const [itemId, quantity] of this.costListAll) {
+      if (fullTable[itemId]) {
+        const basePrice = fullTable[itemId].price || 0.0;
+        const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
+        this.totalCost += price * quantity;
+      }
+    }
+
     // Recalculate map logs revenue, cost, and profit
     for (const mapLog of this.mapLogs) {
       let revenue = 0.0;
@@ -322,6 +342,7 @@ export class StatisticsTracker extends EventEmitter {
     } else {
       // Negative = costs (items consumed)
       this.costList.set(itemId, (this.costList.get(itemId) || 0) + Math.abs(amount));
+      this.costListAll.set(itemId, (this.costListAll.get(itemId) || 0) + Math.abs(amount));
     }
 
     // Calculate price
@@ -339,6 +360,7 @@ export class StatisticsTracker extends EventEmitter {
       } else {
         // Negative = cost
         this.currentMapCost += price * Math.abs(amount);
+        this.totalCost += price * Math.abs(amount);
       }
     }
 
@@ -385,11 +407,16 @@ export class StatisticsTracker extends EventEmitter {
       drops[itemId] = count;
     }
 
+    const profit = this.income - this.currentMapCost;
+
     return {
       drops,
       income: this.income,
+      cost: this.currentMapCost,
+      profit,
       duration,
       incomePerMinute: duration > 0 ? this.income / (duration / 60) : 0,
+      profitPerMinute: duration > 0 ? profit / (duration / 60) : 0,
     };
   }
 
@@ -407,12 +434,17 @@ export class StatisticsTracker extends EventEmitter {
       drops[itemId] = count;
     }
 
+    const profit = this.incomeAll - this.totalCost;
+
     return {
       drops,
       income: this.incomeAll,
+      cost: this.totalCost,
+      profit,
       duration: totalTime,
       mapCount: this.mapCount,
       incomePerMinute: totalTime > 0 ? this.incomeAll / (totalTime / 60) : 0,
+      profitPerMinute: totalTime > 0 ? profit / (totalTime / 60) : 0,
     };
   }
 

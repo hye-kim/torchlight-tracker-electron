@@ -193,7 +193,28 @@ export class FileManager {
       last_update: currentTime,
     };
 
-    return this.saveFullTable(fullTable);
+    const localSuccess = this.saveFullTable(fullTable);
+
+    // Update API if enabled
+    if (this.apiEnabled && localSuccess) {
+      try {
+        const apiUpdates = {
+          price: updates.price,
+          last_update: currentTime,
+        };
+        const apiResult = await this.apiClient.updateItem(itemId, apiUpdates);
+        if (apiResult) {
+          logger.info(`Successfully synced price update to API for item ${itemId}`);
+        } else {
+          logger.warn(`Failed to sync price update to API for item ${itemId}`);
+        }
+      } catch (error) {
+        logger.error(`Error syncing price update to API for item ${itemId}:`, error);
+        // Don't fail the local update if API fails
+      }
+    }
+
+    return localSuccess;
   }
 
   getItemInfo(itemId: string): ItemData | null {

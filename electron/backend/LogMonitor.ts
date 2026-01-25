@@ -354,14 +354,14 @@ export class LogMonitor extends EventEmitter {
           currentMap: {
             mapCount: totalStats.mapCount,
             duration: currentStats.duration,
-            feIncome: currentStats.income,
-            incomePerMinute: currentStats.incomePerMinute,
+            feIncome: currentStats.profit,
+            incomePerMinute: currentStats.profitPerMinute,
           },
           total: {
             mapCount: totalStats.mapCount,
             duration: totalStats.duration,
-            feIncome: totalStats.income,
-            incomePerMinute: totalStats.incomePerMinute,
+            feIncome: totalStats.profit,
+            incomePerMinute: totalStats.profitPerMinute,
           },
         },
         drops: dropsArray,
