@@ -226,12 +226,6 @@ function App() {
     // Apply click-through immediately
     if (window.electronAPI) {
       await window.electronAPI.toggleClickThrough(newClickThrough);
-
-      // If we just enabled click-through, immediately disable it for the header area
-      // so the user can click the button again without moving the mouse
-      if (newClickThrough) {
-        window.electronAPI.setIgnoreMouseEvents(false);
-      }
     }
   };
 
