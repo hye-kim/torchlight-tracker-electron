@@ -18,6 +18,8 @@
 .app.overlay-mode .header-wrapper {
   position: relative;
   z-index: 1000;
+  width: 100%;
+  max-width: 400px;
 }
 
 .app.overlay-mode .header-wrapper::before {
@@ -25,7 +27,8 @@
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
+  width: 100%;
+  max-width: 400px;
   height: 60px;
   background: transparent;
   z-index: 998;
@@ -33,29 +36,22 @@
 }
 
 .app.overlay-mode .header {
-  position: relative;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
+  display: none;
   background-color: rgba(42, 42, 62, 0.95);
   backdrop-filter: blur(10px);
   z-index: 999;
   pointer-events: auto;
+  padding: 8px 16px;
 }
 
 .app.overlay-mode .header-wrapper:hover .header {
-  max-height: 100px;
+  display: flex;
 }
 
 .app.overlay-mode .main-content {
   flex: 1;
   position: relative;
   z-index: 1;
-  pointer-events: none;
-}
-
-.app.overlay-mode .main-content * {
-  pointer-events: auto;
 }
 
 .header {
