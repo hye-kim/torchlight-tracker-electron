@@ -180,12 +180,7 @@ function App() {
   const selectedMapDrops = useMemo(() => {
     if (!selectedMapData) return [];
 
-    // If viewing current active map, use the live drops data
-    if (isInMap && currentMap && selectedMapNumber === currentMap.mapNumber) {
-      return drops;
-    }
-
-    // Otherwise convert from map log data
+    // Convert from map data (either current map or completed map log)
     if (!selectedMapData.drops) return [];
 
     return selectedMapData.drops.map(item => {
@@ -200,17 +195,12 @@ function App() {
         imageUrl: existingDrop?.imageUrl,
       };
     });
-  }, [selectedMapData, drops, isInMap, currentMap, selectedMapNumber]);
+  }, [selectedMapData, drops]);
 
   const selectedMapCosts = useMemo(() => {
     if (!selectedMapData) return [];
 
-    // If viewing current active map, use the live costs data
-    if (isInMap && currentMap && selectedMapNumber === currentMap.mapNumber) {
-      return costs;
-    }
-
-    // Otherwise convert from map log data
+    // Convert from map data (either current map or completed map log)
     if (!selectedMapData.costs) return [];
 
     return selectedMapData.costs.map(item => {
@@ -227,7 +217,7 @@ function App() {
         imageUrl: existingCost?.imageUrl || existingDrop?.imageUrl,
       };
     });
-  }, [selectedMapData, costs, drops, isInMap, currentMap, selectedMapNumber]);
+  }, [selectedMapData, costs, drops]);
 
   // Calculate totals for the selected map
   const totalPickedUp = selectedMapDrops.reduce((sum: number, d: Drop) => sum + d.price * d.quantity, 0);

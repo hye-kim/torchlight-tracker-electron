@@ -441,8 +441,9 @@ export class LogMonitor extends EventEmitter {
     // Update prices
     const pricesUpdated = await this.logParser.updatePricesInTable(text);
 
-    // If prices were updated, refresh the drops display
+    // If prices were updated, recalculate income/costs and refresh the drops display
     if (pricesUpdated > 0) {
+      this.statisticsTracker.recalculateIncomeAndCosts();
       this.emit('reshowDrops');
     }
 
