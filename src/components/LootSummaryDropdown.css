@@ -6,6 +6,7 @@
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid rgba(74, 74, 94, 0.3);
+  pointer-events: auto;
 }
 
 .loot-summary-toggle {
