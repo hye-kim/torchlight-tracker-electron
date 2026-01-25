@@ -302,14 +302,20 @@ function App() {
   };
 
   // Handle mouse events for click-through mode and header visibility
-  const handleHeaderMouseEnter = () => {
+  const handleHeaderMouseEnter = (e: React.MouseEvent) => {
     setShowHeader(true);
     if (config.clickThrough && window.electronAPI) {
       window.electronAPI.setIgnoreMouseEvents(false);
     }
   };
 
-  const handleHeaderMouseLeave = () => {
+  const handleHeaderMouseLeave = (e: React.MouseEvent) => {
+    // Check if we're moving to a child element - if so, don't hide
+    const relatedTarget = e.relatedTarget as Node;
+    if (relatedTarget && e.currentTarget.contains(relatedTarget)) {
+      return; // Still inside wrapper, don't hide
+    }
+
     setShowHeader(false);
     // Don't enable click-through if any dialog is open
     if (config.clickThrough && window.electronAPI && !showOverlaySettings && !showSettingsDialog && !showInitDialog) {
@@ -320,14 +326,12 @@ function App() {
   return (
     <div className={`app ${overlayMode ? 'overlay-mode' : ''}`} style={{ fontSize: `${fontSize}px` }}>
       {overlayMode ? (
-        <>
-          <div
-            className="header-hover-zone"
-            onMouseEnter={handleHeaderMouseEnter}
-            onMouseLeave={handleHeaderMouseLeave}
-          />
-          <div className="header-wrapper">
-            <div className={`header ${showHeader ? 'visible' : ''}`}>
+        <div
+          className="header-wrapper"
+          onMouseEnter={handleHeaderMouseEnter}
+          onMouseLeave={handleHeaderMouseLeave}
+        >
+          <div className={`header ${showHeader ? 'visible' : ''}`}>
               <div className="title-bar">
                 <h1>Torchlight Tracker</h1>
                 <div className="window-controls">
@@ -366,7 +370,7 @@ function App() {
               </div>
             </div>
           </div>
-        </>
+        </div>
       ) : (
         <div
           className="header"

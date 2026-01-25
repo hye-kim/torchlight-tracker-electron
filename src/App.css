@@ -14,23 +14,12 @@
   overflow: visible;
 }
 
-.app.overlay-mode .header-hover-zone {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 80px;
-  background: transparent;
-  z-index: 1002;
-  pointer-events: auto;
-}
-
 .app.overlay-mode .header-wrapper {
   position: relative;
   z-index: 1000;
   width: 100%;
   padding: 0px 16px;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .app.overlay-mode .header {
