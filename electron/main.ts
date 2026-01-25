@@ -30,9 +30,19 @@ function createWindow() {
   const config = configManager.getConfig();
   const overlayMode = config.overlayMode ?? false;
 
+  const width = overlayMode ? (config.overlay_width || 400) : (config.window_width || 1200);
+  const height = overlayMode ? (config.overlay_height || 600) : (config.window_height || 800);
+
+  console.log('[createWindow] overlayMode:', overlayMode);
+  console.log('[createWindow] Creating window with dimensions:', { width, height });
+  console.log('[createWindow] Config dimensions:', {
+    overlay: { width: config.overlay_width, height: config.overlay_height },
+    normal: { width: config.window_width, height: config.window_height }
+  });
+
   mainWindow = new BrowserWindow({
-    width: overlayMode ? (config.overlay_width || 400) : (config.window_width || 1200),
-    height: overlayMode ? (config.overlay_height || 600) : (config.window_height || 800),
+    width,
+    height,
     x: config.window_x,
     y: config.window_y,
     frame: false,
@@ -62,10 +72,13 @@ function createWindow() {
 
   mainWindow.on('close', () => {
     // Don't save dimensions if we're switching modes - the toggle handler already saved them
+    console.log('[close] isSwitchingModes:', isSwitchingModes);
     if (mainWindow && !isSwitchingModes) {
       const bounds = mainWindow.getBounds();
       const currentConfig = configManager.getConfig();
       const isOverlay = currentConfig.overlayMode ?? false;
+
+      console.log('[close] Saving dimensions. isOverlay:', isOverlay, 'bounds:', bounds);
 
       // Save dimensions based on current mode
       if (isOverlay) {
@@ -83,6 +96,8 @@ function createWindow() {
           window_height: bounds.height,
         });
       }
+    } else {
+      console.log('[close] Skipping dimension save (isSwitchingModes=true)');
     }
   });
 
@@ -326,6 +341,10 @@ ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
     const config = configManager.getConfig();
     const currentBounds = mainWindow.getBounds();
 
+    console.log('[toggle-overlay-mode] Switching to overlayMode:', enabled);
+    console.log('[toggle-overlay-mode] Current mode:', config.overlayMode);
+    console.log('[toggle-overlay-mode] Current bounds:', currentBounds);
+
     // Prepare config update with current dimensions and new overlay mode
     const configUpdate: Partial<Config> = {
       overlayMode: enabled,
@@ -334,16 +353,22 @@ ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
     // Save current dimensions based on CURRENT mode (before switching)
     if (config.overlayMode) {
       // Currently in overlay mode, save overlay dimensions
+      console.log('[toggle-overlay-mode] Saving overlay dimensions:', currentBounds.width, 'x', currentBounds.height);
       configUpdate.overlay_width = currentBounds.width;
       configUpdate.overlay_height = currentBounds.height;
     } else {
       // Currently in normal mode, save normal dimensions
+      console.log('[toggle-overlay-mode] Saving normal dimensions:', currentBounds.width, 'x', currentBounds.height);
       configUpdate.window_width = currentBounds.width;
       configUpdate.window_height = currentBounds.height;
     }
 
+    console.log('[toggle-overlay-mode] Config update:', configUpdate);
+
     // Apply all config updates at once
     configManager.updateConfig(configUpdate);
+
+    console.log('[toggle-overlay-mode] Restarting app...');
 
     // Restart app - createWindow will use the new overlayMode and appropriate dimensions
     setTimeout(() => {
