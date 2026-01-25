@@ -145,67 +145,35 @@ export class FileManager {
 
   async initializeFullTableFromEnTable(): Promise<void> {
     const fullTablePath = this.getWritablePath('full_table.json');
-    const itemMapping = this.loadJson<Record<string, { id: string; name_en?: string; type_en?: string }>>('comprehensive_item_mapping.json', {});
 
-    if (!fs.existsSync(fullTablePath)) {
-      logger.info('Initializing full_table.json from comprehensive_item_mapping.json');
-      const fullTable: Record<string, ItemData> = {};
-      for (const [id, data] of Object.entries(itemMapping)) {
-        fullTable[id] = {
-          name: data.name_en || `Item ${id}`,
-          type: data.type_en,
-          price: 0,
-          last_update: 0,
-        };
-      }
-      this.saveFullTable(fullTable);
-      logger.info(`Initialized full_table.json with ${Object.keys(fullTable).length} items`);
+    if (fs.existsSync(fullTablePath)) {
+      logger.info('full_table.json already exists');
       return;
     }
 
-    // full_table.json exists - check for missing items and add them
-    logger.info('Checking for missing items in full_table.json');
-    const fullTable = this.loadFullTable(true);
-    let addedCount = 0;
+    logger.info('Initializing full_table.json from comprehensive_item_mapping.json');
+    const itemMapping = this.loadJson<Record<string, { id: string; name_en?: string; type_en?: string }>>('comprehensive_item_mapping.json', {});
 
+    const fullTable: Record<string, ItemData> = {};
     for (const [id, data] of Object.entries(itemMapping)) {
-      if (!fullTable[id]) {
-        fullTable[id] = {
-          name: data.name_en || `Item ${id}`,
-          type: data.type_en,
-          price: 0,
-          last_update: 0,
-        };
-        addedCount++;
-      }
+      fullTable[id] = {
+        name: data.name_en || `Item ${id}`,
+        type: data.type_en,
+        price: 0,
+        last_update: 0,
+      };
     }
 
-    if (addedCount > 0) {
-      this.saveFullTable(fullTable);
-      logger.info(`Added ${addedCount} missing items to full_table.json`);
-    } else {
-      logger.info('full_table.json is up to date with comprehensive_item_mapping.json');
-    }
+    this.saveFullTable(fullTable);
+    logger.info(`Initialized full_table.json with ${Object.keys(fullTable).length} items`);
   }
 
   async updateItem(itemId: string, updates: Partial<ItemData>): Promise<boolean> {
     const fullTable = this.loadFullTable(true);
 
     if (!fullTable[itemId]) {
-      // Item doesn't exist in full_table - try to initialize from comprehensive mapping
-      const itemInfo = this.getItemInfo(itemId);
-      if (itemInfo) {
-        logger.info(`Auto-creating missing item ${itemId} in full_table.json`);
-        fullTable[itemId] = {
-          name: itemInfo.name_en || itemInfo.name || `Item ${itemId}`,
-          type: itemInfo.type_en || itemInfo.type,
-          price: 0,
-          last_update: 0,
-        };
-      } else {
-        logger.warn(`Item ${itemId} not found in table or comprehensive mapping`);
-        return false;
-      }
+      logger.warn(`Item ${itemId} not found in table`);
+      return false;
     }
 
     const currentItem = fullTable[itemId];
@@ -314,7 +282,7 @@ export class FileManager {
 
   /**
    * Sync all items from the API to local table.
-   * This fetches the latest prices for all items.
+   * Completely overwrites full_table.json with API data on startup.
    */
   async syncAllPricesFromAPI(): Promise<number> {
     try {
@@ -326,32 +294,44 @@ export class FileManager {
         return 0;
       }
 
-      const fullTable = this.loadFullTable(true);
-      let updateCount = 0;
+      // Load comprehensive mapping for item names/types
+      const itemMapping = this.loadJson<Record<string, { id: string; name_en?: string; type_en?: string }>>('comprehensive_item_mapping.json', {});
+
+      // Build complete table from API data
+      const fullTable: Record<string, ItemData> = {};
+      let itemCount = 0;
 
       for (const [itemId, apiItem] of Object.entries(apiItems)) {
-        if (fullTable[itemId] && apiItem.price !== undefined) {
-          const apiLastUpdate = apiItem.last_update || Math.floor(Date.now() / 1000);
-          const localLastUpdate = fullTable[itemId].last_update || 0;
+        const mappingData = itemMapping[itemId];
+        const apiLastUpdate = apiItem.last_update || Math.floor(Date.now() / 1000);
 
-          // Only update price if API data is fresher than local
-          if (apiLastUpdate > localLastUpdate) {
-            fullTable[itemId].price = apiItem.price;
-            fullTable[itemId].last_update = apiLastUpdate;
-          }
+        fullTable[itemId] = {
+          name: mappingData?.name_en || apiItem.name_en || apiItem.name || `Item ${itemId}`,
+          type: mappingData?.type_en || apiItem.type_en || apiItem.type,
+          price: apiItem.price || 0,
+          last_update: apiLastUpdate,
+          last_api_sync: apiLastUpdate,
+        };
+        itemCount++;
+      }
 
-          // Always track what the API currently has
-          fullTable[itemId].last_api_sync = apiLastUpdate;
-          updateCount++;
+      // Add any items from comprehensive mapping that aren't in API yet
+      for (const [itemId, data] of Object.entries(itemMapping)) {
+        if (!fullTable[itemId]) {
+          fullTable[itemId] = {
+            name: data.name_en || `Item ${itemId}`,
+            type: data.type_en,
+            price: 0,
+            last_update: 0,
+          };
+          itemCount++;
         }
       }
 
-      if (updateCount > 0) {
-        this.saveFullTable(fullTable);
-        logger.info(`Synced ${updateCount} item prices from API`);
-      }
+      this.saveFullTable(fullTable);
+      logger.info(`Synced ${itemCount} items from API to full_table.json`);
 
-      return updateCount;
+      return itemCount;
     } catch (error) {
       logger.error('Error syncing prices from API:', error);
       return 0;
