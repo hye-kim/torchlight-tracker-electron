@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, dialog, session } from 'electron';
 import path from 'path';
-import { ConfigManager } from './backend/ConfigManager';
+import { ConfigManager, Config } from './backend/ConfigManager';
 import { FileManager } from './backend/FileManager';
 import { LogParser } from './backend/LogParser';
 import { InventoryTracker } from './backend/InventoryTracker';
@@ -321,23 +321,24 @@ ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
     const config = configManager.getConfig();
     const currentBounds = mainWindow.getBounds();
 
-    // Save current dimensions before switching modes
+    // Prepare config update with current dimensions and new overlay mode
+    const configUpdate: Partial<Config> = {
+      overlayMode: enabled,
+    };
+
+    // Save current dimensions based on current mode
     if (config.overlayMode) {
       // Currently in overlay mode, save overlay dimensions
-      configManager.updateConfig({
-        overlay_width: currentBounds.width,
-        overlay_height: currentBounds.height,
-      });
+      configUpdate.overlay_width = currentBounds.width;
+      configUpdate.overlay_height = currentBounds.height;
     } else {
       // Currently in normal mode, save normal dimensions
-      configManager.updateConfig({
-        window_width: currentBounds.width,
-        window_height: currentBounds.height,
-      });
+      configUpdate.window_width = currentBounds.width;
+      configUpdate.window_height = currentBounds.height;
     }
 
-    // Update overlay mode
-    configManager.setOverlayMode(enabled);
+    // Apply all config updates at once
+    configManager.updateConfig(configUpdate);
     mainWindow.setAlwaysOnTop(enabled);
 
     // Resize window to saved dimensions for the new mode
@@ -350,11 +351,11 @@ ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
       mainWindow.setSize(updatedConfig.window_width || 1200, updatedConfig.window_height || 800);
     }
 
-    // Restart app to apply changes
+    // Restart app to apply changes (increased timeout to ensure config is written)
     setTimeout(() => {
       app.relaunch();
       app.exit();
-    }, 100);
+    }, 200);
   }
   return { success: true };
 });
