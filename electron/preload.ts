@@ -29,6 +29,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   windowMinimize: () => ipcRenderer.invoke('window-minimize'),
   windowMaximize: () => ipcRenderer.invoke('window-maximize'),
   windowClose: () => ipcRenderer.invoke('window-close'),
+  windowResize: (width: number, height: number) => ipcRenderer.invoke('window-resize', width, height),
 
   // Listen for updates
   onUpdateDisplay: (callback: (data: any) => void) => {
@@ -61,6 +62,7 @@ declare global {
       windowMinimize: () => Promise<{ success: boolean }>;
       windowMaximize: () => Promise<{ success: boolean }>;
       windowClose: () => Promise<{ success: boolean }>;
+      windowResize: (width: number, height: number) => Promise<{ success: boolean }>;
       onUpdateDisplay: (callback: (data: any) => void) => void;
       onInitializationComplete: (callback: () => void) => void;
     };

@@ -24,17 +24,20 @@ function LootSummaryDropdown({ drops, costs, totalPickedUp, totalCost }: LootSum
   const totalProfit = totalPickedUp - totalCost;
 
   const handleToggle = () => {
-    setIsOpen(!isOpen);
+    const willOpen = !isOpen;
+    setIsOpen(willOpen);
 
     // Adjust window height when toggling
     if (window.electronAPI) {
       setTimeout(() => {
-        const contentHeight = document.querySelector('.loot-summary-content')?.scrollHeight || 0;
-        const baseHeight = 600;
-        const newHeight = !isOpen ? baseHeight + Math.min(contentHeight, 400) : baseHeight;
-
-        // This would need an IPC handler to resize the window
-        // For now, the CSS will handle the overflow
+        if (willOpen) {
+          const contentHeight = document.querySelector('.loot-summary-content')?.scrollHeight || 0;
+          const baseHeight = 600;
+          const newHeight = baseHeight + Math.min(contentHeight + 50, 450);
+          window.electronAPI.windowResize(400, newHeight);
+        } else {
+          window.electronAPI.windowResize(400, 600);
+        }
       }, 100);
     }
   };

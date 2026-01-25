@@ -377,3 +377,11 @@ ipcMain.handle('window-close', () => {
   }
   return { success: true };
 });
+
+ipcMain.handle('window-resize', (_, width: number, height: number) => {
+  if (mainWindow) {
+    const currentSize = mainWindow.getSize();
+    mainWindow.setSize(width || currentSize[0], height || currentSize[1], true);
+  }
+  return { success: true };
+});

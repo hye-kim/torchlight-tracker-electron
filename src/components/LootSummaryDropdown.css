@@ -1,11 +1,11 @@
 .loot-summary-dropdown {
   display: flex;
   flex-direction: column;
-  background-color: rgba(30, 30, 46, 0.85);
-  backdrop-filter: blur(10px);
+  background-color: rgba(30, 30, 46, 0.75);
+  backdrop-filter: blur(8px);
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid rgba(74, 74, 94, 0.4);
+  border: 1px solid rgba(74, 74, 94, 0.3);
 }
 
 .loot-summary-toggle {
