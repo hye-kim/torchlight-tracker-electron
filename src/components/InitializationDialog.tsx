@@ -14,15 +14,8 @@ function InitializationDialog({ onClose }: InitializationDialogProps) {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Only close if clicking directly on the overlay, not on child elements, and after initial render
-    if (canClose && e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
   return (
-    <div className="dialog-overlay" onClick={handleOverlayClick}>
+    <div className="dialog-overlay">
       <div className="init-dialog-content" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
           <h2>🎯 Tracker Initialization</h2>
