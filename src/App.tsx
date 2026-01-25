@@ -93,6 +93,7 @@ function App() {
   const [isInMap, setIsInMap] = useState(false);
   const [currentMap, setCurrentMap] = useState<CurrentMapData | null>(null);
   const [selectedMapNumber, setSelectedMapNumber] = useState<number | null>(null);
+  const [showHeader, setShowHeader] = useState(false);
 
   useEffect(() => {
     // Load initial config
@@ -300,14 +301,16 @@ function App() {
     return item?.enabled ?? true;
   };
 
-  // Handle mouse events for click-through mode
+  // Handle mouse events for click-through mode and header visibility
   const handleHeaderMouseEnter = () => {
+    setShowHeader(true);
     if (config.clickThrough && window.electronAPI) {
       window.electronAPI.setIgnoreMouseEvents(false);
     }
   };
 
   const handleHeaderMouseLeave = () => {
+    setShowHeader(false);
     // Don't enable click-through if any dialog is open
     if (config.clickThrough && window.electronAPI && !showOverlaySettings && !showSettingsDialog && !showInitDialog) {
       window.electronAPI.setIgnoreMouseEvents(true);
@@ -322,7 +325,7 @@ function App() {
           onMouseEnter={handleHeaderMouseEnter}
           onMouseLeave={handleHeaderMouseLeave}
         >
-          <div className="header">
+          <div className={`header ${showHeader ? 'visible' : ''}`}>
             <div className="title-bar">
               <h1>Torchlight Tracker</h1>
               <div className="window-controls">

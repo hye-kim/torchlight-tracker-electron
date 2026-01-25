@@ -46,7 +46,7 @@
   pointer-events: auto;
 }
 
-.app.overlay-mode .header-wrapper:hover .header {
+.app.overlay-mode .header.visible {
   visibility: visible;
   opacity: 1;
 }
