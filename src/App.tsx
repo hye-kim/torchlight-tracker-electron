@@ -237,6 +237,11 @@ function App() {
     // Apply click-through immediately
     if (window.electronAPI) {
       await window.electronAPI.toggleClickThrough(newClickThrough);
+
+      // If enabling clickthrough, immediately activate it (don't wait for header to hide)
+      if (newClickThrough) {
+        await window.electronAPI.setIgnoreMouseEvents(true);
+      }
     }
   };
 
