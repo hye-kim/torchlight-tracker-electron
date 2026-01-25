@@ -210,6 +210,72 @@ export class StatisticsTracker extends EventEmitter {
   }
 
   /**
+   * Recalculate income and costs based on current prices.
+   * Call this when prices are updated to sync totals with new prices.
+   */
+  recalculateIncomeAndCosts(): void {
+    const fullTable = this.fileManager.loadFullTable();
+    const taxEnabled = this.configManager.getTaxMode() === 1;
+
+    // Recalculate current map income
+    this.income = 0.0;
+    for (const [itemId, quantity] of this.dropList) {
+      if (fullTable[itemId]) {
+        const basePrice = fullTable[itemId].price || 0.0;
+        const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
+        this.income += price * quantity;
+      }
+    }
+
+    // Recalculate total income
+    this.incomeAll = 0.0;
+    for (const [itemId, quantity] of this.dropListAll) {
+      if (fullTable[itemId]) {
+        const basePrice = fullTable[itemId].price || 0.0;
+        const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
+        this.incomeAll += price * quantity;
+      }
+    }
+
+    // Recalculate current map costs
+    this.currentMapCost = 0.0;
+    for (const [itemId, quantity] of this.costList) {
+      if (fullTable[itemId]) {
+        const basePrice = fullTable[itemId].price || 0.0;
+        const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
+        this.currentMapCost += price * quantity;
+      }
+    }
+
+    // Recalculate map logs revenue, cost, and profit
+    for (const mapLog of this.mapLogs) {
+      let revenue = 0.0;
+      for (const drop of mapLog.drops) {
+        if (fullTable[drop.itemId]) {
+          const basePrice = fullTable[drop.itemId].price || 0.0;
+          const price = calculatePriceWithTax(basePrice, drop.itemId, taxEnabled);
+          revenue += price * drop.quantity;
+        }
+      }
+
+      let cost = 0.0;
+      for (const costItem of mapLog.costs) {
+        if (fullTable[costItem.itemId]) {
+          const basePrice = fullTable[costItem.itemId].price || 0.0;
+          const price = calculatePriceWithTax(basePrice, costItem.itemId, taxEnabled);
+          cost += price * costItem.quantity;
+        }
+      }
+
+      mapLog.revenue = revenue;
+      mapLog.cost = cost;
+      mapLog.profit = revenue - cost;
+    }
+
+    logger.info('Recalculated income and costs based on updated prices');
+  }
+
+  /**
    * Process a single item change.
    */
   private processSingleItemChange(
