@@ -374,6 +374,13 @@ ipcMain.handle('set-ignore-mouse-events', (_, ignore: boolean) => {
   return { success: true };
 });
 
+// Handle set-ignore-mouse-events from ipcRenderer.send (used by preload for interactive elements)
+ipcMain.on('set-ignore-mouse-events', (_, ignore: boolean, options?: any) => {
+  if (mainWindow) {
+    mainWindow.setIgnoreMouseEvents(ignore, options || { forward: true });
+  }
+});
+
 ipcMain.handle('set-font-size', (_, fontSize: number) => {
   configManager.setFontSize(fontSize);
   return { success: true };

@@ -42,6 +42,21 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
 });
 
+// Handle interactive elements for click-through functionality
+window.addEventListener('DOMContentLoaded', () => {
+  const interactiveElements = document.querySelectorAll('.interactive');
+
+  interactiveElements.forEach((element) => {
+    element.addEventListener('mouseenter', () => {
+      ipcRenderer.send('set-ignore-mouse-events', false);
+    });
+
+    element.addEventListener('mouseleave', () => {
+      ipcRenderer.send('set-ignore-mouse-events', true, { forward: true });
+    });
+  });
+});
+
 // Type definitions for window.electronAPI
 declare global {
   interface Window {

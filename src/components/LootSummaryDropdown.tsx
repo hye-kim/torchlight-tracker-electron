@@ -49,59 +49,18 @@ function LootSummaryDropdown({ drops, costs, totalPickedUp, totalCost }: LootSum
     }
   };
 
-  // Handle mouse events for toggle button (disable click-through)
-  const handleToggleMouseEnter = () => {
-    if (window.electronAPI) {
-      window.electronAPI.setIgnoreMouseEvents(false);
-    }
-  };
-
-  const handleToggleMouseLeave = () => {
-    if (window.electronAPI) {
-      // Re-check config to restore click-through if enabled
-      window.electronAPI.getConfig().then((config: any) => {
-        if (config.clickThrough) {
-          window.electronAPI.setIgnoreMouseEvents(false);
-        }
-      });
-    }
-  };
-
-  // Handle mouse events for content area (enable click-through)
-  const handleContentMouseEnter = () => {
-    if (window.electronAPI) {
-      window.electronAPI.getConfig().then((config: any) => {
-        if (config.clickThrough) {
-          window.electronAPI.setIgnoreMouseEvents(true);
-        }
-      });
-    }
-  };
-
-  const handleContentMouseLeave = () => {
-    if (window.electronAPI) {
-      window.electronAPI.setIgnoreMouseEvents(false);
-    }
-  };
-
   return (
     <div className="loot-summary-dropdown">
       <button
-        className="loot-summary-toggle"
+        className="loot-summary-toggle interactive"
         onClick={handleToggle}
-        onMouseEnter={handleToggleMouseEnter}
-        onMouseLeave={handleToggleMouseLeave}
       >
         <span>Loot Summary</span>
         <span className={`arrow ${isOpen ? 'open' : ''}`}>▼</span>
       </button>
 
       {isOpen && (
-        <div
-          className="loot-summary-content"
-          onMouseEnter={handleContentMouseEnter}
-          onMouseLeave={handleContentMouseLeave}
-        >
+        <div className="loot-summary-content">
           <div className="loot-summary-section">
             <h3>Drops ({drops.length} items)</h3>
             <div className="loot-items">
