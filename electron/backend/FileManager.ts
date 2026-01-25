@@ -259,8 +259,15 @@ export class FileManager {
         const fullTable = this.loadFullTable(true);
         if (fullTable[itemId]) {
           const apiLastUpdate = apiItem.last_update || Math.floor(Date.now() / 1000);
-          fullTable[itemId].price = apiItem.price;
-          fullTable[itemId].last_update = apiLastUpdate;
+          const localLastUpdate = fullTable[itemId].last_update || 0;
+
+          // Only update price if API data is fresher than local
+          if (apiLastUpdate > localLastUpdate) {
+            fullTable[itemId].price = apiItem.price;
+            fullTable[itemId].last_update = apiLastUpdate;
+          }
+
+          // Always track what the API currently has
           fullTable[itemId].last_api_sync = apiLastUpdate;
           this.saveFullTable(fullTable);
           logger.info(`Fetched price from API for ${itemId}: ${apiItem.price}`);
@@ -293,8 +300,15 @@ export class FileManager {
       for (const [itemId, apiItem] of Object.entries(apiItems)) {
         if (fullTable[itemId] && apiItem.price !== undefined) {
           const apiLastUpdate = apiItem.last_update || Math.floor(Date.now() / 1000);
-          fullTable[itemId].price = apiItem.price;
-          fullTable[itemId].last_update = apiLastUpdate;
+          const localLastUpdate = fullTable[itemId].last_update || 0;
+
+          // Only update price if API data is fresher than local
+          if (apiLastUpdate > localLastUpdate) {
+            fullTable[itemId].price = apiItem.price;
+            fullTable[itemId].last_update = apiLastUpdate;
+          }
+
+          // Always track what the API currently has
           fullTable[itemId].last_api_sync = apiLastUpdate;
           updateCount++;
         }
