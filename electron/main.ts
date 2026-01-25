@@ -30,14 +30,14 @@ function createWindow() {
   const overlayMode = config.overlayMode ?? false;
 
   mainWindow = new BrowserWindow({
-    width: config.window_width || 800,
-    height: config.window_height || 600,
+    width: overlayMode ? 400 : (config.window_width || 1200),
+    height: overlayMode ? 600 : (config.window_height || 800),
     x: config.window_x,
     y: config.window_y,
     frame: false, // Frameless for custom title bar and rounded corners
-    transparent: overlayMode, // Transparent in overlay mode
+    transparent: true, // Always transparent to support overlay mode switching
     alwaysOnTop: overlayMode, // Always on top in overlay mode
-    backgroundColor: overlayMode ? '#00000000' : '#1e1e2e',
+    backgroundColor: '#00000000', // Always transparent background
     roundedCorners: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -307,11 +307,22 @@ ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
   configManager.setOverlayMode(enabled);
   if (mainWindow) {
     mainWindow.setAlwaysOnTop(enabled);
+
+    // Resize window when toggling overlay mode
+    if (enabled) {
+      // Shrink to overlay size
+      mainWindow.setSize(400, 600);
+    } else {
+      // Restore to normal size
+      const config = configManager.getConfig();
+      mainWindow.setSize(config.window_width || 1200, config.window_height || 800);
+    }
+
     // Restart app to apply transparent background
-    if (enabled !== (configManager.getConfig().overlayMode ?? false)) {
+    setTimeout(() => {
       app.relaunch();
       app.exit();
-    }
+    }, 100);
   }
   return { success: true };
 });

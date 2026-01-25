@@ -20,8 +20,6 @@ interface OverlaySettingsProps {
 }
 
 function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
-  const [overlayMode, setOverlayMode] = useState(config.overlayMode ?? false);
-  const [clickThrough, setClickThrough] = useState(config.clickThrough ?? false);
   const [fontSize, setFontSize] = useState(config.fontSize ?? 14);
   const [displayItems, setDisplayItems] = useState<DisplayItem[]>(
     config.displayItems ?? [
@@ -37,6 +35,21 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
     ]
   );
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
+
+  // Apply changes in real-time
+  useEffect(() => {
+    if (window.electronAPI) {
+      window.electronAPI.setFontSize(fontSize);
+      onSave({ fontSize });
+    }
+  }, [fontSize]);
+
+  useEffect(() => {
+    if (window.electronAPI) {
+      window.electronAPI.setDisplayItems(displayItems);
+      onSave({ displayItems });
+    }
+  }, [displayItems]);
 
   // Sort displayItems by order
   const sortedItems = [...displayItems].sort((a, b) => a.order - b.order);
@@ -76,25 +89,13 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
     );
   };
 
-  const handleSave = async () => {
+  const handleClose = () => {
+    // Final save on close
     const updates = {
-      overlayMode,
-      clickThrough,
       fontSize,
       displayItems,
     };
-
-    // Save config
-    await onSave(updates);
-
-    // Apply overlay mode and click-through settings
-    if (window.electronAPI) {
-      await window.electronAPI.toggleOverlayMode(overlayMode);
-      await window.electronAPI.toggleClickThrough(clickThrough);
-      await window.electronAPI.setFontSize(fontSize);
-      await window.electronAPI.setDisplayItems(displayItems);
-    }
-
+    onSave(updates);
     onClose();
   };
 
@@ -114,47 +115,19 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
   return (
     <div
       className="dialog-overlay"
-      onClick={onClose}
+      onClick={handleClose}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <div className="dialog-content overlay-settings" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
-          <h2>Overlay Settings</h2>
-          <button className="close-btn" onClick={onClose}>
+          <h2>Display Settings</h2>
+          <button className="close-btn" onClick={handleClose}>
             ✕
           </button>
         </div>
 
         <div className="dialog-body">
-          <div className="form-group">
-            <label>
-              <input
-                type="checkbox"
-                checked={overlayMode}
-                onChange={(e) => setOverlayMode(e.target.checked)}
-              />
-              <span>Enable Overlay Mode</span>
-            </label>
-            <span className="form-hint">
-              Makes the window transparent and always on top (requires restart)
-            </span>
-          </div>
-
-          <div className="form-group">
-            <label>
-              <input
-                type="checkbox"
-                checked={clickThrough}
-                onChange={(e) => setClickThrough(e.target.checked)}
-              />
-              <span>Enable Click-Through</span>
-            </label>
-            <span className="form-hint">
-              Allows clicks to pass through the window to the game
-            </span>
-          </div>
-
           <div className="form-group">
             <label htmlFor="fontSize">Font Size: {fontSize}px</label>
             <input
@@ -196,11 +169,8 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
         </div>
 
         <div className="dialog-footer">
-          <button className="btn-secondary" onClick={onClose}>
-            Cancel
-          </button>
-          <button className="btn-primary" onClick={handleSave}>
-            Save Changes
+          <button className="btn-primary" onClick={handleClose}>
+            Close
           </button>
         </div>
       </div>

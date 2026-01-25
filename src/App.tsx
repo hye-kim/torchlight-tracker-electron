@@ -195,6 +195,30 @@ function App() {
     window.electronAPI.windowClose();
   };
 
+  const handleToggleOverlayMode = async () => {
+    const newOverlayMode = !overlayMode;
+    const updates = { overlayMode: newOverlayMode };
+    const newConfig = await window.electronAPI.updateConfig(updates);
+    setConfig(newConfig);
+
+    // Apply overlay mode immediately
+    if (window.electronAPI) {
+      await window.electronAPI.toggleOverlayMode(newOverlayMode);
+    }
+  };
+
+  const handleToggleClickThrough = async () => {
+    const newClickThrough = !config.clickThrough;
+    const updates = { clickThrough: newClickThrough };
+    const newConfig = await window.electronAPI.updateConfig(updates);
+    setConfig(newConfig);
+
+    // Apply click-through immediately
+    if (window.electronAPI) {
+      await window.electronAPI.toggleClickThrough(newClickThrough);
+    }
+  };
+
   // Get the selected map data (current map or from map logs)
   const selectedMapData = useMemo(() => {
     if (selectedMapNumber === null) return null;
@@ -289,8 +313,22 @@ function App() {
         <div className="title-bar">
           <h1>Torchlight Tracker</h1>
           <div className="window-controls">
-            <button className="settings-btn" onClick={() => setShowOverlaySettings(true)} title="Overlay Settings">
+            <button className="icon-btn" onClick={() => setShowOverlaySettings(true)} title="Settings">
               ⚙️
+            </button>
+            <button
+              className={`icon-btn ${overlayMode ? 'active' : ''}`}
+              onClick={handleToggleOverlayMode}
+              title={overlayMode ? 'Exit Overlay Mode' : 'Enter Overlay Mode'}
+            >
+              {overlayMode ? '↙️' : '↗️'}
+            </button>
+            <button
+              className={`icon-btn ${config.clickThrough ? 'active' : ''}`}
+              onClick={handleToggleClickThrough}
+              title={config.clickThrough ? 'Disable Click-Through' : 'Enable Click-Through'}
+            >
+              🖱️
             </button>
             <button className="window-btn minimize" onClick={handleWindowMinimize} title="Minimize">
               −
@@ -408,6 +446,7 @@ function App() {
                 onExportDebugLog={handleExportDebugLog}
                 onOpenSettings={() => setShowSettings(true)}
                 onResetStats={handleResetStats}
+                onToggleOverlay={handleToggleOverlayMode}
                 isInitialized={isInitialized}
                 isWaitingForInit={isWaitingForInit}
               />
