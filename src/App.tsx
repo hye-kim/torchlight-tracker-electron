@@ -305,7 +305,7 @@ function App() {
     return item?.enabled ?? true;
   };
 
-  // Handle mouse events for click-through mode
+  // Handle mouse events for header to disable click-through when hovering
   const handleHeaderMouseEnter = () => {
     if (config.clickThrough && window.electronAPI) {
       window.electronAPI.setIgnoreMouseEvents(false);
@@ -321,7 +321,8 @@ function App() {
   return (
     <div className={`app ${overlayMode ? 'overlay-mode' : ''}`} style={{ fontSize: `${fontSize}px` }}>
       {overlayMode ? (
-        <div className="header-wrapper"
+        <div
+          className="header-wrapper"
           onMouseEnter={handleHeaderMouseEnter}
           onMouseLeave={handleHeaderMouseLeave}
         >
