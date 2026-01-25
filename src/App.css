@@ -39,6 +39,10 @@
   pointer-events: none;
 }
 
+.app.overlay-mode .header-wrapper.active {
+  pointer-events: auto;
+}
+
 .app.overlay-mode .header {
   visibility: hidden;
   opacity: 0;
@@ -48,13 +52,12 @@
   z-index: 1000;
   padding: 8px 16px;
   border-radius: 8px;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .app.overlay-mode .header.visible {
   visibility: visible;
   opacity: 1;
-  pointer-events: auto;
 }
 
 .app.overlay-mode .main-content {

@@ -350,7 +350,7 @@ function App() {
           onMouseMove={handleHeaderMouseMove}
         >
           <div className="header-hover-zone" />
-          <div className="header-wrapper">
+          <div className={`header-wrapper ${showHeader ? 'active' : ''}`}>
             <div className={`header ${showHeader ? 'visible' : ''}`}>
               <div className="title-bar">
                 <h1>Torchlight Tracker</h1>
