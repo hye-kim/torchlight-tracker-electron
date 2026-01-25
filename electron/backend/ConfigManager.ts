@@ -17,6 +17,8 @@ export interface Config {
   window_y?: number;
   window_width?: number;
   window_height?: number;
+  overlay_width?: number;
+  overlay_height?: number;
   api_url?: string;
   overlayMode?: boolean;
   clickThrough?: boolean;

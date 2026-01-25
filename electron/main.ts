@@ -30,14 +30,14 @@ function createWindow() {
   const overlayMode = config.overlayMode ?? false;
 
   mainWindow = new BrowserWindow({
-    width: overlayMode ? 400 : (config.window_width || 1200),
-    height: overlayMode ? 600 : (config.window_height || 800),
+    width: overlayMode ? (config.overlay_width || 400) : (config.window_width || 1200),
+    height: overlayMode ? (config.overlay_height || 600) : (config.window_height || 800),
     x: config.window_x,
     y: config.window_y,
-    frame: false, // Frameless for custom title bar and rounded corners
-    transparent: true, // Always transparent to support overlay mode switching
-    alwaysOnTop: overlayMode, // Always on top in overlay mode
-    backgroundColor: '#00000000', // Always transparent background
+    frame: false,
+    transparent: true,
+    titleBarStyle: 'hidden',
+    alwaysOnTop: overlayMode,
     roundedCorners: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -62,12 +62,25 @@ function createWindow() {
   mainWindow.on('close', () => {
     if (mainWindow) {
       const bounds = mainWindow.getBounds();
-      configManager.updateConfig({
-        window_x: bounds.x,
-        window_y: bounds.y,
-        window_width: bounds.width,
-        window_height: bounds.height,
-      });
+      const currentConfig = configManager.getConfig();
+      const isOverlay = currentConfig.overlayMode ?? false;
+
+      // Save dimensions based on current mode
+      if (isOverlay) {
+        configManager.updateConfig({
+          window_x: bounds.x,
+          window_y: bounds.y,
+          overlay_width: bounds.width,
+          overlay_height: bounds.height,
+        });
+      } else {
+        configManager.updateConfig({
+          window_x: bounds.x,
+          window_y: bounds.y,
+          window_width: bounds.width,
+          window_height: bounds.height,
+        });
+      }
     }
   });
 
@@ -304,21 +317,40 @@ ipcMain.handle('export-debug-log', async () => {
 
 // Overlay mode IPC handlers
 ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
-  configManager.setOverlayMode(enabled);
   if (mainWindow) {
-    mainWindow.setAlwaysOnTop(enabled);
+    const config = configManager.getConfig();
+    const currentBounds = mainWindow.getBounds();
 
-    // Resize window when toggling overlay mode
-    if (enabled) {
-      // Shrink to overlay size
-      mainWindow.setSize(400, 600);
+    // Save current dimensions before switching modes
+    if (config.overlayMode) {
+      // Currently in overlay mode, save overlay dimensions
+      configManager.updateConfig({
+        overlay_width: currentBounds.width,
+        overlay_height: currentBounds.height,
+      });
     } else {
-      // Restore to normal size
-      const config = configManager.getConfig();
-      mainWindow.setSize(config.window_width || 1200, config.window_height || 800);
+      // Currently in normal mode, save normal dimensions
+      configManager.updateConfig({
+        window_width: currentBounds.width,
+        window_height: currentBounds.height,
+      });
     }
 
-    // Restart app to apply transparent background
+    // Update overlay mode
+    configManager.setOverlayMode(enabled);
+    mainWindow.setAlwaysOnTop(enabled);
+
+    // Resize window to saved dimensions for the new mode
+    const updatedConfig = configManager.getConfig();
+    if (enabled) {
+      // Switching to overlay mode
+      mainWindow.setSize(updatedConfig.overlay_width || 400, updatedConfig.overlay_height || 600);
+    } else {
+      // Switching to normal mode
+      mainWindow.setSize(updatedConfig.window_width || 1200, updatedConfig.window_height || 800);
+    }
+
+    // Restart app to apply changes
     setTimeout(() => {
       app.relaunch();
       app.exit();
