@@ -5,6 +5,7 @@ interface ElectronAPI {
   updateConfig: (updates: any) => Promise<any>;
   getStats: () => Promise<any>;
   getDrops: () => Promise<any>;
+  getMapLogs: () => Promise<any>;
   initializeTracker: () => Promise<{ success: boolean }>;
   exportExcel: () => Promise<{ success: boolean; filePath?: string }>;
   resetStats: () => Promise<{ success: boolean }>;
