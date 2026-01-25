@@ -392,11 +392,7 @@ function App() {
           </div>
         </div>
       ) : (
-        <div
-          className="header"
-          onMouseEnter={handleHeaderMouseEnter}
-          onMouseLeave={handleHeaderMouseLeave}
-        >
+        <div className="header">
           <div className="title-bar">
             <h1>Torchlight Tracker</h1>
             <div className="window-controls">
