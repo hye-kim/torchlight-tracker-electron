@@ -17,7 +17,7 @@
 .app.overlay-mode .header-hover-container {
   position: relative;
   width: 100%;
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .app.overlay-mode .header-hover-zone {
