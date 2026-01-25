@@ -24,12 +24,6 @@
   z-index: 1000;
   background-color: rgba(42, 42, 62, 0.95);
   backdrop-filter: blur(10px);
-  pointer-events: none;
-}
-
-.app.overlay-mode .header:hover {
-  opacity: 1;
-  pointer-events: auto;
 }
 
 .app.overlay-mode .header::before {
@@ -39,11 +33,11 @@
   left: 0;
   right: 0;
   height: 60px;
-  pointer-events: auto;
+  z-index: -1;
 }
 
-.app.overlay-mode .header:hover::before {
-  display: none;
+.app.overlay-mode .header:hover {
+  opacity: 1;
 }
 
 .app.overlay-mode .main-content {
@@ -80,6 +74,11 @@
   display: flex;
   gap: 4px;
   -webkit-app-region: no-drag;
+  pointer-events: auto;
+}
+
+.window-controls button {
+  pointer-events: auto;
 }
 
 .icon-btn {
