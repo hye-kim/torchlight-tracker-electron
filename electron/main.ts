@@ -350,17 +350,19 @@ ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
       overlayMode: enabled,
     };
 
-    // Save current dimensions based on CURRENT mode (before switching)
-    if (config.overlayMode) {
-      // Currently in overlay mode, save overlay dimensions
-      console.log('[toggle-overlay-mode] Saving overlay dimensions:', currentBounds.width, 'x', currentBounds.height);
-      configUpdate.overlay_width = currentBounds.width;
-      configUpdate.overlay_height = currentBounds.height;
-    } else {
-      // Currently in normal mode, save normal dimensions
-      console.log('[toggle-overlay-mode] Saving normal dimensions:', currentBounds.width, 'x', currentBounds.height);
+    // Save current dimensions to the mode we're switching FROM
+    // If enabled=true, we're switching TO overlay, so we're currently in normal mode
+    // If enabled=false, we're switching TO normal, so we're currently in overlay mode
+    if (enabled) {
+      // Switching TO overlay mode, save current size as normal mode dimensions
+      console.log('[toggle-overlay-mode] Switching TO overlay mode, saving current size to normal mode:', currentBounds.width, 'x', currentBounds.height);
       configUpdate.window_width = currentBounds.width;
       configUpdate.window_height = currentBounds.height;
+    } else {
+      // Switching TO normal mode, save current size as overlay mode dimensions
+      console.log('[toggle-overlay-mode] Switching TO normal mode, saving current size to overlay mode:', currentBounds.width, 'x', currentBounds.height);
+      configUpdate.overlay_width = currentBounds.width;
+      configUpdate.overlay_height = currentBounds.height;
     }
 
     console.log('[toggle-overlay-mode] Config update:', configUpdate);
