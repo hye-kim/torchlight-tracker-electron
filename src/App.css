@@ -11,16 +11,14 @@
 .app.overlay-mode {
   background-color: transparent;
   width: 100%;
-  max-width: 400px;
   overflow: visible;
-  pointer-events: none;
 }
 
 .app.overlay-mode .header-wrapper {
   position: relative;
   z-index: 1000;
   width: 100%;
-  max-width: 400px;
+  padding: 0px 16px;
   pointer-events: auto;
 }
 
@@ -30,7 +28,6 @@
   top: 0;
   left: 0;
   width: 100%;
-  max-width: 400px;
   height: 60px;
   background: transparent;
   z-index: 998;
@@ -40,18 +37,18 @@
 .app.overlay-mode .header {
   visibility: hidden;
   opacity: 0;
-  pointer-events: none;
   transition: visibility 0.3s, opacity 0.3s ease;
   background-color: rgba(42, 42, 62, 0.95);
   backdrop-filter: blur(10px);
   z-index: 999;
   padding: 8px 16px;
+  border-radius: 8px;
+  pointer-events: auto;
 }
 
 .app.overlay-mode .header-wrapper:hover .header {
   visibility: visible;
   opacity: 1;
-  pointer-events: auto;
 }
 
 .app.overlay-mode .main-content {
@@ -289,7 +286,6 @@
   flex-direction: column;
   gap: 16px;
   padding: 16px;
-  max-width: 400px;
   width: 100%;
 }
 
