@@ -145,35 +145,67 @@ export class FileManager {
 
   async initializeFullTableFromEnTable(): Promise<void> {
     const fullTablePath = this.getWritablePath('full_table.json');
+    const itemMapping = this.loadJson<Record<string, { id: string; name_en?: string; type_en?: string }>>('comprehensive_item_mapping.json', {});
 
-    if (fs.existsSync(fullTablePath)) {
-      logger.info('full_table.json already exists');
+    if (!fs.existsSync(fullTablePath)) {
+      logger.info('Initializing full_table.json from comprehensive_item_mapping.json');
+      const fullTable: Record<string, ItemData> = {};
+      for (const [id, data] of Object.entries(itemMapping)) {
+        fullTable[id] = {
+          name: data.name_en || `Item ${id}`,
+          type: data.type_en,
+          price: 0,
+          last_update: 0,
+        };
+      }
+      this.saveFullTable(fullTable);
+      logger.info(`Initialized full_table.json with ${Object.keys(fullTable).length} items`);
       return;
     }
 
-    logger.info('Initializing full_table.json from comprehensive_item_mapping.json');
-    const itemMapping = this.loadJson<Record<string, { id: string; name_en?: string; type_en?: string }>>('comprehensive_item_mapping.json', {});
+    // full_table.json exists - check for missing items and add them
+    logger.info('Checking for missing items in full_table.json');
+    const fullTable = this.loadFullTable(true);
+    let addedCount = 0;
 
-    const fullTable: Record<string, ItemData> = {};
     for (const [id, data] of Object.entries(itemMapping)) {
-      fullTable[id] = {
-        name: data.name_en || `Item ${id}`,
-        type: data.type_en,
-        price: 0,
-        last_update: 0,
-      };
+      if (!fullTable[id]) {
+        fullTable[id] = {
+          name: data.name_en || `Item ${id}`,
+          type: data.type_en,
+          price: 0,
+          last_update: 0,
+        };
+        addedCount++;
+      }
     }
 
-    this.saveFullTable(fullTable);
-    logger.info(`Initialized full_table.json with ${Object.keys(fullTable).length} items`);
+    if (addedCount > 0) {
+      this.saveFullTable(fullTable);
+      logger.info(`Added ${addedCount} missing items to full_table.json`);
+    } else {
+      logger.info('full_table.json is up to date with comprehensive_item_mapping.json');
+    }
   }
 
   async updateItem(itemId: string, updates: Partial<ItemData>): Promise<boolean> {
     const fullTable = this.loadFullTable(true);
 
     if (!fullTable[itemId]) {
-      logger.warn(`Item ${itemId} not found in table`);
-      return false;
+      // Item doesn't exist in full_table - try to initialize from comprehensive mapping
+      const itemInfo = this.getItemInfo(itemId);
+      if (itemInfo) {
+        logger.info(`Auto-creating missing item ${itemId} in full_table.json`);
+        fullTable[itemId] = {
+          name: itemInfo.name_en || itemInfo.name || `Item ${itemId}`,
+          type: itemInfo.type_en || itemInfo.type,
+          price: 0,
+          last_update: 0,
+        };
+      } else {
+        logger.warn(`Item ${itemId} not found in table or comprehensive mapping`);
+        return false;
+      }
     }
 
     const currentItem = fullTable[itemId];
