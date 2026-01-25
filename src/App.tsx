@@ -266,9 +266,26 @@ function App() {
     return item?.enabled ?? true;
   };
 
+  // Handle mouse events for click-through mode
+  const handleHeaderMouseEnter = () => {
+    if (config.clickThrough && window.electronAPI) {
+      window.electronAPI.setIgnoreMouseEvents(false);
+    }
+  };
+
+  const handleHeaderMouseLeave = () => {
+    if (config.clickThrough && window.electronAPI) {
+      window.electronAPI.setIgnoreMouseEvents(true);
+    }
+  };
+
   return (
     <div className={`app ${overlayMode ? 'overlay-mode' : ''}`} style={{ fontSize: `${fontSize}px` }}>
-      <div className="header">
+      <div
+        className="header"
+        onMouseEnter={handleHeaderMouseEnter}
+        onMouseLeave={handleHeaderMouseLeave}
+      >
         <div className="title-bar">
           <h1>Torchlight Tracker</h1>
           <div className="window-controls">
@@ -290,7 +307,11 @@ function App() {
 
       <div className="main-content">
         {overlayMode ? (
-          <div className="overlay-content">
+          <div
+            className="overlay-content"
+            onMouseEnter={handleHeaderMouseEnter}
+            onMouseLeave={handleHeaderMouseLeave}
+          >
             <div className="overlay-stats">
               {sortedDisplayItems.map((item) => {
                 if (!item.enabled) return null;

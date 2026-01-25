@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Overlay mode controls
   toggleOverlayMode: (enabled: boolean) => ipcRenderer.invoke('toggle-overlay-mode', enabled),
   toggleClickThrough: (enabled: boolean) => ipcRenderer.invoke('toggle-click-through', enabled),
+  setIgnoreMouseEvents: (ignore: boolean) => ipcRenderer.invoke('set-ignore-mouse-events', ignore),
   setFontSize: (fontSize: number) => ipcRenderer.invoke('set-font-size', fontSize),
   setDisplayItems: (displayItems: any) => ipcRenderer.invoke('set-display-items', displayItems),
 
@@ -54,6 +55,7 @@ declare global {
       exportDebugLog: () => Promise<{ success: boolean; filePath?: string }>;
       toggleOverlayMode: (enabled: boolean) => Promise<{ success: boolean }>;
       toggleClickThrough: (enabled: boolean) => Promise<{ success: boolean }>;
+      setIgnoreMouseEvents: (ignore: boolean) => Promise<{ success: boolean }>;
       setFontSize: (fontSize: number) => Promise<{ success: boolean }>;
       setDisplayItems: (displayItems: any) => Promise<{ success: boolean }>;
       windowMinimize: () => Promise<{ success: boolean }>;

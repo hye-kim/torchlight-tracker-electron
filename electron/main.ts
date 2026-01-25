@@ -324,6 +324,13 @@ ipcMain.handle('toggle-click-through', (_, enabled: boolean) => {
   return { success: true };
 });
 
+ipcMain.handle('set-ignore-mouse-events', (_, ignore: boolean) => {
+  if (mainWindow) {
+    mainWindow.setIgnoreMouseEvents(ignore, { forward: true });
+  }
+  return { success: true };
+});
+
 ipcMain.handle('set-font-size', (_, fontSize: number) => {
   configManager.setFontSize(fontSize);
   return { success: true };

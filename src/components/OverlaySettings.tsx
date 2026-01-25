@@ -98,8 +98,26 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
     onClose();
   };
 
+  // Handle mouse events for click-through mode
+  const handleMouseEnter = () => {
+    if (window.electronAPI) {
+      window.electronAPI.setIgnoreMouseEvents(false);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (window.electronAPI && config.clickThrough) {
+      window.electronAPI.setIgnoreMouseEvents(true);
+    }
+  };
+
   return (
-    <div className="dialog-overlay" onClick={onClose}>
+    <div
+      className="dialog-overlay"
+      onClick={onClose}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <div className="dialog-content overlay-settings" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
           <h2>Overlay Settings</h2>
