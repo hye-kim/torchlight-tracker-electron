@@ -61,14 +61,12 @@ function LootSummaryDropdown({ drops, costs, totalPickedUp, totalCost }: LootSum
   };
 
   return (
-    <div
-      className="loot-summary-dropdown"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <div className="loot-summary-dropdown">
       <button
         className="loot-summary-toggle"
         onClick={handleToggle}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         <span>Loot Summary</span>
         <span className={`arrow ${isOpen ? 'open' : ''}`}>▼</span>

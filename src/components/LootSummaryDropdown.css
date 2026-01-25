@@ -20,7 +20,6 @@
   cursor: pointer;
   border: none;
   transition: background-color 0.2s ease;
-  pointer-events: auto;
 }
 
 .loot-summary-toggle:hover {

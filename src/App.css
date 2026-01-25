@@ -19,7 +19,7 @@
   z-index: 1000;
   width: 100%;
   padding: 0px 16px;
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .app.overlay-mode .header-wrapper::before {
@@ -31,7 +31,7 @@
   height: 60px;
   background: transparent;
   z-index: 1001;
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .app.overlay-mode .header {

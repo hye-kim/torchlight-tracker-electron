@@ -317,12 +317,12 @@ function App() {
   return (
     <div className={`app ${overlayMode ? 'overlay-mode' : ''}`} style={{ fontSize: `${fontSize}px` }}>
       {overlayMode ? (
-        <div className="header-wrapper">
-          <div
-            className="header"
-            onMouseEnter={handleHeaderMouseEnter}
-            onMouseLeave={handleHeaderMouseLeave}
-          >
+        <div
+          className="header-wrapper"
+          onMouseEnter={handleHeaderMouseEnter}
+          onMouseLeave={handleHeaderMouseLeave}
+        >
+          <div className="header">
             <div className="title-bar">
               <h1>Torchlight Tracker</h1>
               <div className="window-controls">
