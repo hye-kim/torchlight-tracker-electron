@@ -223,13 +223,13 @@ function App() {
     const newConfig = await window.electronAPI.updateConfig(updates);
     setConfig(newConfig);
 
-    // Apply click-through immediately
+    // Apply click-through
     if (window.electronAPI) {
       await window.electronAPI.toggleClickThrough(newClickThrough);
-
-      // If enabling clickthrough, immediately activate it (don't wait for header to hide)
-      if (newClickThrough) {
-        await window.electronAPI.setIgnoreMouseEvents(true);
+      // Don't activate immediately - let mouse enter/leave handlers manage it
+      if (!newClickThrough) {
+        // If disabling, make sure click-through is off
+        await window.electronAPI.setIgnoreMouseEvents(false);
       }
     }
   };
@@ -305,27 +305,23 @@ function App() {
     return item?.enabled ?? true;
   };
 
-  // Handle mouse events for header to disable click-through when hovering
-  const handleHeaderMouseEnter = () => {
+  // Handle mouse events for overlay stats to enable click-through
+  const handleStatsMouseEnter = () => {
     if (config.clickThrough && window.electronAPI) {
-      window.electronAPI.setIgnoreMouseEvents(false);
+      window.electronAPI.setIgnoreMouseEvents(true);
     }
   };
 
-  const handleHeaderMouseLeave = () => {
-    if (config.clickThrough && window.electronAPI && !showOverlaySettings && !showSettingsDialog && !showInitDialog) {
-      window.electronAPI.setIgnoreMouseEvents(true);
+  const handleStatsMouseLeave = () => {
+    if (config.clickThrough && window.electronAPI) {
+      window.electronAPI.setIgnoreMouseEvents(false);
     }
   };
 
   return (
     <div className={`app ${overlayMode ? 'overlay-mode' : ''}`} style={{ fontSize: `${fontSize}px` }}>
       {overlayMode ? (
-        <div
-          className="header-wrapper"
-          onMouseEnter={handleHeaderMouseEnter}
-          onMouseLeave={handleHeaderMouseLeave}
-        >
+        <div className="header-wrapper">
           <div className="header">
               <div className="title-bar">
                 <h1>Torchlight Tracker</h1>
@@ -394,7 +390,11 @@ function App() {
       <div className="main-content">
         {overlayMode ? (
           <div className="overlay-content">
-            <div className="overlay-stats">
+            <div
+              className="overlay-stats"
+              onMouseEnter={handleStatsMouseEnter}
+              onMouseLeave={handleStatsMouseLeave}
+            >
               {sortedDisplayItems.map((item) => {
                 if (!item.enabled) return null;
 
