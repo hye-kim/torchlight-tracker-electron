@@ -99,6 +99,18 @@ app.whenReady().then(async () => {
     logger.error('Failed to sync prices from API:', error);
   });
 
+  // Periodically refresh prices from API every hour
+  setInterval(() => {
+    logger.info('Periodic API price refresh...');
+    fileManager.syncAllPricesFromAPI().then((count) => {
+      if (count > 0) {
+        logger.info(`Periodic refresh: synced ${count} prices from API`);
+      }
+    }).catch((error) => {
+      logger.error('Periodic API refresh failed:', error);
+    });
+  }, 3600 * 1000); // 1 hour in milliseconds
+
   // Detect game
   const { gameFound, logFilePath } = await gameDetector.detectGame();
 

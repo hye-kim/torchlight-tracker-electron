@@ -11,6 +11,7 @@ const logger = Logger.getInstance();
 export interface ItemData {
   price?: number;
   last_update?: number;
+  last_api_sync?: number;
   name?: string;
   name_en?: string;
   type?: string;
@@ -33,7 +34,6 @@ export class FileManager {
   private resourcePath: string;
   private itemDatabase: Record<string, ComprehensiveItemEntry> | null = null;
   private apiClient: APIClient;
-  private apiEnabled: boolean = true;
 
   constructor() {
     this.userDataPath = app.getPath('userData');
@@ -177,23 +177,40 @@ export class FileManager {
     }
 
     const currentItem = fullTable[itemId];
-    const localLastUpdate = currentItem.last_update || 0;
     const currentTime = Math.floor(Date.now() / 1000);
-    const timeSinceUpdate = currentTime - localLastUpdate;
+    const lastApiSync = currentItem.last_api_sync || 0;
+    const timeSinceApiSync = currentTime - lastApiSync;
 
-    if (timeSinceUpdate < API_UPDATE_THROTTLE) {
-      logger.debug(`Item ${itemId} updated recently (${timeSinceUpdate}s ago), skipping update`);
-      return true;
-    }
-
-    // Update locally
+    // Always update locally with fresh game data
     fullTable[itemId] = {
       ...currentItem,
       ...updates,
       last_update: currentTime,
     };
 
-    return this.saveFullTable(fullTable);
+    const localSuccess = this.saveFullTable(fullTable);
+
+    // Sync to API if enough time has passed since last API sync
+    if (localSuccess && timeSinceApiSync >= API_UPDATE_THROTTLE) {
+      try {
+        const apiUpdates = {
+          price: updates.price,
+          last_update: currentTime,
+        };
+        const apiResult = await this.apiClient.updateItem(itemId, apiUpdates);
+        if (apiResult) {
+          // Update last_api_sync timestamp after successful sync
+          fullTable[itemId].last_api_sync = currentTime;
+          this.saveFullTable(fullTable);
+          logger.info(`Synced price update to API for item ${itemId}: ${updates.price}`);
+        }
+      } catch (error) {
+        logger.error(`Error syncing price update to API for item ${itemId}:`, error);
+        // Don't fail the local update if API fails
+      }
+    }
+
+    return localSuccess;
   }
 
   getItemInfo(itemId: string): ItemData | null {
@@ -236,17 +253,22 @@ export class FileManager {
    * Updates the local table if a price is found.
    */
   async fetchPriceFromAPI(itemId: string): Promise<number | null> {
-    if (!this.apiEnabled) {
-      return null;
-    }
-
     try {
       const apiItem = await this.apiClient.getItem(itemId);
       if (apiItem && apiItem.price !== undefined) {
         const fullTable = this.loadFullTable(true);
         if (fullTable[itemId]) {
-          fullTable[itemId].price = apiItem.price;
-          fullTable[itemId].last_update = Math.floor(Date.now() / 1000);
+          const apiLastUpdate = apiItem.last_update || Math.floor(Date.now() / 1000);
+          const localLastUpdate = fullTable[itemId].last_update || 0;
+
+          // Only update price if API data is fresher than local
+          if (apiLastUpdate > localLastUpdate) {
+            fullTable[itemId].price = apiItem.price;
+            fullTable[itemId].last_update = apiLastUpdate;
+          }
+
+          // Always track what the API currently has
+          fullTable[itemId].last_api_sync = apiLastUpdate;
           this.saveFullTable(fullTable);
           logger.info(`Fetched price from API for ${itemId}: ${apiItem.price}`);
           return apiItem.price;
@@ -260,14 +282,9 @@ export class FileManager {
 
   /**
    * Sync all items from the API to local table.
-   * This fetches the latest prices for all items.
+   * Completely overwrites full_table.json with API data on startup.
    */
   async syncAllPricesFromAPI(): Promise<number> {
-    if (!this.apiEnabled) {
-      logger.warn('API is disabled, skipping price sync');
-      return 0;
-    }
-
     try {
       logger.info('Fetching all items from API...');
       const apiItems = await this.apiClient.getAllItems(undefined, false);
@@ -277,34 +294,48 @@ export class FileManager {
         return 0;
       }
 
-      const fullTable = this.loadFullTable(true);
-      let updateCount = 0;
+      // Load comprehensive mapping for item names/types
+      const itemMapping = this.loadJson<Record<string, { id: string; name_en?: string; type_en?: string }>>('comprehensive_item_mapping.json', {});
+
+      // Build complete table from API data
+      const fullTable: Record<string, ItemData> = {};
+      let itemCount = 0;
 
       for (const [itemId, apiItem] of Object.entries(apiItems)) {
-        if (fullTable[itemId] && apiItem.price !== undefined) {
-          fullTable[itemId].price = apiItem.price;
-          fullTable[itemId].last_update = apiItem.last_update || Math.floor(Date.now() / 1000);
-          updateCount++;
+        const mappingData = itemMapping[itemId];
+        const apiLastUpdate = apiItem.last_update || Math.floor(Date.now() / 1000);
+
+        fullTable[itemId] = {
+          name: mappingData?.name_en || apiItem.name_en || apiItem.name || `Item ${itemId}`,
+          type: mappingData?.type_en || apiItem.type_en || apiItem.type,
+          price: apiItem.price || 0,
+          last_update: apiLastUpdate,
+          last_api_sync: apiLastUpdate,
+        };
+        itemCount++;
+      }
+
+      // Add any items from comprehensive mapping that aren't in API yet
+      for (const [itemId, data] of Object.entries(itemMapping)) {
+        if (!fullTable[itemId]) {
+          fullTable[itemId] = {
+            name: data.name_en || `Item ${itemId}`,
+            type: data.type_en,
+            price: 0,
+            last_update: 0,
+          };
+          itemCount++;
         }
       }
 
-      if (updateCount > 0) {
-        this.saveFullTable(fullTable);
-        logger.info(`Synced ${updateCount} item prices from API`);
-      }
+      this.saveFullTable(fullTable);
+      logger.info(`Synced ${itemCount} items from API to full_table.json`);
 
-      return updateCount;
+      return itemCount;
     } catch (error) {
       logger.error('Error syncing prices from API:', error);
       return 0;
     }
   }
 
-  /**
-   * Enable or disable API integration.
-   */
-  setAPIEnabled(enabled: boolean): void {
-    this.apiEnabled = enabled;
-    logger.info(`API integration ${enabled ? 'enabled' : 'disabled'}`);
-  }
 }
