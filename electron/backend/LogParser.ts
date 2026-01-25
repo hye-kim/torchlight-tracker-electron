@@ -114,20 +114,7 @@ export class LogParser {
       const numValues = Math.min(values.length, PRICE_SAMPLE_SIZE);
       const roundedValues = values.slice(0, numValues).map((v) => Math.round(parseFloat(v) * 100) / 100);
 
-      // Try to find mode (most common price)
-      const counter = new Map<number, number>();
-      for (const value of roundedValues) {
-        counter.set(value, (counter.get(value) || 0) + 1);
-      }
-
-      const mostCommon = Array.from(counter.entries()).sort((a, b) => b[1] - a[1])[0];
-
-      // Use mode if it appears at least 30% of the time
-      if (mostCommon && mostCommon[1] >= roundedValues.length * 0.3) {
-        return Math.round(mostCommon[0] * 10000) / 10000;
-      }
-
-      // Fallback to median
+      // Calculate median price
       const sorted = roundedValues.sort((a, b) => a - b);
       const mid = Math.floor(sorted.length / 2);
       const median = sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
