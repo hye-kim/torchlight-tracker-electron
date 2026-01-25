@@ -40,7 +40,7 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
     },
-    icon: path.join(__dirname, '../assets/icon.ico'),
+    icon: path.join(__dirname, '../build-resources/icon.ico'),
   });
 
   if (isDev) {
