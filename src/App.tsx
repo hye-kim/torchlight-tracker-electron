@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import StatsCard from './components/StatsCard';
 import DropsCard from './components/DropsCard';
 import ControlCard from './components/ControlCard';
@@ -93,8 +93,6 @@ function App() {
   const [isInMap, setIsInMap] = useState(false);
   const [currentMap, setCurrentMap] = useState<CurrentMapData | null>(null);
   const [selectedMapNumber, setSelectedMapNumber] = useState<number | null>(null);
-  const [showHeader, setShowHeader] = useState(false);
-  const hideHeaderTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Load initial config
@@ -138,15 +136,6 @@ function App() {
       document.body.style.backgroundColor = '#1e1e2e';
     }
   }, [config.overlayMode]);
-
-  // Cleanup timer on unmount
-  useEffect(() => {
-    return () => {
-      if (hideHeaderTimerRef.current) {
-        clearTimeout(hideHeaderTimerRef.current);
-      }
-    };
-  }, []);
 
   // Auto-select current map when in map
   useEffect(() => {
@@ -316,47 +305,27 @@ function App() {
     return item?.enabled ?? true;
   };
 
-  // Handle mouse events for click-through mode and header visibility
-  const startHideHeaderTimer = () => {
-    // Clear existing timer
-    if (hideHeaderTimerRef.current) {
-      clearTimeout(hideHeaderTimerRef.current);
-    }
-
-    // Start new timer to hide header after 3 seconds
-    hideHeaderTimerRef.current = setTimeout(() => {
-      setShowHeader(false);
-      // Re-enable click-through if any dialog is open
-      if (config.clickThrough && window.electronAPI && !showOverlaySettings && !showSettingsDialog && !showInitDialog) {
-        window.electronAPI.setIgnoreMouseEvents(true);
-      }
-    }, 3000);
-  };
-
+  // Handle mouse events for click-through mode
   const handleHeaderMouseEnter = () => {
-    setShowHeader(true);
     if (config.clickThrough && window.electronAPI) {
       window.electronAPI.setIgnoreMouseEvents(false);
     }
-    startHideHeaderTimer();
   };
 
-  const handleHeaderMouseMove = () => {
-    // Refresh the timer on any mouse movement
-    startHideHeaderTimer();
+  const handleHeaderMouseLeave = () => {
+    if (config.clickThrough && window.electronAPI && !showOverlaySettings && !showSettingsDialog && !showInitDialog) {
+      window.electronAPI.setIgnoreMouseEvents(true);
+    }
   };
 
   return (
     <div className={`app ${overlayMode ? 'overlay-mode' : ''}`} style={{ fontSize: `${fontSize}px` }}>
       {overlayMode ? (
-        <div
-          className="header-hover-container"
+        <div className="header-wrapper"
           onMouseEnter={handleHeaderMouseEnter}
-          onMouseMove={handleHeaderMouseMove}
+          onMouseLeave={handleHeaderMouseLeave}
         >
-          <div className="header-hover-zone" />
-          <div className={`header-wrapper ${showHeader ? 'active' : ''}`}>
-            <div className={`header ${showHeader ? 'visible' : ''}`}>
+          <div className="header">
               <div className="title-bar">
                 <h1>Torchlight Tracker</h1>
                 <div className="window-controls">
