@@ -306,6 +306,7 @@
   border-radius: 8px;
   padding: 12px;
   border: 1px solid rgba(74, 74, 94, 0.3);
+  pointer-events: none;
 }
 
 .overlay-stat-item {
@@ -314,6 +315,7 @@
   align-items: center;
   padding: 6px 8px;
   border-radius: 4px;
+  pointer-events: none;
 }
 
 .overlay-stat-item .label {

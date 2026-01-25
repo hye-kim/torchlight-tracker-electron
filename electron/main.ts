@@ -417,3 +417,10 @@ ipcMain.handle('window-resize', (_, width: number, height: number) => {
   }
   return { success: true };
 });
+
+ipcMain.handle('get-window-bounds', () => {
+  if (mainWindow) {
+    return mainWindow.getBounds();
+  }
+  return { x: 0, y: 0, width: 400, height: 600 };
+});

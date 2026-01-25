@@ -23,20 +23,27 @@ function LootSummaryDropdown({ drops, costs, totalPickedUp, totalCost }: LootSum
 
   const totalProfit = totalPickedUp - totalCost;
 
-  const handleToggle = () => {
+  const handleToggle = async () => {
     const willOpen = !isOpen;
     setIsOpen(willOpen);
 
-    // Adjust window height when toggling
+    // Adjust window height when toggling, preserving current width
     if (window.electronAPI) {
-      setTimeout(() => {
+      setTimeout(async () => {
+        const bounds = await window.electronAPI.getWindowBounds();
+        const currentWidth = bounds.width;
+
         if (willOpen) {
           const contentHeight = document.querySelector('.loot-summary-content')?.scrollHeight || 0;
           const baseHeight = 600;
-          const newHeight = baseHeight + Math.min(contentHeight + 50, 450);
-          window.electronAPI.windowResize(400, newHeight);
+          const newHeight = Math.max(bounds.height, baseHeight + Math.min(contentHeight + 50, 450));
+          window.electronAPI.windowResize(currentWidth, newHeight);
         } else {
-          window.electronAPI.windowResize(400, 600);
+          // When closing, only resize if window was made larger
+          const baseHeight = 600;
+          if (bounds.height > baseHeight) {
+            window.electronAPI.windowResize(currentWidth, baseHeight);
+          }
         }
       }, 100);
     }
