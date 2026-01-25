@@ -258,8 +258,10 @@ export class FileManager {
       if (apiItem && apiItem.price !== undefined) {
         const fullTable = this.loadFullTable(true);
         if (fullTable[itemId]) {
+          const apiLastUpdate = apiItem.last_update || Math.floor(Date.now() / 1000);
           fullTable[itemId].price = apiItem.price;
-          fullTable[itemId].last_update = apiItem.last_update || Math.floor(Date.now() / 1000);
+          fullTable[itemId].last_update = apiLastUpdate;
+          fullTable[itemId].last_api_sync = apiLastUpdate;
           this.saveFullTable(fullTable);
           logger.info(`Fetched price from API for ${itemId}: ${apiItem.price}`);
           return apiItem.price;
@@ -290,8 +292,10 @@ export class FileManager {
 
       for (const [itemId, apiItem] of Object.entries(apiItems)) {
         if (fullTable[itemId] && apiItem.price !== undefined) {
+          const apiLastUpdate = apiItem.last_update || Math.floor(Date.now() / 1000);
           fullTable[itemId].price = apiItem.price;
-          fullTable[itemId].last_update = apiItem.last_update || Math.floor(Date.now() / 1000);
+          fullTable[itemId].last_update = apiLastUpdate;
+          fullTable[itemId].last_api_sync = apiLastUpdate;
           updateCount++;
         }
       }
