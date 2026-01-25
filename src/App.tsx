@@ -129,12 +129,13 @@ function App() {
 
   // Set body background to transparent when in overlay mode
   useEffect(() => {
+    const overlayMode = config.overlayMode ?? false;
     if (overlayMode) {
       document.body.style.backgroundColor = 'transparent';
     } else {
       document.body.style.backgroundColor = '#1e1e2e';
     }
-  }, [overlayMode]);
+  }, [config.overlayMode]);
 
   // Auto-select current map when in map
   useEffect(() => {
