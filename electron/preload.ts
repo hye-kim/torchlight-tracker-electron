@@ -1,5 +1,9 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
+// Declare DOM globals for preload context
+declare const window: Window;
+declare const document: Document;
+
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -43,10 +47,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
 });
 
 // Handle interactive elements for click-through functionality
-(window as any).addEventListener('DOMContentLoaded', () => {
-  const interactiveElements = (document as any).querySelectorAll('.interactive');
+window.addEventListener('DOMContentLoaded', () => {
+  const interactiveElements = document.querySelectorAll('.interactive');
 
-  interactiveElements.forEach((element: any) => {
+  interactiveElements.forEach((element) => {
     element.addEventListener('mouseenter', () => {
       ipcRenderer.send('set-ignore-mouse-events', false);
     });
