@@ -35,13 +35,6 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
     ]
   );
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
-  const [canClose, setCanClose] = useState(false);
-
-  // Prevent closing immediately after opening
-  useEffect(() => {
-    const timer = setTimeout(() => setCanClose(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Apply changes in real-time
   useEffect(() => {

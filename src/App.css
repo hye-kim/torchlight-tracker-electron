@@ -26,6 +26,8 @@
   backdrop-filter: blur(10px);
   padding: 8px 16px;
   border-radius: 8px;
+  pointer-events: auto;
+  width: 100%;
 }
 
 .app.overlay-mode .main-content {

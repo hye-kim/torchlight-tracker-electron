@@ -15,13 +15,6 @@ interface SettingsDialogProps {
 function SettingsDialog({ config, onSave, onClose }: SettingsDialogProps) {
   const [tax, setTax] = useState(config.tax);
   const [user, setUser] = useState(config.user);
-  const [canClose, setCanClose] = useState(false);
-
-  // Prevent closing immediately after opening
-  useEffect(() => {
-    const timer = setTimeout(() => setCanClose(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleSave = () => {
     onSave({ tax, user });

@@ -297,9 +297,9 @@ function App() {
   return (
     <div className={`app ${overlayMode ? 'overlay-mode' : ''}`} style={{ fontSize: `${fontSize}px` }}>
       {overlayMode ? (
-        <div className="header-wrapper interactive">
-          <div className="header interactive">
-              <div className="title-bar interactive">
+        <div className="header-wrapper">
+          <div className="header">
+              <div className="title-bar">
                 <h1>Torchlight Tracker</h1>
                 <div className="window-controls interactive">
                   <button
