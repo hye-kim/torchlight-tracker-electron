@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import './InitializationDialog.css';
 
 interface InitializationDialogProps {
@@ -5,8 +6,16 @@ interface InitializationDialogProps {
 }
 
 function InitializationDialog({ onClose }: InitializationDialogProps) {
+  const [canClose, setCanClose] = useState(false);
+
+  // Prevent closing immediately after opening
+  useEffect(() => {
+    const timer = setTimeout(() => setCanClose(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="dialog-overlay" onClick={onClose}>
+    <div className="dialog-overlay">
       <div className="init-dialog-content" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
           <h2>🎯 Tracker Initialization</h2>

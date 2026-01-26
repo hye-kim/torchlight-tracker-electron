@@ -6,6 +6,7 @@ interface ControlCardProps {
   onExportDebugLog: () => void;
   onOpenSettings: () => void;
   onResetStats: () => void;
+  onToggleOverlay: () => void;
   isInitialized: boolean;
   isWaitingForInit: boolean;
 }
@@ -16,6 +17,7 @@ function ControlCard({
   onExportDebugLog,
   onOpenSettings,
   onResetStats,
+  onToggleOverlay,
   isInitialized,
   isWaitingForInit,
 }: ControlCardProps) {
@@ -46,6 +48,11 @@ function ControlCard({
         <button className="control-btn" onClick={onOpenSettings}>
           <span className="btn-icon">⚙️</span>
           Settings
+        </button>
+
+        <button className="control-btn" onClick={onToggleOverlay}>
+          <span className="btn-icon">📐</span>
+          Enable Overlay Mode
         </button>
 
         <button className="control-btn danger" onClick={onResetStats}>

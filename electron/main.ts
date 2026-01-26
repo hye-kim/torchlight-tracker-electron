@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, dialog, session } from 'electron';
 import path from 'path';
-import { ConfigManager } from './backend/ConfigManager';
+import { ConfigManager, Config } from './backend/ConfigManager';
 import { FileManager } from './backend/FileManager';
 import { LogParser } from './backend/LogParser';
 import { InventoryTracker } from './backend/InventoryTracker';
@@ -15,6 +15,7 @@ const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow: BrowserWindow | null = null;
 let logMonitor: LogMonitor | null = null;
+let isSwitchingModes = false; // Flag to prevent close handler from interfering during mode switch
 
 // Core components
 const configManager = new ConfigManager();
@@ -27,14 +28,21 @@ const excelExporter = new ExcelExporter(fileManager);
 
 function createWindow() {
   const config = configManager.getConfig();
+  const overlayMode = config.overlayMode ?? false;
+
+  const width = overlayMode ? (config.overlay_width || 400) : (config.window_width || 1300);
+  const height = overlayMode ? (config.overlay_height || 1000) : (config.window_height || 900);
 
   mainWindow = new BrowserWindow({
-    width: config.window_width || 800,
-    height: config.window_height || 600,
+    width,
+    height,
     x: config.window_x,
     y: config.window_y,
-    frame: true,
-    transparent: false,
+    frame: false,
+    transparent: true,
+    titleBarStyle: 'hidden',
+    alwaysOnTop: overlayMode,
+    roundedCorners: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -42,6 +50,11 @@ function createWindow() {
     },
     icon: path.join(__dirname, '../build-resources/icon.ico'),
   });
+
+  // Apply click-through if enabled
+  if (config.clickThrough) {
+    mainWindow.setIgnoreMouseEvents(true, { forward: true });
+  }
 
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173');
@@ -51,14 +64,28 @@ function createWindow() {
   }
 
   mainWindow.on('close', () => {
-    if (mainWindow) {
+    // Don't save dimensions if we're switching modes - the toggle handler already saved them
+    if (mainWindow && !isSwitchingModes) {
       const bounds = mainWindow.getBounds();
-      configManager.updateConfig({
-        window_x: bounds.x,
-        window_y: bounds.y,
-        window_width: bounds.width,
-        window_height: bounds.height,
-      });
+      const currentConfig = configManager.getConfig();
+      const isOverlay = currentConfig.overlayMode ?? false;
+
+      // Save dimensions based on current mode
+      if (isOverlay) {
+        configManager.updateConfig({
+          window_x: bounds.x,
+          window_y: bounds.y,
+          overlay_width: bounds.width,
+          overlay_height: bounds.height,
+        });
+      } else {
+        configManager.updateConfig({
+          window_x: bounds.x,
+          window_y: bounds.y,
+          window_width: bounds.width,
+          window_height: bounds.height,
+        });
+      }
     }
   });
 
@@ -291,4 +318,116 @@ ipcMain.handle('export-debug-log', async () => {
     return { success: true, filePath };
   }
   return { success: false };
+});
+
+// Overlay mode IPC handlers
+ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
+  if (mainWindow) {
+    // Set flag to prevent close handler from overwriting dimensions
+    isSwitchingModes = true;
+
+    const config = configManager.getConfig();
+    const currentBounds = mainWindow.getBounds();
+
+    // Prepare config update with current dimensions and new overlay mode
+    const configUpdate: Partial<Config> = {
+      overlayMode: enabled,
+    };
+
+    // Save current dimensions to the mode we're switching FROM
+    // If enabled=true, we're switching TO overlay, so we're currently in normal mode
+    // If enabled=false, we're switching TO normal, so we're currently in overlay mode
+    if (enabled) {
+      // Switching TO overlay mode, save current size as normal mode dimensions
+      configUpdate.window_width = currentBounds.width;
+      configUpdate.window_height = currentBounds.height;
+    } else {
+      // Switching TO normal mode, save current size as overlay mode dimensions
+      configUpdate.overlay_width = currentBounds.width;
+      configUpdate.overlay_height = currentBounds.height;
+    }
+
+    // Apply all config updates at once
+    configManager.updateConfig(configUpdate);
+
+    // Restart app - createWindow will use the new overlayMode and appropriate dimensions
+    setTimeout(() => {
+      app.relaunch();
+      app.exit();
+    }, 200);
+  }
+  return { success: true };
+});
+
+ipcMain.handle('toggle-click-through', (_, enabled: boolean) => {
+  configManager.setClickThrough(enabled);
+  if (mainWindow) {
+    mainWindow.setIgnoreMouseEvents(enabled, { forward: true });
+  }
+  return { success: true };
+});
+
+ipcMain.handle('set-ignore-mouse-events', (_, ignore: boolean) => {
+  if (mainWindow) {
+    mainWindow.setIgnoreMouseEvents(ignore, { forward: true });
+  }
+  return { success: true };
+});
+
+// Handle set-ignore-mouse-events from ipcRenderer.send (used by preload for interactive elements)
+ipcMain.on('set-ignore-mouse-events', (_, ignore: boolean, options?: any) => {
+  if (mainWindow) {
+    mainWindow.setIgnoreMouseEvents(ignore, options || { forward: true });
+  }
+});
+
+ipcMain.handle('set-font-size', (_, fontSize: number) => {
+  configManager.setFontSize(fontSize);
+  return { success: true };
+});
+
+ipcMain.handle('set-display-items', (_, displayItems) => {
+  configManager.setDisplayItems(displayItems);
+  return { success: true };
+});
+
+// Window controls
+ipcMain.handle('window-minimize', () => {
+  if (mainWindow) {
+    mainWindow.minimize();
+  }
+  return { success: true };
+});
+
+ipcMain.handle('window-maximize', () => {
+  if (mainWindow) {
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  }
+  return { success: true };
+});
+
+ipcMain.handle('window-close', () => {
+  if (mainWindow) {
+    mainWindow.close();
+  }
+  return { success: true };
+});
+
+ipcMain.handle('window-resize', (_, width: number, height: number) => {
+  if (mainWindow) {
+    const currentSize = mainWindow.getSize();
+    mainWindow.setSize(width || currentSize[0], height || currentSize[1], true);
+  }
+  return { success: true };
+});
+
+ipcMain.handle('get-window-bounds', () => {
+  if (mainWindow) {
+    return mainWindow.getBounds();
+  }
+  return { x: 0, y: 0, width: 400, height: 600 };
 });

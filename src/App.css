@@ -4,21 +4,182 @@
   height: 100vh;
   background-color: #1e1e2e;
   color: #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.app.overlay-mode {
+  background-color: transparent;
+  width: 100%;
+  overflow: visible;
+}
+
+.app.overlay-mode .header-wrapper {
+  position: relative;
+  width: 100%;
+  padding: 0px 16px;
+  pointer-events: auto;
+}
+
+.app.overlay-mode .header {
+  background-color: rgba(42, 42, 62, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+.app.overlay-mode .main-content {
+  flex: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
+  padding: 8px 16px;
   background-color: #2a2a3e;
   border-bottom: 1px solid #4a4a5e;
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 16px;
 }
 
 .header h1 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: #8b5cf6;
+  margin: 0;
+}
+
+.window-controls {
+  display: flex;
+  gap: 4px;
+  -webkit-app-region: no-drag;
+  pointer-events: auto;
+}
+
+.window-controls button {
+  pointer-events: auto;
+}
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  position: relative;
+}
+
+.icon-btn:hover {
+  background-color: rgba(234, 179, 8, 0.3);
+  color: #fbbf24;
+}
+
+.icon-btn.active {
+  background-color: #8b5cf6;
+  color: #ffffff;
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+}
+
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.w-4 {
+  width: 1rem;
+}
+
+.h-4 {
+  height: 1rem;
+}
+
+.w-5 {
+  width: 1.25rem;
+}
+
+.h-5 {
+  height: 1.25rem;
+}
+
+/* Tooltip styling */
+.icon-btn::after,
+.window-btn::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1e1e2e;
+  color: #e2e8f0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+  border: 1px solid #4a4a5e;
+}
+
+.icon-btn:hover::after,
+.window-btn:hover::after {
+  opacity: 1;
+}
+
+.window-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background-color: transparent;
+  color: #94a3b8;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-weight: 300;
+  position: relative;
+}
+
+.window-btn:hover {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.window-btn.close:hover {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+.window-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.window-btn.maximize svg {
+  width: 16px;
+  height: 16px;
 }
 
 .opacity-control {
@@ -94,4 +255,60 @@
   padding: 16px;
   overflow-y: auto;
   min-width: 0;
+}
+
+/* Overlay Mode Styles */
+.overlay-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  width: 100%;
+}
+
+.overlay-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: rgba(30, 30, 46, 0.75);
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid rgba(74, 74, 94, 0.3);
+  pointer-events: none;
+}
+
+.overlay-stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.overlay-stat-item .label {
+  font-size: 0.9em;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.overlay-stat-item .value {
+  font-size: 0.95em;
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.overlay-stat-item .value.recording {
+  color: #10b981;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
 }
