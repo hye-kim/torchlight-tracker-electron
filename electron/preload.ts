@@ -50,7 +50,12 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     element.addEventListener('pointerleave', () => {
-      ipcRenderer.send('set-ignore-mouse-events', true);
+      // Only enable click-through if clickThrough is enabled in config
+      ipcRenderer.invoke('get-config').then((config: any) => {
+        if (config.clickThrough) {
+          ipcRenderer.send('set-ignore-mouse-events', true, { forward: true });
+        }
+      });
     });
   };
 
