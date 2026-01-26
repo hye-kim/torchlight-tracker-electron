@@ -304,10 +304,10 @@ function App() {
     <div className={`app ${overlayMode ? 'overlay-mode' : ''}`} style={{ fontSize: `${fontSize}px` }}>
       {overlayMode ? (
         <div className="header-wrapper interactive">
-          <div className="header">
-              <div className="title-bar">
+          <div className="header interactive">
+              <div className="title-bar interactive">
                 <h1>Torchlight Tracker</h1>
-                <div className="window-controls">
+                <div className="window-controls interactive">
                   <button
                     className="icon-btn"
                     onClick={(e) => {
@@ -343,7 +343,6 @@ function App() {
               </div>
             </div>
           </div>
-        </div>
       ) : (
         <div className="header">
           <div className="title-bar">

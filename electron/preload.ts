@@ -45,12 +45,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
 // Handle interactive elements for click-through functionality
 window.addEventListener('DOMContentLoaded', () => {
   const attachHandlers = (element: Element) => {
-    element.addEventListener('mouseenter', () => {
+    element.addEventListener('pointerenter', () => {
       ipcRenderer.send('set-ignore-mouse-events', false);
     });
 
-    element.addEventListener('mouseleave', () => {
-      ipcRenderer.send('set-ignore-mouse-events', true, { forward: true });
+    element.addEventListener('pointerleave', () => {
+      ipcRenderer.send('set-ignore-mouse-events', true);
     });
   };
 
