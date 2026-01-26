@@ -294,12 +294,6 @@ function App() {
   const displayItems = config.displayItems ?? [];
   const sortedDisplayItems = [...displayItems].sort((a, b) => a.order - b.order);
 
-  // Helper function to check if a display item is enabled
-  const isItemEnabled = (id: string) => {
-    const item = displayItems.find(item => item.id === id);
-    return item?.enabled ?? true;
-  };
-
   return (
     <div className={`app ${overlayMode ? 'overlay-mode' : ''}`} style={{ fontSize: `${fontSize}px` }}>
       {overlayMode ? (
