@@ -43,10 +43,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
 });
 
 // Handle interactive elements for click-through functionality
-window.addEventListener('DOMContentLoaded', () => {
-  const interactiveElements = document.querySelectorAll('.interactive');
+(window as any).addEventListener('DOMContentLoaded', () => {
+  const interactiveElements = (document as any).querySelectorAll('.interactive');
 
-  interactiveElements.forEach((element) => {
+  interactiveElements.forEach((element: any) => {
     element.addEventListener('mouseenter', () => {
       ipcRenderer.send('set-ignore-mouse-events', false);
     });
