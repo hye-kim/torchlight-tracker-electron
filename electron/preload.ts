@@ -44,9 +44,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
 // Handle interactive elements for click-through functionality
 window.addEventListener('DOMContentLoaded', () => {
-  const interactiveElements = document.querySelectorAll('.interactive');
-
-  interactiveElements.forEach((element) => {
+  const attachHandlers = (element: Element) => {
     element.addEventListener('mouseenter', () => {
       ipcRenderer.send('set-ignore-mouse-events', false);
     });
@@ -54,7 +52,29 @@ window.addEventListener('DOMContentLoaded', () => {
     element.addEventListener('mouseleave', () => {
       ipcRenderer.send('set-ignore-mouse-events', true, { forward: true });
     });
+  };
+
+  // Attach handlers to existing interactive elements
+  document.querySelectorAll('.interactive').forEach(attachHandlers);
+
+  // Watch for new interactive elements being added
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (node instanceof Element) {
+          // Check if the added node itself has interactive class
+          if (node.classList.contains('interactive')) {
+            attachHandlers(node);
+          }
+          // Check if any children have interactive class
+          node.querySelectorAll('.interactive').forEach(attachHandlers);
+        }
+      });
+    });
   });
+
+  // Start observing the document with the configured parameters
+  observer.observe(document.body, { childList: true, subtree: true });
 });
 
 // Type definitions for window.electronAPI
