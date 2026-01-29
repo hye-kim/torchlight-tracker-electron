@@ -9,7 +9,6 @@ const PATTERN_PRICE_ID = /XchgSearchPrice----SynId = (\d+).*?\+refer \[(\d+)\]/g
 const PATTERN_ITEM_CHANGE = /\[.*?\]GameLog: Display: \[Game\] ItemChange@ (Add|Update) Id=(\d+)_[^ ]+ BagNum=(\d+) in PageId=(\d+) SlotId=(\d+)/g;
 const PATTERN_BAG_MODIFY = /\[.*?\]GameLog: Display: \[Game\] BagMgr@:Modfy BagItem PageId = (\d+) SlotId = (\d+) ConfigBaseId = (\d+) Num = (\d+)/g;
 const PATTERN_BAG_INIT = /\[.*?\]GameLog: Display: \[Game\] BagMgr@:InitBagData PageId = (\d+) SlotId = (\d+) ConfigBaseId = (\d+) Num = (\d+)/g;
-const PATTERN_ITEM_CHANGE = /\[.*?\]GameLog: Display: \[Game\] ItemChange@ (Add|Update|Remove) Id=([^\s]+) BagNum=(\d+) in PageId=(\d+) SlotId=(\d+)/g;
 const PATTERN_RESET_ITEMS_START = /ItemChange@ ProtoName=ResetItemsLayout start/;
 const PATTERN_RESET_ITEMS_END = /ItemChange@ ProtoName=ResetItemsLayout end/;
 const PATTERN_ITEM_CHANGE_RESET = /ItemChange@ Reset PageId=(\d+)/g;
@@ -239,16 +238,6 @@ export class LogParser {
    */
   detectResetItemsLayoutEnd(text: string): boolean {
     return PATTERN_RESET_ITEMS_END.test(text);
-  }
-
-  extractItemChanges(text: string): BagModification[] {
-    const matches = Array.from(text.matchAll(PATTERN_ITEM_CHANGE));
-    return matches.map((m) => ({
-      pageId: m[4],
-      slotId: m[5],
-      configBaseId: m[2],
-      count: parseInt(m[3]),
-    }));
   }
 
   detectMapChange(text: string): { entering: boolean; exiting: boolean } {
