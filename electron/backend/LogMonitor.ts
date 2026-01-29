@@ -54,9 +54,8 @@ export class LogMonitor extends EventEmitter {
   private readonly INIT_BUFFER_SIZE = 100; // Buffer up to 100 lines for initialization
 
   // Buffer for pre-map item changes (consumables used right before entering)
-  private preMapChanges: Array<[string, number]> = [];
-  private lastItemChangeTime: number = 0;
-  private readonly PRE_MAP_WINDOW_MS = 3000; // Track items used within 3 seconds before map entry
+  private preMapChanges: Array<{ itemId: string; amount: number; timestamp: number }> = [];
+  private readonly PRE_MAP_WINDOW_MS = 2000; // Track items used within 2 seconds before map entry
 
   constructor(
     logFilePath: string | null,
@@ -469,6 +468,17 @@ export class LogMonitor extends EventEmitter {
       }
     }
 
+    // Detect sort operations - clear pre-map buffer when sort ends
+    // (sort movements can generate false costs)
+    if (line.includes('Sort operation ended')) {
+      if (this.preMapChanges.length > 0) {
+        logger.info(
+          `Clearing ${this.preMapChanges.length} buffered pre-map changes due to sort operation`
+        );
+        this.preMapChanges = [];
+      }
+    }
+
     // Detect map changes and update state BEFORE processing items
     const mapChange = this.logParser.detectMapChange(line);
 
@@ -479,9 +489,16 @@ export class LogMonitor extends EventEmitter {
 
       // Apply buffered pre-map item changes if within time window
       const now = Date.now();
-      if (this.preMapChanges.length > 0 && now - this.lastItemChangeTime <= this.PRE_MAP_WINDOW_MS) {
-        logger.info(`Applying ${this.preMapChanges.length} pre-map item changes (consumed within ${this.PRE_MAP_WINDOW_MS}ms before map entry)`);
-        this.statisticsTracker.processItemChanges(this.preMapChanges);
+      const recentChanges = this.preMapChanges.filter(
+        (change) => now - change.timestamp <= this.PRE_MAP_WINDOW_MS
+      );
+
+      if (recentChanges.length > 0) {
+        const changes: Array<[string, number]> = recentChanges.map((c) => [c.itemId, c.amount]);
+        logger.info(
+          `Applying ${changes.length} pre-map item changes (consumed within ${this.PRE_MAP_WINDOW_MS}ms before map entry)`
+        );
+        this.statisticsTracker.processItemChanges(changes);
         this.emit('reshowDrops');
       }
 
@@ -507,14 +524,16 @@ export class LogMonitor extends EventEmitter {
         // Only buffer negative changes (costs), not positive (drops picked up in town)
         const costsOnly = changes.filter(([_, amount]) => amount < 0);
         if (costsOnly.length > 0) {
-          this.preMapChanges.push(...costsOnly);
-          this.lastItemChangeTime = Date.now();
-
-          // Clean up old buffered changes (older than time window)
           const now = Date.now();
-          if (now - this.lastItemChangeTime > this.PRE_MAP_WINDOW_MS) {
-            this.preMapChanges = [];
+          // Add new changes with timestamps
+          for (const [itemId, amount] of costsOnly) {
+            this.preMapChanges.push({ itemId, amount, timestamp: now });
           }
+
+          // Clean up old buffered changes (keep only recent ones)
+          this.preMapChanges = this.preMapChanges.filter(
+            (change) => now - change.timestamp <= this.PRE_MAP_WINDOW_MS
+          );
         }
       }
     }
