@@ -113,6 +113,25 @@ export class InventoryTracker {
       return [];
     }
 
+    // First, process InitBagData events to update baseline (without reporting changes)
+    const bagInitEntries = this.logParser.extractBagInitData(text);
+    if (bagInitEntries.length > 0) {
+      const itemTotals = new Map<string, number>();
+
+      for (const entry of bagInitEntries) {
+        const slotKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
+        this.bagState.set(slotKey, entry.count);
+
+        const current = itemTotals.get(entry.configBaseId) || 0;
+        itemTotals.set(entry.configBaseId, current + entry.count);
+      }
+
+      // Update baselines for items that had InitBagData
+      for (const [itemId, total] of itemTotals) {
+        this.bagState.set(`init:${itemId}`, total);
+      }
+    }
+
     const bagModifications = this.logParser.extractBagModifications(text);
 
     if (bagModifications.length === 0) {
@@ -229,6 +248,13 @@ export class InventoryTracker {
   }
 
   private detectChangesWithoutInit(text: string): Array<[string, number]> {
+    // First, process InitBagData events to establish baseline (without reporting changes)
+    const bagInitEntries = this.logParser.extractBagInitData(text);
+    for (const entry of bagInitEntries) {
+      const slotKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
+      this.bagState.set(slotKey, entry.count);
+    }
+
     const bagModifications = this.logParser.extractBagModifications(text);
     if (bagModifications.length === 0) {
       return [];
