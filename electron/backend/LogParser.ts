@@ -185,12 +185,25 @@ export class LogParser {
 
   extractBagInitData(text: string): BagModification[] {
     const matches = Array.from(text.matchAll(PATTERN_BAG_INIT));
-    return matches.map((m) => ({
-      pageId: m[1],
-      slotId: m[2],
-      configBaseId: m[3],
-      count: parseInt(m[4]),
-    }));
+    return matches.map((m) => {
+      const pageId = m[1];
+      const slotId = m[2];
+      const configBaseId = m[3];
+      const count = parseInt(m[4]);
+
+      // Create synthetic fullId for InitBagData (since it doesn't have one)
+      // Format: baseId_init_pageId_slotId to make it unique per slot
+      const fullId = `${configBaseId}_init_${pageId}_${slotId}`;
+
+      return {
+        pageId,
+        slotId,
+        configBaseId,
+        count,
+        fullId,
+        action: 'Add' as const,
+      };
+    });
   }
 
   /**

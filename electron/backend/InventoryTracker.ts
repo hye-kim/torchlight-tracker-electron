@@ -79,34 +79,29 @@ export class InventoryTracker {
     this.itemInstances.clear();
     const itemTotals = new Map<string, number>();
 
+    // Initialize itemInstances with synthetic fullIds from InitBagData
     for (const entry of bagInitEntries) {
       const slotKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
       this.bagState.set(slotKey, entry.count);
 
       const current = itemTotals.get(entry.configBaseId) || 0;
       itemTotals.set(entry.configBaseId, current + entry.count);
+
+      // Store instance with synthetic fullId (created by extractBagInitData)
+      if (entry.fullId) {
+        this.itemInstances.set(entry.fullId, {
+          fullId: entry.fullId,
+          baseId: entry.configBaseId,
+          pageId: entry.pageId,
+          slotId: entry.slotId,
+          count: entry.count,
+        });
+      }
     }
 
     // Store initial totals
     for (const [itemId, total] of itemTotals) {
       this.bagState.set(`init:${itemId}`, total);
-    }
-
-    // Also try to initialize itemInstances from ItemChange events in the log
-    const itemChanges = this.logParser.extractItemChanges(text);
-    if (itemChanges.length > 0) {
-      logger.info(`Found ${itemChanges.length} ItemChange entries during initialization`);
-      for (const change of itemChanges) {
-        if (change.fullId && change.action !== 'Remove') {
-          this.itemInstances.set(change.fullId, {
-            fullId: change.fullId,
-            baseId: change.configBaseId,
-            pageId: change.pageId,
-            slotId: change.slotId,
-            count: change.count,
-          });
-        }
-      }
     }
 
     this.bagInitialized = true;
@@ -208,6 +203,13 @@ export class InventoryTracker {
       if (result.success) {
         return [];
       }
+      // If initialization not complete, return empty (don't track until initialized)
+      return [];
+    }
+
+    // If not initialized yet, return empty (requires manual initialization)
+    if (!this.bagInitialized) {
+      return [];
     }
 
     // Phase 2: Check for sort operations
@@ -226,31 +228,16 @@ export class InventoryTracker {
       return [];
     }
 
-    // Phase 3 & 4: Try using ItemChange@ events with fullId tracking
+    // Phase 3 & 4: Use ItemChange@ events with fullId tracking
+    // This is the ONLY tracking method - no fallbacks to broken slot-based logic
     const itemChanges = this.logParser.extractItemChanges(text);
-    if (itemChanges.length > 0 && this.bagInitialized) {
+    if (itemChanges.length > 0) {
       return this.processItemChangesWithFullId(itemChanges);
     }
 
-    // If no ItemChange@ events but we have BagMgr@ events, use legacy detection
-    // This handles cases where game logs different event types for different actions
-    if (this.bagInitialized && this.initializationComplete) {
-      const bagModifications = this.logParser.extractBagModifications(text);
-      if (bagModifications.length > 0) {
-        logger.debug(`No ItemChange@ events, falling back to BagMgr@ detection (${bagModifications.length} modifications)`);
-        return this.detectBagChanges(text);
-      }
-    }
-
-    // Try legacy initialization if not initialized
-    if (!this.bagInitialized) {
-      if (this.initializeBagStateLegacy(text)) {
-        return [];
-      }
-    }
-
-    // Fallback: simple detection without initialization
-    return this.detectChangesWithoutInit(text);
+    // No ItemChange@ events in this batch - return empty
+    // (ItemChange@ should always be present when items change)
+    return [];
   }
 
   /**
@@ -276,25 +263,35 @@ export class InventoryTracker {
     if (bagInitEntries.length >= MIN_BAG_ITEMS_FOR_INIT) {
       logger.info(`Updating inventory state from ${bagInitEntries.length} InitBagData entries after sort`);
 
-      // Clear old slot-based state
+      // Clear old instances and rebuild from InitBagData
+      this.itemInstances.clear();
       const itemTotals = new Map<string, number>();
 
-      // Update bag state with new slots
+      // Update bag state and itemInstances with new slot positions
       for (const entry of bagInitEntries) {
         const slotKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
         this.bagState.set(slotKey, entry.count);
 
         const current = itemTotals.get(entry.configBaseId) || 0;
         itemTotals.set(entry.configBaseId, current + entry.count);
+
+        // Store instance with synthetic fullId (items have new positions after sort)
+        if (entry.fullId) {
+          this.itemInstances.set(entry.fullId, {
+            fullId: entry.fullId,
+            baseId: entry.configBaseId,
+            pageId: entry.pageId,
+            slotId: entry.slotId,
+            count: entry.count,
+          });
+        }
       }
 
-      // Update initial totals (baseline remains the same, just update tracking)
-      // We don't reset the baseline because items didn't actually change, just moved
-
-      // Process any ItemChange events that came after the sort
+      // Process any ItemChange events that came after the sort (with real fullIds)
       const postSortChanges = this.logParser.extractItemChanges(text);
       if (postSortChanges.length > 0) {
-        // Update item instances with new positions
+        logger.info(`Found ${postSortChanges.length} ItemChange events after sort - updating instances with real fullIds`);
+        // These have real fullIds, so they replace the synthetic ones
         for (const change of postSortChanges) {
           if (change.fullId) {
             this.itemInstances.set(change.fullId, {
@@ -378,20 +375,37 @@ export class InventoryTracker {
             count: change.count,
           });
         } else {
-          // First time seeing this fullId - check if item existed in this slot before
+          // First time seeing this fullId - might be replacing a synthetic one
           const slotKey = `${change.pageId}:${change.slotId}:${change.configBaseId}`;
           const previousCount = this.bagState.get(slotKey) || 0;
 
-          // Calculate delta from previous slot state
-          const delta = change.count - previousCount;
+          // Check if there's a synthetic fullId for this slot (from InitBagData)
+          const syntheticFullId = `${change.configBaseId}_init_${change.pageId}_${change.slotId}`;
+          const syntheticInstance = this.itemInstances.get(syntheticFullId);
 
-          if (delta !== 0) {
-            const netChange = realChanges.get(change.configBaseId) || 0;
-            realChanges.set(change.configBaseId, netChange + delta);
-            logger.debug(`Item tracked (first fullId): ${change.fullId} (${change.configBaseId}) ${previousCount} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`);
+          if (syntheticInstance) {
+            // Replace synthetic fullId with real one
+            this.itemInstances.delete(syntheticFullId);
+            logger.debug(`Replacing synthetic fullId ${syntheticFullId} with real fullId ${change.fullId}`);
+
+            // Compare with synthetic instance count
+            const delta = change.count - syntheticInstance.count;
+            if (delta !== 0) {
+              const netChange = realChanges.get(change.configBaseId) || 0;
+              realChanges.set(change.configBaseId, netChange + delta);
+              logger.debug(`Item count changed: ${change.fullId} (${change.configBaseId}) ${syntheticInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`);
+            }
+          } else {
+            // No synthetic fullId - calculate delta from bagState
+            const delta = change.count - previousCount;
+            if (delta !== 0) {
+              const netChange = realChanges.get(change.configBaseId) || 0;
+              realChanges.set(change.configBaseId, netChange + delta);
+              logger.debug(`Item tracked (first fullId): ${change.fullId} (${change.configBaseId}) ${previousCount} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`);
+            }
           }
 
-          // Track this item instance going forward
+          // Track this item instance going forward with real fullId
           this.itemInstances.set(change.fullId, {
             fullId: change.fullId,
             baseId: change.configBaseId,
