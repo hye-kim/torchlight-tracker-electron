@@ -4,7 +4,7 @@ import { app } from 'electron';
 import axios from 'axios';
 import { Logger } from './Logger';
 import { APIClient } from './APIClient';
-import { API_UPDATE_THROTTLE } from './constants';
+import { API_UPDATE_THROTTLE, DEFAULT_API_URL, FULL_TABLE_FILE, COMPREHENSIVE_ITEM_DATABASE_FILE, DROP_LOG_FILE } from './constants';
 
 const logger = Logger.getInstance();
 
@@ -41,7 +41,7 @@ export class FileManager {
       ? process.resourcesPath
       : path.join(process.cwd(), '..');
 
-    this.apiUrl = 'https://torchlight-price-tracker.onrender.com';
+    this.apiUrl = DEFAULT_API_URL;
     this.apiClient = new APIClient(this.apiUrl, 60, 3);
   }
 
@@ -103,12 +103,12 @@ export class FileManager {
       return this.fullTableCache;
     }
 
-    const data = this.loadJson<Record<string, ItemData>>('full_table.json', {});
+    const data = this.loadJson<Record<string, ItemData>>(FULL_TABLE_FILE, {});
 
     // Merge with comprehensive item database to get proper names
     if (!this.itemDatabase) {
       this.itemDatabase = this.loadJson<Record<string, ComprehensiveItemEntry>>(
-        'comprehensive_item_mapping.json',
+        COMPREHENSIVE_ITEM_DATABASE_FILE,
         {}
       );
     }
@@ -136,7 +136,7 @@ export class FileManager {
   }
 
   saveFullTable(data: Record<string, ItemData>): boolean {
-    const success = this.saveJson('full_table.json', data);
+    const success = this.saveJson(FULL_TABLE_FILE, data);
     if (success) {
       this.fullTableCache = data;
     }
@@ -144,7 +144,7 @@ export class FileManager {
   }
 
   async initializeFullTableFromEnTable(): Promise<void> {
-    const fullTablePath = this.getWritablePath('full_table.json');
+    const fullTablePath = this.getWritablePath(FULL_TABLE_FILE);
 
     if (fs.existsSync(fullTablePath)) {
       logger.info('full_table.json already exists');
@@ -152,7 +152,7 @@ export class FileManager {
     }
 
     logger.info('Initializing full_table.json from comprehensive_item_mapping.json');
-    const itemMapping = this.loadJson<Record<string, { id: string; name_en?: string; type_en?: string }>>('comprehensive_item_mapping.json', {});
+    const itemMapping = this.loadJson<Record<string, { id: string; name_en?: string; type_en?: string }>>(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
 
     const fullTable: Record<string, ItemData> = {};
     for (const [id, data] of Object.entries(itemMapping)) {
@@ -215,7 +215,7 @@ export class FileManager {
 
   getItemInfo(itemId: string): ItemData | null {
     // First check comprehensive item database
-    const compDb = this.loadJson<Record<string, any>>('comprehensive_item_mapping.json', {});
+    const compDb = this.loadJson<Record<string, any>>(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
     if (compDb[itemId]) {
       return compDb[itemId];
     }
@@ -235,7 +235,7 @@ export class FileManager {
   }
 
   logDrop(itemId: string, quantity: number, price: number): void {
-    const dropLogPath = this.getWritablePath('drop.txt');
+    const dropLogPath = this.getWritablePath(DROP_LOG_FILE);
     const timestamp = new Date().toISOString();
     const itemInfo = this.getItemInfo(itemId);
     const itemName = itemInfo?.name || itemId;
@@ -295,7 +295,7 @@ export class FileManager {
       }
 
       // Load comprehensive mapping for item names/types
-      const itemMapping = this.loadJson<Record<string, { id: string; name_en?: string; type_en?: string }>>('comprehensive_item_mapping.json', {});
+      const itemMapping = this.loadJson<Record<string, { id: string; name_en?: string; type_en?: string }>>(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
 
       // Build complete table from API data
       const fullTable: Record<string, ItemData> = {};

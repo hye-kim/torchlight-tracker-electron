@@ -17,6 +17,7 @@ import {
   LOG_FILE_ROTATION_MAX_RETRIES,
   LOG_FILE_ROTATION_RETRY_DELAY,
   LOG_POLL_INTERVAL,
+  COMPREHENSIVE_ITEM_DATABASE_FILE,
 } from './constants';
 
 const logger = Logger.getInstance();
@@ -296,7 +297,7 @@ export class LogMonitor extends EventEmitter {
       const currentStats = this.statisticsTracker.getCurrentMapStats();
       const totalStats = this.statisticsTracker.getTotalStats();
       const fullTable = this.fileManager.loadFullTable();
-      const itemMapping = this.fileManager.loadJson<Record<string, { id: string; img?: string; name_en?: string; type_en?: string }>>('comprehensive_item_mapping.json', {});
+      const itemMapping = this.fileManager.loadJson<Record<string, { id: string; img?: string; name_en?: string; type_en?: string }>>(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
 
       // Helper to get item image URL from comprehensive mapping
       const getItemImageUrl = (itemId: string): string | undefined => {

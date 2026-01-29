@@ -1,6 +1,6 @@
 import { FileManager, ItemData } from './FileManager';
 import { Logger } from './Logger';
-import { PATTERN_SUBREGION_ENTER, getSubregionDisplayName } from './constants';
+import { PATTERN_SUBREGION_ENTER, getSubregionDisplayName, EXCLUDED_ITEM_ID, PRICE_SAMPLE_SIZE } from './constants';
 
 const logger = Logger.getInstance();
 
@@ -38,8 +38,6 @@ const LOG_NOISE_PATTERNS = [
 ];
 
 const NOISE_REGEX = new RegExp(LOG_NOISE_PATTERNS.join('|'), 'i');
-const EXCLUDED_ITEM_ID = '100300';
-const PRICE_SAMPLE_SIZE = 30;
 
 export interface BagModification {
   pageId: string;
