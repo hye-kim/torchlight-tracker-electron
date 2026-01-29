@@ -20,9 +20,10 @@ export class InventoryTracker {
   private initializationInProgress: boolean = false;
   private firstScan: boolean = true;
 
-  // Phase 2: Sort detection
+  // Phase 2: Sort detection (for logging and safety)
   private isInSortOperation: boolean = false;
-  private sortBuffer: BagModification[] = [];
+  private sortStartTime: number = 0;
+  private readonly SORT_TIMEOUT_MS = 5000; // 5 seconds timeout for stuck sort state
 
   // Phase 3: FullId-based tracking
   private itemInstances: Map<string, ItemInstance> = new Map();
@@ -42,7 +43,7 @@ export class InventoryTracker {
     this.initializationInProgress = false;
     this.firstScan = true;
     this.isInSortOperation = false;
-    this.sortBuffer = [];
+    this.sortStartTime = 0;
     this.itemInstances.clear();
     this.changeBuffer = [];
     this.lastProcessTime = 0;
@@ -170,97 +171,39 @@ export class InventoryTracker {
       return [];
     }
 
-    // Phase 2: Check for sort operations
+    // Check for stuck sort state and auto-recover
+    if (this.isInSortOperation) {
+      const now = Date.now();
+      if (now - this.sortStartTime > this.SORT_TIMEOUT_MS) {
+        logger.warn(
+          `Sort operation timed out after ${this.SORT_TIMEOUT_MS}ms - auto-recovering from stuck state`
+        );
+        this.isInSortOperation = false;
+        this.sortStartTime = 0;
+      }
+    }
+
+    // Detect sort operations for logging purposes
     if (this.logParser.detectResetItemsLayoutStart(text)) {
-      this.handleSortStart();
+      this.isInSortOperation = true;
+      this.sortStartTime = Date.now();
+      logger.info('Sort operation started - continuing to track item changes normally');
     }
 
     if (this.logParser.detectResetItemsLayoutEnd(text)) {
-      return this.handleSortEnd(text);
+      logger.info('Sort operation ended');
+      this.isInSortOperation = false;
+      this.sortStartTime = 0;
     }
 
-    // If in sort operation, buffer changes and return nothing
-    if (this.isInSortOperation) {
-      const itemChanges = this.logParser.extractItemChanges(text);
-      this.sortBuffer.push(...itemChanges);
-      return [];
-    }
-
-    // Phase 3 & 4: Use ItemChange@ events with fullId tracking
-    // This is the ONLY tracking method - no fallbacks to broken slot-based logic
+    // Process all ItemChange@ events normally, regardless of sort state
+    // The fullId-based tracking already distinguishes movements from quantity changes
     const itemChanges = this.logParser.extractItemChanges(text);
     if (itemChanges.length > 0) {
       return this.processItemChangesWithFullId(itemChanges);
     }
 
     // No ItemChange@ events in this batch - return empty
-    // (ItemChange@ should always be present when items change)
-    return [];
-  }
-
-  /**
-   * Phase 2: Handle sort operation start.
-   */
-  private handleSortStart(): void {
-    this.isInSortOperation = true;
-    this.sortBuffer = [];
-    logger.info('Sort operation started - buffering changes');
-  }
-
-  /**
-   * Phase 2: Handle sort operation end.
-   * After sort, process buffered ItemChange@ events to update positions.
-   */
-  private handleSortEnd(text: string): Array<[string, number]> {
-    logger.info('Sort operation ended - processing buffered changes');
-    this.isInSortOperation = false;
-
-    // Process buffered ItemChange events from the sort operation
-    // These are just movements (slot changes), not quantity changes
-    if (this.sortBuffer.length > 0) {
-      logger.info(`Processing ${this.sortBuffer.length} buffered ItemChange events from sort`);
-
-      // Update itemInstances with new positions
-      for (const change of this.sortBuffer) {
-        if (change.fullId) {
-          this.itemInstances.set(change.fullId, {
-            fullId: change.fullId,
-            baseId: change.configBaseId,
-            pageId: change.pageId,
-            slotId: change.slotId,
-            count: change.count,
-          });
-
-          // Update bagState
-          const slotKey = `${change.pageId}:${change.slotId}:${change.configBaseId}`;
-          this.bagState.set(slotKey, change.count);
-        }
-      }
-    }
-
-    // Process any ItemChange events that came after the sort end marker
-    const postSortChanges = this.logParser.extractItemChanges(text);
-    if (postSortChanges.length > 0) {
-      logger.info(`Found ${postSortChanges.length} ItemChange events after sort end`);
-      for (const change of postSortChanges) {
-        if (change.fullId) {
-          this.itemInstances.set(change.fullId, {
-            fullId: change.fullId,
-            baseId: change.configBaseId,
-            pageId: change.pageId,
-            slotId: change.slotId,
-            count: change.count,
-          });
-
-          // Update bagState
-          const slotKey = `${change.pageId}:${change.slotId}:${change.configBaseId}`;
-          this.bagState.set(slotKey, change.count);
-        }
-      }
-    }
-
-    // Clear sort buffer
-    this.sortBuffer = [];
     return [];
   }
 
