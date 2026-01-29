@@ -8,6 +8,10 @@ const logger = Logger.getInstance();
 const PATTERN_PRICE_ID = /XchgSearchPrice----SynId = (\d+).*?\+refer \[(\d+)\]/gs;
 const PATTERN_BAG_MODIFY = /\[.*?\]GameLog: Display: \[Game\] BagMgr@:Modfy BagItem PageId = (\d+) SlotId = (\d+) ConfigBaseId = (\d+) Num = (\d+)/g;
 const PATTERN_BAG_INIT = /\[.*?\]GameLog: Display: \[Game\] BagMgr@:InitBagData PageId = (\d+) SlotId = (\d+) ConfigBaseId = (\d+) Num = (\d+)/g;
+const PATTERN_ITEM_CHANGE = /\[.*?\]GameLog: Display: \[Game\] ItemChange@ (Add|Update|Remove) Id=([^\s]+) BagNum=(\d+) in PageId=(\d+) SlotId=(\d+)/g;
+const PATTERN_RESET_ITEMS_START = /ItemChange@ ProtoName=ResetItemsLayout start/;
+const PATTERN_RESET_ITEMS_END = /ItemChange@ ProtoName=ResetItemsLayout end/;
+const PATTERN_ITEM_CHANGE_RESET = /ItemChange@ Reset PageId=(\d+)/g;
 const PATTERN_MAP_ENTER = /PageApplyBase@ _UpdateGameEnd: LastSceneName = World'\/Game\/Art\/Maps\/01SD\/XZ_YuJinZhiXiBiNanSuo200\/XZ_YuJinZhiXiBiNanSuo200.XZ_YuJinZhiXiBiNanSuo200' NextSceneName = World'\/Game\/Art\/Maps/;
 const PATTERN_MAP_EXIT = /NextSceneName = World'\/Game\/Art\/Maps\/01SD\/XZ_YuJinZhiXiBiNanSuo200\/XZ_YuJinZhiXiBiNanSuo200.XZ_YuJinZhiXiBiNanSuo200'/;
 const PATTERN_VALUE = /\+\d+\s+\[([\d.]+)\]/g;
@@ -44,6 +48,8 @@ export interface BagModification {
   slotId: string;
   configBaseId: string;
   count: number;
+  fullId?: string; // Unique item instance ID (e.g., "100300_5be0cefd-fcbf-11f0-be72-00000000001f")
+  action?: 'Add' | 'Update' | 'Remove'; // Action type for ItemChange events
 }
 
 export class LogParser {
@@ -185,6 +191,40 @@ export class LogParser {
       configBaseId: m[3],
       count: parseInt(m[4]),
     }));
+  }
+
+  /**
+   * Extract ItemChange@ events with unique fullId.
+   * These events track individual item stacks with persistent identifiers.
+   */
+  extractItemChanges(text: string): BagModification[] {
+    const matches = Array.from(text.matchAll(PATTERN_ITEM_CHANGE));
+    return matches.map((m) => {
+      const fullId = m[2];
+      const baseId = fullId.split('_')[0]; // Extract base ID from fullId
+      return {
+        action: m[1] as 'Add' | 'Update' | 'Remove',
+        fullId: fullId,
+        pageId: m[4],
+        slotId: m[5],
+        configBaseId: baseId,
+        count: parseInt(m[3]),
+      };
+    });
+  }
+
+  /**
+   * Detect if text contains ResetItemsLayout start event (sorting begins).
+   */
+  detectResetItemsLayoutStart(text: string): boolean {
+    return PATTERN_RESET_ITEMS_START.test(text);
+  }
+
+  /**
+   * Detect if text contains ResetItemsLayout end event (sorting complete).
+   */
+  detectResetItemsLayoutEnd(text: string): boolean {
+    return PATTERN_RESET_ITEMS_END.test(text);
   }
 
   detectMapChange(text: string): { entering: boolean; exiting: boolean } {
