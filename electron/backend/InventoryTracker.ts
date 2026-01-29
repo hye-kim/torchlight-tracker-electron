@@ -86,7 +86,7 @@ export class InventoryTracker {
       const current = itemTotals.get(entry.configBaseId) || 0;
       itemTotals.set(entry.configBaseId, current + entry.count);
 
-      // Store instance with synthetic fullId (created by extractBagInitData)
+      // Store instance with fullId from ItemChange events
       if (entry.fullId) {
         this.itemInstances.set(entry.fullId, {
           fullId: entry.fullId,
@@ -155,54 +155,6 @@ export class InventoryTracker {
     return false;
   }
 
-  detectBagChanges(text: string): Array<[string, number]> {
-    if (!this.bagInitialized) {
-      return [];
-    }
-
-    const itemChanges = this.logParser.extractItemChanges(text);
-    if (itemChanges.length === 0) {
-      return [];
-    }
-
-    const changes: Array<[string, number]> = [];
-
-    // Update bagState with all ItemChange events
-    for (const entry of itemChanges) {
-      const slotKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
-      this.bagState.set(slotKey, entry.count);
-    }
-
-    // Calculate current totals and compare with baseline
-    const modifiedItems = new Set<string>();
-    for (const entry of itemChanges) {
-      modifiedItems.add(entry.configBaseId);
-    }
-
-    for (const itemId of modifiedItems) {
-      const initKey = `init:${itemId}`;
-      const baselineTotal = this.bagState.get(initKey) || 0;
-
-      // Calculate current total by summing ALL slots for this itemId
-      let currentTotal = 0;
-      for (const [key, value] of this.bagState) {
-        if (!key.startsWith('init:') && key.endsWith(`:${itemId}`)) {
-          currentTotal += value;
-        }
-      }
-
-      const netChange = currentTotal - baselineTotal;
-
-      if (netChange !== 0) {
-        changes.push([itemId, netChange]);
-        // Update baseline to current total
-        this.bagState.set(initKey, currentTotal);
-      }
-    }
-
-    return changes;
-  }
-
   scanForChanges(text: string): Array<[string, number]> {
     // Handle initialization if awaiting
     if (this.awaitingInitialization) {
@@ -258,57 +210,52 @@ export class InventoryTracker {
 
   /**
    * Phase 2: Handle sort operation end.
-   * After sort, we get a fresh inventory snapshot from InitBagData.
+   * After sort, process buffered ItemChange@ events to update positions.
    */
   private handleSortEnd(text: string): Array<[string, number]> {
-    logger.info('Sort operation ended - processing snapshot');
+    logger.info('Sort operation ended - processing buffered changes');
     this.isInSortOperation = false;
 
-    // Get fresh snapshot from InitBagData
-    const bagInitEntries = this.logParser.extractBagInitData(text);
+    // Process buffered ItemChange events from the sort operation
+    // These are just movements (slot changes), not quantity changes
+    if (this.sortBuffer.length > 0) {
+      logger.info(`Processing ${this.sortBuffer.length} buffered ItemChange events from sort`);
 
-    if (bagInitEntries.length >= MIN_BAG_ITEMS_FOR_INIT) {
-      logger.info(`Updating inventory state from ${bagInitEntries.length} InitBagData entries after sort`);
-
-      // Clear old instances and rebuild from InitBagData
-      this.itemInstances.clear();
-      const itemTotals = new Map<string, number>();
-
-      // Update bag state and itemInstances with new slot positions
-      for (const entry of bagInitEntries) {
-        const slotKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
-        this.bagState.set(slotKey, entry.count);
-
-        const current = itemTotals.get(entry.configBaseId) || 0;
-        itemTotals.set(entry.configBaseId, current + entry.count);
-
-        // Store instance with synthetic fullId (items have new positions after sort)
-        if (entry.fullId) {
-          this.itemInstances.set(entry.fullId, {
-            fullId: entry.fullId,
-            baseId: entry.configBaseId,
-            pageId: entry.pageId,
-            slotId: entry.slotId,
-            count: entry.count,
+      // Update itemInstances with new positions
+      for (const change of this.sortBuffer) {
+        if (change.fullId) {
+          this.itemInstances.set(change.fullId, {
+            fullId: change.fullId,
+            baseId: change.configBaseId,
+            pageId: change.pageId,
+            slotId: change.slotId,
+            count: change.count,
           });
+
+          // Update bagState
+          const slotKey = `${change.pageId}:${change.slotId}:${change.configBaseId}`;
+          this.bagState.set(slotKey, change.count);
         }
       }
+    }
 
-      // Process any ItemChange events that came after the sort (with real fullIds)
-      const postSortChanges = this.logParser.extractItemChanges(text);
-      if (postSortChanges.length > 0) {
-        logger.info(`Found ${postSortChanges.length} ItemChange events after sort - updating instances with real fullIds`);
-        // These have real fullIds, so they replace the synthetic ones
-        for (const change of postSortChanges) {
-          if (change.fullId) {
-            this.itemInstances.set(change.fullId, {
-              fullId: change.fullId,
-              baseId: change.configBaseId,
-              pageId: change.pageId,
-              slotId: change.slotId,
-              count: change.count,
-            });
-          }
+    // Process any ItemChange events that came after the sort end marker
+    const postSortChanges = this.logParser.extractItemChanges(text);
+    if (postSortChanges.length > 0) {
+      logger.info(`Found ${postSortChanges.length} ItemChange events after sort end`);
+      for (const change of postSortChanges) {
+        if (change.fullId) {
+          this.itemInstances.set(change.fullId, {
+            fullId: change.fullId,
+            baseId: change.configBaseId,
+            pageId: change.pageId,
+            slotId: change.slotId,
+            count: change.count,
+          });
+
+          // Update bagState
+          const slotKey = `${change.pageId}:${change.slotId}:${change.configBaseId}`;
+          this.bagState.set(slotKey, change.count);
         }
       }
     }
@@ -449,60 +396,6 @@ export class InventoryTracker {
     }
 
     return result;
-  }
-
-  private detectChangesWithoutInit(text: string): Array<[string, number]> {
-    const itemChanges = this.logParser.extractItemChanges(text);
-    if (itemChanges.length === 0) {
-      return [];
-    }
-
-    const changes: Array<[string, number]> = [];
-
-    // Calculate previous totals by summing all slots per itemId
-    const previousTotals = new Map<string, number>();
-    for (const [slotKey, qty] of this.bagState) {
-      if (!slotKey.startsWith('init:')) {
-        const parts = slotKey.split(':');
-        if (parts.length === 3) {
-          const itemId = parts[2];
-          previousTotals.set(itemId, (previousTotals.get(itemId) || 0) + qty);
-        }
-      }
-    }
-
-    // Update bagState with all ItemChange events
-    const modifiedItems = new Set<string>();
-    for (const entry of itemChanges) {
-      const slotKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
-      this.bagState.set(slotKey, entry.count);
-      modifiedItems.add(entry.configBaseId);
-    }
-
-    // Calculate current totals by summing all slots per itemId
-    const currentTotals = new Map<string, number>();
-    for (const [slotKey, qty] of this.bagState) {
-      if (!slotKey.startsWith('init:')) {
-        const parts = slotKey.split(':');
-        if (parts.length === 3) {
-          const itemId = parts[2];
-          currentTotals.set(itemId, (currentTotals.get(itemId) || 0) + qty);
-        }
-      }
-    }
-
-    // Track ALL changes (both increases and decreases) for modified items
-    // Positive = drops, Negative = costs
-    for (const itemId of modifiedItems) {
-      const currentTotal = currentTotals.get(itemId) || 0;
-      const previousTotal = previousTotals.get(itemId) || 0;
-      const change = currentTotal - previousTotal;
-      if (change !== 0) {
-        changes.push([itemId, change]);
-      }
-    }
-
-    return changes;
   }
 
   resetMapBaseline(): number {
