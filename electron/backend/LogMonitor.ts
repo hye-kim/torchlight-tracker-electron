@@ -49,6 +49,10 @@ export class LogMonitor extends EventEmitter {
   private lastPriceCheck: number = Date.now();
   private readonly PRICE_BUFFER_INTERVAL = 1000; // Check price buffer every 1 second
 
+  // Buffer for initialization (needs multiple ItemChange entries)
+  private initBuffer: string[] = [];
+  private readonly INIT_BUFFER_SIZE = 100; // Buffer up to 100 lines for initialization
+
   constructor(
     logFilePath: string | null,
     logParser: LogParser,
@@ -259,6 +263,9 @@ export class LogMonitor extends EventEmitter {
       }
     }
 
+    // Clear initialization buffer
+    this.initBuffer = [];
+
     // Ensure log file is closed
     this.closeLogFile();
 
@@ -420,12 +427,28 @@ export class LogMonitor extends EventEmitter {
    * Process a single log line for map state and item tracking.
    */
   private processLogLine(line: string): void {
-    // Check for initialization completion
+    // Check for initialization - buffer lines until we have enough
     if (this.inventoryTracker['awaitingInitialization']) {
-      const result = this.inventoryTracker.processInitialization(line);
-      if (result.success && result.itemCount) {
-        this.emit('initializationComplete', result.itemCount);
+      this.initBuffer.push(line);
+
+      // Once we have enough lines buffered, try initialization
+      if (this.initBuffer.length >= this.INIT_BUFFER_SIZE) {
+        const bufferedText = this.initBuffer.join('\n');
+        const result = this.inventoryTracker.processInitialization(bufferedText);
+
+        if (result.success && result.itemCount) {
+          this.emit('initializationComplete', result.itemCount);
+          this.initBuffer = []; // Clear buffer after successful init
+        } else {
+          // Keep oldest 50 lines, discard oldest half to make room
+          if (this.initBuffer.length >= this.INIT_BUFFER_SIZE * 2) {
+            this.initBuffer = this.initBuffer.slice(this.INIT_BUFFER_SIZE);
+          }
+        }
       }
+
+      // Don't process other events until initialized
+      return;
     }
 
     // Detect subregion entry
