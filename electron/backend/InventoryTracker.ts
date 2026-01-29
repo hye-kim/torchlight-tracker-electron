@@ -232,9 +232,14 @@ export class InventoryTracker {
       return this.processItemChangesWithFullId(itemChanges);
     }
 
-    // If initialized and complete, detect changes using legacy method
+    // If no ItemChange@ events but we have BagMgr@ events, use legacy detection
+    // This handles cases where game logs different event types for different actions
     if (this.bagInitialized && this.initializationComplete) {
-      return this.detectBagChanges(text);
+      const bagModifications = this.logParser.extractBagModifications(text);
+      if (bagModifications.length > 0) {
+        logger.debug(`No ItemChange@ events, falling back to BagMgr@ detection (${bagModifications.length} modifications)`);
+        return this.detectBagChanges(text);
+      }
     }
 
     // Try legacy initialization if not initialized
@@ -316,8 +321,11 @@ export class InventoryTracker {
   private processItemChangesWithFullId(changes: BagModification[]): Array<[string, number]> {
     const realChanges = new Map<string, number>();
 
+    logger.debug(`Processing ${changes.length} ItemChange events with fullId tracking (${this.itemInstances.size} instances tracked)`);
+
     for (const change of changes) {
       if (!change.fullId) {
+        logger.warn(`ItemChange event missing fullId: ${JSON.stringify(change)}`);
         continue; // Skip if no fullId
       }
 
@@ -370,7 +378,20 @@ export class InventoryTracker {
             count: change.count,
           });
         } else {
-          // New item (first time seeing this fullId)
+          // First time seeing this fullId - check if item existed in this slot before
+          const slotKey = `${change.pageId}:${change.slotId}:${change.configBaseId}`;
+          const previousCount = this.bagState.get(slotKey) || 0;
+
+          // Calculate delta from previous slot state
+          const delta = change.count - previousCount;
+
+          if (delta !== 0) {
+            const netChange = realChanges.get(change.configBaseId) || 0;
+            realChanges.set(change.configBaseId, netChange + delta);
+            logger.debug(`Item tracked (first fullId): ${change.fullId} (${change.configBaseId}) ${previousCount} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`);
+          }
+
+          // Track this item instance going forward
           this.itemInstances.set(change.fullId, {
             fullId: change.fullId,
             baseId: change.configBaseId,
@@ -378,10 +399,6 @@ export class InventoryTracker {
             slotId: change.slotId,
             count: change.count,
           });
-
-          const netChange = realChanges.get(change.configBaseId) || 0;
-          realChanges.set(change.configBaseId, netChange + change.count);
-          logger.debug(`Item tracked (new): ${change.fullId} (${change.configBaseId}) x${change.count}`);
         }
       }
     }
@@ -404,6 +421,10 @@ export class InventoryTracker {
       if (delta !== 0) {
         result.push([itemId, delta]);
       }
+    }
+
+    if (result.length > 0) {
+      logger.info(`Detected ${result.length} real changes via fullId tracking: ${result.map(([id, amt]) => `${id}:${amt > 0 ? '+' : ''}${amt}`).join(', ')}`);
     }
 
     return result;
