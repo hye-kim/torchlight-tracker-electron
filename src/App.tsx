@@ -125,6 +125,11 @@ function App() {
       setIsInitialized(true);
       setIsWaitingForInit(false);
     });
+
+    // Listen for overlay mode changes
+    window.electronAPI.onOverlayModeChanged((overlayMode: boolean) => {
+      setConfig((prev) => ({ ...prev, overlayMode }));
+    });
   }, []);
 
   // Set body background to transparent when in overlay mode
@@ -419,7 +424,7 @@ function App() {
                       <div key={item.id} className="overlay-stat-item">
                         <span className="label">Map Duration:</span>
                         <span className="value">
-                          {Math.floor((stats?.currentMap.duration || 0) / 60)}m {(stats?.currentMap.duration || 0) % 60}s
+                          {Math.floor((stats?.currentMap.duration || 0) / 60)}m {Math.floor((stats?.currentMap.duration || 0) % 60)}s
                         </span>
                       </div>
                     );
@@ -428,7 +433,7 @@ function App() {
                       <div key={item.id} className="overlay-stat-item">
                         <span className="label">Total Duration:</span>
                         <span className="value">
-                          {Math.floor((stats?.total.duration || 0) / 60)}m {(stats?.total.duration || 0) % 60}s
+                          {Math.floor((stats?.total.duration || 0) / 60)}m {Math.floor((stats?.total.duration || 0) % 60)}s
                         </span>
                       </div>
                     );
