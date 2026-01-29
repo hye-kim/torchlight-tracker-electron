@@ -53,6 +53,11 @@ export class LogMonitor extends EventEmitter {
   private initBuffer: string[] = [];
   private readonly INIT_BUFFER_SIZE = 100; // Buffer up to 100 lines for initialization
 
+  // Buffer for pre-map item changes (consumables used right before entering)
+  private preMapChanges: Array<[string, number]> = [];
+  private lastItemChangeTime: number = 0;
+  private readonly PRE_MAP_WINDOW_MS = 3000; // Track items used within 3 seconds before map entry
+
   constructor(
     logFilePath: string | null,
     logParser: LogParser,
@@ -266,6 +271,9 @@ export class LogMonitor extends EventEmitter {
     // Clear initialization buffer
     this.initBuffer = [];
 
+    // Clear pre-map changes buffer
+    this.preMapChanges = [];
+
     // Ensure log file is closed
     this.closeLogFile();
 
@@ -468,18 +476,47 @@ export class LogMonitor extends EventEmitter {
       this.statisticsTracker.enterMap(this.pendingSubregion || subregion);
       this.pendingSubregion = null;
       this.inventoryTracker.resetMapBaseline();
+
+      // Apply buffered pre-map item changes if within time window
+      const now = Date.now();
+      if (this.preMapChanges.length > 0 && now - this.lastItemChangeTime <= this.PRE_MAP_WINDOW_MS) {
+        logger.info(`Applying ${this.preMapChanges.length} pre-map item changes (consumed within ${this.PRE_MAP_WINDOW_MS}ms before map entry)`);
+        this.statisticsTracker.processItemChanges(this.preMapChanges);
+        this.emit('reshowDrops');
+      }
+
+      // Clear pre-map buffer
+      this.preMapChanges = [];
     }
 
     if (mapChange.exiting) {
       this.statisticsTracker.exitMap();
+      // Clear any buffered pre-map changes when exiting (shouldn't have any, but just in case)
+      this.preMapChanges = [];
     }
 
     // Process item changes with current map state
-    // This ensures items are tracked with the correct isInMap state
     const changes = this.inventoryTracker.scanForChanges(line);
-    if (changes.length > 0 && this.statisticsTracker.getIsInMap()) {
-      this.statisticsTracker.processItemChanges(changes);
-      this.emit('reshowDrops');
+    if (changes.length > 0) {
+      if (this.statisticsTracker.getIsInMap()) {
+        // In map - track immediately
+        this.statisticsTracker.processItemChanges(changes);
+        this.emit('reshowDrops');
+      } else {
+        // Outside map - buffer for potential pre-map application
+        // Only buffer negative changes (costs), not positive (drops picked up in town)
+        const costsOnly = changes.filter(([_, amount]) => amount < 0);
+        if (costsOnly.length > 0) {
+          this.preMapChanges.push(...costsOnly);
+          this.lastItemChangeTime = Date.now();
+
+          // Clean up old buffered changes (older than time window)
+          const now = Date.now();
+          if (now - this.lastItemChangeTime > this.PRE_MAP_WINDOW_MS) {
+            this.preMapChanges = [];
+          }
+        }
+      }
     }
   }
 
