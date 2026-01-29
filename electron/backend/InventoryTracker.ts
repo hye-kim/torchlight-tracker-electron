@@ -120,26 +120,47 @@ export class InventoryTracker {
     }
 
     const changes: Array<[string, number]> = [];
-    const slotChanges = new Map<string, number>();
 
-    // Track changes per slot
+    // Group modifications by itemId to detect which items are being updated
+    const itemsBeingModified = new Set<string>();
     for (const entry of bagModifications) {
-      const slotKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
-      const prevCount = this.bagState.get(slotKey) || 0;
-      this.bagState.set(slotKey, entry.count);
-
-      const current = slotChanges.get(entry.configBaseId) || 0;
-      slotChanges.set(entry.configBaseId, current + (entry.count - prevCount));
+      itemsBeingModified.add(entry.configBaseId);
     }
 
-    // Calculate net changes
-    for (const [itemId, slotChange] of slotChanges) {
-      if (slotChange === 0) continue;
+    // CRITICAL FIX: For each item being modified, clear ALL existing slot data for that item.
+    // This prevents stale slot data from inflating totals when items change slots.
+    //
+    // Example: If you have 10x item in slot 5, then pick up 3 more and the game moves
+    // all 13 to slot 7, the game log only shows "slot 7 = 13" without clearing slot 5.
+    // By clearing all slots for this item first, we ensure the total is calculated from
+    // only the fresh BagModify data, giving us the correct total of 13 instead of 23.
+    for (const itemId of itemsBeingModified) {
+      const keysToDelete: string[] = [];
+      for (const [key] of this.bagState) {
+        if (!key.startsWith('init:') && key.endsWith(`:${itemId}`)) {
+          keysToDelete.push(key);
+        }
+      }
+      if (keysToDelete.length > 0) {
+        logger.debug(`Clearing ${keysToDelete.length} stale slots for item ${itemId}`);
+      }
+      for (const key of keysToDelete) {
+        this.bagState.delete(key);
+      }
+    }
 
+    // Now process the fresh slot data from BagModify logs
+    for (const entry of bagModifications) {
+      const slotKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
+      this.bagState.set(slotKey, entry.count);
+    }
+
+    // Calculate net changes by comparing new totals to baselines
+    for (const itemId of itemsBeingModified) {
       const initKey = `init:${itemId}`;
       const initialTotal = this.bagState.get(initKey) || 0;
 
-      // Calculate current total for this item
+      // Calculate current total for this item from fresh slot data
       let currentTotal = 0;
       for (const [key, value] of this.bagState) {
         if (!key.startsWith('init:') && key.endsWith(`:${itemId}`)) {
@@ -201,8 +222,28 @@ export class InventoryTracker {
       }
     }
 
-    // Apply modifications
+    // Apply the same fix: clear stale slots before applying modifications
     const currentState = new Map(this.bagState);
+    const itemsBeingModified = new Set<string>();
+    for (const entry of bagModifications) {
+      itemsBeingModified.add(entry.configBaseId);
+    }
+
+    // Clear all slots for items being modified to prevent stale data
+    for (const itemId of itemsBeingModified) {
+      const keysToDelete: string[] = [];
+      for (const [key] of currentState) {
+        const parts = key.split(':');
+        if (parts.length === 3 && parts[2] === itemId) {
+          keysToDelete.push(key);
+        }
+      }
+      for (const key of keysToDelete) {
+        currentState.delete(key);
+      }
+    }
+
+    // Now apply fresh modifications
     for (const entry of bagModifications) {
       const itemKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
       currentState.set(itemKey, entry.count);
