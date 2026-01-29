@@ -224,12 +224,14 @@ export class InventoryTracker {
       }
     }
 
-    // Find increases (drops) for modified items only
+    // Track ALL changes (both increases and decreases) for modified items
+    // Positive = drops, Negative = costs
     for (const itemId of modifiedItems) {
       const currentTotal = currentTotals.get(itemId) || 0;
       const previousTotal = previousTotals.get(itemId) || 0;
-      if (currentTotal > previousTotal) {
-        drops.push([itemId, currentTotal - previousTotal]);
+      const change = currentTotal - previousTotal;
+      if (change !== 0) {
+        drops.push([itemId, change]);
       }
     }
 
