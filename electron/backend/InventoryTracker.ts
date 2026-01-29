@@ -124,12 +124,54 @@ export class InventoryTracker {
     // Track which items were modified
     const modifiedItems = new Set<string>();
 
+    // CRITICAL: Detect if any NEW slots are appearing (indicating reorganization/sorting)
+    // Group modifications by itemId and check for new slots
+    const itemSlotData = new Map<string, { newSlots: Set<string>; hasNewSlot: boolean }>();
+
+    for (const entry of bagModifications) {
+      const slotKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
+      const itemId = entry.configBaseId;
+
+      if (!itemSlotData.has(itemId)) {
+        itemSlotData.set(itemId, { newSlots: new Set(), hasNewSlot: false });
+      }
+
+      const data = itemSlotData.get(itemId)!;
+      data.newSlots.add(slotKey);
+
+      // Check if this slot is NEW (not currently in bagState)
+      if (!this.bagState.has(slotKey)) {
+        data.hasNewSlot = true;
+      }
+
+      modifiedItems.add(itemId);
+    }
+
+    // Clear old slots if new slots detected (prevents double-counting during reorganization)
+    for (const [itemId, data] of itemSlotData) {
+      if (data.hasNewSlot) {
+        // New slot detected = item was reorganized
+        // Clear ALL existing slots for this item to prevent double-counting
+        const keysToDelete: string[] = [];
+        for (const [key] of this.bagState) {
+          if (!key.startsWith('init:') && key.endsWith(`:${itemId}`)) {
+            keysToDelete.push(key);
+          }
+        }
+
+        if (keysToDelete.length > 0) {
+          logger.debug(`Item ${itemId}: Clearing ${keysToDelete.length} old slots (detected new slot)`);
+          for (const key of keysToDelete) {
+            this.bagState.delete(key);
+          }
+        }
+      }
+    }
+
     // Update bagState with BagModify data
-    // BagModify only shows slots that CHANGED, not all slots for an item
     for (const entry of bagModifications) {
       const slotKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
       this.bagState.set(slotKey, entry.count);
-      modifiedItems.add(entry.configBaseId);
     }
 
     // For each modified item, calculate total by summing ALL slots for that itemId
@@ -204,14 +246,50 @@ export class InventoryTracker {
       }
     }
 
-    // Track which items were modified
+    // Track which items were modified and detect new slots
     const modifiedItems = new Set<string>();
+    const itemSlotData = new Map<string, { newSlots: Set<string>; hasNewSlot: boolean }>();
+
+    for (const entry of bagModifications) {
+      const slotKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
+      const itemId = entry.configBaseId;
+
+      if (!itemSlotData.has(itemId)) {
+        itemSlotData.set(itemId, { newSlots: new Set(), hasNewSlot: false });
+      }
+
+      const data = itemSlotData.get(itemId)!;
+      data.newSlots.add(slotKey);
+
+      // Check if this slot is NEW
+      if (!this.bagState.has(slotKey)) {
+        data.hasNewSlot = true;
+      }
+
+      modifiedItems.add(itemId);
+    }
+
+    // Clear old slots if new slots detected
+    for (const [itemId, data] of itemSlotData) {
+      if (data.hasNewSlot) {
+        const keysToDelete: string[] = [];
+        for (const [key] of this.bagState) {
+          const parts = key.split(':');
+          if (parts.length === 3 && parts[2] === itemId) {
+            keysToDelete.push(key);
+          }
+        }
+
+        for (const key of keysToDelete) {
+          this.bagState.delete(key);
+        }
+      }
+    }
 
     // Apply modifications
     for (const entry of bagModifications) {
       const itemKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
       this.bagState.set(itemKey, entry.count);
-      modifiedItems.add(entry.configBaseId);
     }
 
     // Calculate current totals by summing all slots per itemId
