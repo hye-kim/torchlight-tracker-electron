@@ -9,6 +9,7 @@ import { GameDetector } from './backend/GameDetector';
 import { LogMonitor } from './backend/LogMonitor';
 import { Logger } from './backend/Logger';
 import { ExcelExporter } from './backend/ExcelExporter';
+import { CONFIG_FILE } from './backend/constants';
 
 const logger = Logger.getInstance();
 const isDev = process.env.NODE_ENV === 'development';
@@ -106,7 +107,7 @@ app.whenReady().then(async () => {
   );
 
   // Initialize data files
-  await fileManager.ensureFileExists('config.json', {
+  await fileManager.ensureFileExists(CONFIG_FILE, {
     tax: 1,
     user: '',
   });

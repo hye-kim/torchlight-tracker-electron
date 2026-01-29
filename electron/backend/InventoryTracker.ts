@@ -1,9 +1,8 @@
 import { LogParser, BagModification } from './LogParser';
 import { Logger } from './Logger';
+import { MIN_BAG_ITEMS_FOR_INIT, MIN_BAG_ITEMS_LEGACY } from './constants';
 
 const logger = Logger.getInstance();
-const MIN_BAG_ITEMS_FOR_INIT = 20;
-const MIN_BAG_ITEMS_LEGACY = 10;
 
 interface ItemInstance {
   fullId: string;

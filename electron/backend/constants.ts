@@ -2,10 +2,8 @@
  * Constants used throughout the Torchlight Infinite Price Tracker application.
  */
 
-// Application Information
-export const APP_NAME = 'Torchlight Price Checker';
-export const APP_VERSION = '0.0.3';
-export const APP_TITLE = `${APP_NAME} v${APP_VERSION}`;
+// API Configuration
+export const DEFAULT_API_URL = 'https://torchlight-price-tracker.onrender.com';
 
 // File Paths
 export const CONFIG_FILE = 'config.json';
@@ -13,22 +11,10 @@ export const FULL_TABLE_FILE = 'full_table.json';
 export const COMPREHENSIVE_ITEM_DATABASE_FILE = 'comprehensive_item_mapping.json';
 export const DROP_LOG_FILE = 'drop.txt';
 
-// Game Detection
-export const GAME_WINDOW_TITLE = 'Torchlight: Infinite  ';
-export const LOG_FILE_RELATIVE_PATH = '../../../TorchLight/Saved/Logs/UE_game.log';
-
 // Price Configuration
 export const TAX_RATE = 0.875; // 12.5% tax
 export const PRICE_SAMPLE_SIZE = 30;
 export const EXCLUDED_ITEM_ID = '100300';
-
-// Status Indicators
-export const STATUS_FRESH = '✔'; // < 2 hours
-export const STATUS_STALE = '◯'; // 2-24 hours
-export const STATUS_OLD = '✘'; // > 24 hours
-
-export const TIME_FRESH_THRESHOLD = 7200; // 2 hours in seconds
-export const TIME_STALE_THRESHOLD = 86400; // 24 hours in seconds
 
 // Initialization Configuration
 export const MIN_BAG_ITEMS_FOR_INIT = 20;
@@ -102,46 +88,6 @@ export function formatDuration(seconds: number): string {
     return `${hours}h ${minutes}m ${secs}s`;
   }
   return `${minutes}m ${secs}s`;
-}
-
-/**
- * Determine the freshness status of a price based on last update time.
- */
-export function getPriceFreshnessStatus(lastUpdate: number, currentTime: number): string {
-  const timePassed = currentTime - lastUpdate;
-
-  if (timePassed < TIME_FRESH_THRESHOLD) {
-    return 'Fresh';
-  } else if (timePassed < TIME_STALE_THRESHOLD) {
-    return 'Stale';
-  } else {
-    return 'Old';
-  }
-}
-
-/**
- * Get the visual indicator for price freshness.
- */
-export function getPriceFreshnessIndicator(lastUpdate: number, currentTime: number): string {
-  const timePassed = currentTime - lastUpdate;
-
-  if (timePassed < TIME_FRESH_THRESHOLD) {
-    return STATUS_FRESH;
-  } else if (timePassed < TIME_STALE_THRESHOLD) {
-    return STATUS_STALE;
-  } else {
-    return STATUS_OLD;
-  }
-}
-
-/**
- * Calculate Flame Elementium per hour rate.
- */
-export function calculateFePerHour(income: number, duration: number): number {
-  if (duration <= 0) {
-    return 0.0;
-  }
-  return income / (duration / 3600);
 }
 
 /**

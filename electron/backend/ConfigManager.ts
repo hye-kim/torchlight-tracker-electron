@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { app } from 'electron';
+import { CONFIG_FILE, DEFAULT_API_URL } from './constants';
 
 export interface DisplayItem {
   id: string;
@@ -32,7 +33,7 @@ export class ConfigManager {
 
   constructor() {
     const userDataPath = app.getPath('userData');
-    this.configPath = path.join(userDataPath, 'config.json');
+    this.configPath = path.join(userDataPath, CONFIG_FILE);
     this.config = this.loadConfig();
   }
 
@@ -51,7 +52,7 @@ export class ConfigManager {
       opacity: 1.0,
       tax: 0,
       user: '',
-      api_url: 'https://torchlight-price-tracker.onrender.com',
+      api_url: DEFAULT_API_URL,
       overlayMode: false,
       clickThrough: false,
       fontSize: 14,
@@ -109,7 +110,7 @@ export class ConfigManager {
   }
 
   getApiUrl(): string {
-    return this.config.api_url || 'https://torchlight-price-tracker.onrender.com';
+    return this.config.api_url || DEFAULT_API_URL;
   }
 
   getOverlayMode(): boolean {

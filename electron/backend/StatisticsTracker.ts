@@ -449,16 +449,6 @@ export class StatisticsTracker extends EventEmitter {
   }
 
   /**
-   * Format seconds as "Xm Ys" string.
-   * @deprecated Use formatDuration from constants module instead.
-   */
-  getFormattedTime(seconds: number): string {
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}m${s}s`;
-  }
-
-  /**
    * Set the exclude list for filtering items.
    */
   setExcludeList(excludeList: string[]): void {
