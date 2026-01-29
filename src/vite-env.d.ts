@@ -22,6 +22,7 @@ interface ElectronAPI {
   getWindowBounds: () => Promise<{ x: number; y: number; width: number; height: number }>;
   onUpdateDisplay: (callback: (data: any) => void) => void;
   onInitializationComplete: (callback: () => void) => void;
+  onOverlayModeChanged: (callback: (overlayMode: boolean) => void) => void;
 }
 
 declare global {
