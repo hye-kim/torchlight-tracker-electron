@@ -15,7 +15,6 @@ const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow: BrowserWindow | null = null;
 let logMonitor: LogMonitor | null = null;
-let isSwitchingModes = false; // Flag to prevent close handler from interfering during mode switch
 
 // Core components
 const configManager = new ConfigManager();
@@ -64,8 +63,7 @@ function createWindow() {
   }
 
   mainWindow.on('close', () => {
-    // Don't save dimensions if we're switching modes - the toggle handler already saved them
-    if (mainWindow && !isSwitchingModes) {
+    if (mainWindow) {
       const bounds = mainWindow.getBounds();
       const currentConfig = configManager.getConfig();
       const isOverlay = currentConfig.overlayMode ?? false;
@@ -323,9 +321,6 @@ ipcMain.handle('export-debug-log', async () => {
 // Overlay mode IPC handlers
 ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
   if (mainWindow) {
-    // Set flag to prevent close handler from overwriting dimensions
-    isSwitchingModes = true;
-
     const config = configManager.getConfig();
     const currentBounds = mainWindow.getBounds();
 
@@ -341,20 +336,39 @@ ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
       // Switching TO overlay mode, save current size as normal mode dimensions
       configUpdate.window_width = currentBounds.width;
       configUpdate.window_height = currentBounds.height;
+
+      // Apply overlay window properties
+      const overlayWidth = config.overlay_width ?? 400;
+      const overlayHeight = config.overlay_height ?? 1000;
+      mainWindow.setBounds({
+        width: overlayWidth,
+        height: overlayHeight,
+        x: currentBounds.x,
+        y: currentBounds.y,
+      });
+      mainWindow.setAlwaysOnTop(true);
     } else {
       // Switching TO normal mode, save current size as overlay mode dimensions
       configUpdate.overlay_width = currentBounds.width;
       configUpdate.overlay_height = currentBounds.height;
+
+      // Apply normal window properties
+      const normalWidth = config.window_width ?? 1300;
+      const normalHeight = config.window_height ?? 900;
+      mainWindow.setBounds({
+        width: normalWidth,
+        height: normalHeight,
+        x: currentBounds.x,
+        y: currentBounds.y,
+      });
+      mainWindow.setAlwaysOnTop(false);
     }
 
     // Apply all config updates at once
     configManager.updateConfig(configUpdate);
 
-    // Restart app - createWindow will use the new overlayMode and appropriate dimensions
-    setTimeout(() => {
-      app.relaunch();
-      app.exit();
-    }, 200);
+    // Notify renderer to update UI layout
+    mainWindow.webContents.send('overlay-mode-changed', enabled);
   }
   return { success: true };
 });
