@@ -40,6 +40,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onInitializationComplete: (callback: () => void) => {
     ipcRenderer.on('initialization-complete', () => callback());
   },
+
+  onOverlayModeChanged: (callback: (overlayMode: boolean) => void) => {
+    ipcRenderer.on('overlay-mode-changed', (_, overlayMode) => callback(overlayMode));
+  },
 });
 
 // Handle interactive elements for click-through functionality
@@ -107,6 +111,7 @@ declare global {
       getWindowBounds: () => Promise<{ x: number; y: number; width: number; height: number }>;
       onUpdateDisplay: (callback: (data: any) => void) => void;
       onInitializationComplete: (callback: () => void) => void;
+      onOverlayModeChanged: (callback: (overlayMode: boolean) => void) => void;
     };
   }
 }
