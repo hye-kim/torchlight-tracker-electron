@@ -231,9 +231,36 @@ export class InventoryTracker {
           realChanges.set(previousInstance.baseId, netChange - previousInstance.count);
           this.itemInstances.delete(change.fullId);
           logger.debug(`Item removed: ${change.fullId} (${previousInstance.baseId}) x${previousInstance.count}`);
+        } else {
+          // No previousInstance - use bagState as fallback
+          const slotKey = `${change.pageId}:${change.slotId}:${change.configBaseId}`;
+          const previousCount = this.bagState.get(slotKey) || 0;
+          if (previousCount > 0) {
+            const netChange = realChanges.get(change.configBaseId) || 0;
+            realChanges.set(change.configBaseId, netChange - previousCount);
+            logger.debug(`Item removed (no instance): ${change.fullId} (${change.configBaseId}) x${previousCount} from bagState`);
+          }
         }
       } else if (change.action === 'Add') {
         // New item added
+        if (previousInstance) {
+          // Unexpected: Add for an item we're already tracking
+          // Treat as an Update instead
+          logger.warn(`Add event for existing fullId: ${change.fullId} - treating as Update`);
+          const delta = change.count - previousInstance.count;
+          if (delta !== 0) {
+            const netChange = realChanges.get(change.configBaseId) || 0;
+            realChanges.set(change.configBaseId, netChange + delta);
+            logger.debug(`Item count changed (Add as Update): ${change.fullId} (${change.configBaseId}) ${previousInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`);
+          }
+        } else {
+          // Normal Add - new item
+          const netChange = realChanges.get(change.configBaseId) || 0;
+          realChanges.set(change.configBaseId, netChange + change.count);
+          logger.debug(`Item added: ${change.fullId} (${change.configBaseId}) x${change.count}`);
+        }
+
+        // Update itemInstances regardless
         this.itemInstances.set(change.fullId, {
           fullId: change.fullId,
           baseId: change.configBaseId,
@@ -241,10 +268,6 @@ export class InventoryTracker {
           slotId: change.slotId,
           count: change.count,
         });
-
-        const netChange = realChanges.get(change.configBaseId) || 0;
-        realChanges.set(change.configBaseId, netChange + change.count);
-        logger.debug(`Item added: ${change.fullId} (${change.configBaseId}) x${change.count}`);
       } else if (change.action === 'Update') {
         if (previousInstance) {
           // Check if this is a movement or a quantity change
