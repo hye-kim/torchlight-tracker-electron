@@ -6,6 +6,7 @@ const logger = Logger.getInstance();
 
 // Constants
 const PATTERN_PRICE_ID = /XchgSearchPrice----SynId = (\d+).*?\+refer \[(\d+)\]/gs;
+const PATTERN_ITEM_CHANGE = /\[.*?\]GameLog: Display: \[Game\] ItemChange@ (Add|Update) Id=(\d+)_[^ ]+ BagNum=(\d+) in PageId=(\d+) SlotId=(\d+)/g;
 const PATTERN_BAG_MODIFY = /\[.*?\]GameLog: Display: \[Game\] BagMgr@:Modfy BagItem PageId = (\d+) SlotId = (\d+) ConfigBaseId = (\d+) Num = (\d+)/g;
 const PATTERN_BAG_INIT = /\[.*?\]GameLog: Display: \[Game\] BagMgr@:InitBagData PageId = (\d+) SlotId = (\d+) ConfigBaseId = (\d+) Num = (\d+)/g;
 const PATTERN_MAP_ENTER = /PageApplyBase@ _UpdateGameEnd: LastSceneName = World'\/Game\/Art\/Maps\/01SD\/XZ_YuJinZhiXiBiNanSuo200\/XZ_YuJinZhiXiBiNanSuo200.XZ_YuJinZhiXiBiNanSuo200' NextSceneName = World'\/Game\/Art\/Maps/;
@@ -184,6 +185,16 @@ export class LogParser {
       slotId: m[2],
       configBaseId: m[3],
       count: parseInt(m[4]),
+    }));
+  }
+
+  extractItemChanges(text: string): BagModification[] {
+    const matches = Array.from(text.matchAll(PATTERN_ITEM_CHANGE));
+    return matches.map((m) => ({
+      pageId: m[4],
+      slotId: m[5],
+      configBaseId: m[2],
+      count: parseInt(m[3]),
     }));
   }
 
