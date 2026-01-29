@@ -7,8 +7,6 @@ const logger = Logger.getInstance();
 // Constants
 const PATTERN_PRICE_ID = /XchgSearchPrice----SynId = (\d+).*?\+refer \[(\d+)\]/gs;
 const PATTERN_ITEM_CHANGE = /\[.*?\]GameLog: Display: \[Game\] ItemChange@ (Add|Update|Remove) Id=(\d+_[^ ]+) BagNum=(\d+) in PageId=(\d+) SlotId=(\d+)/g;
-const PATTERN_BAG_MODIFY = /\[.*?\]GameLog: Display: \[Game\] BagMgr@:Modfy BagItem PageId = (\d+) SlotId = (\d+) ConfigBaseId = (\d+) Num = (\d+)/g;
-const PATTERN_BAG_INIT = /\[.*?\]GameLog: Display: \[Game\] BagMgr@:InitBagData PageId = (\d+) SlotId = (\d+) ConfigBaseId = (\d+) Num = (\d+)/g;
 const PATTERN_RESET_ITEMS_START = /ItemChange@ ProtoName=ResetItemsLayout start/;
 const PATTERN_RESET_ITEMS_END = /ItemChange@ ProtoName=ResetItemsLayout end/;
 const PATTERN_ITEM_CHANGE_RESET = /ItemChange@ Reset PageId=(\d+)/g;
@@ -171,39 +169,6 @@ export class LogParser {
     }
 
     return updateCount;
-  }
-
-  extractBagModifications(text: string): BagModification[] {
-    const matches = Array.from(text.matchAll(PATTERN_BAG_MODIFY));
-    return matches.map((m) => ({
-      pageId: m[1],
-      slotId: m[2],
-      configBaseId: m[3],
-      count: parseInt(m[4]),
-    }));
-  }
-
-  extractBagInitData(text: string): BagModification[] {
-    const matches = Array.from(text.matchAll(PATTERN_BAG_INIT));
-    return matches.map((m) => {
-      const pageId = m[1];
-      const slotId = m[2];
-      const configBaseId = m[3];
-      const count = parseInt(m[4]);
-
-      // Create synthetic fullId for InitBagData (since it doesn't have one)
-      // Format: baseId_init_pageId_slotId to make it unique per slot
-      const fullId = `${configBaseId}_init_${pageId}_${slotId}`;
-
-      return {
-        pageId,
-        slotId,
-        configBaseId,
-        count,
-        fullId,
-        action: 'Add' as const,
-      };
-    });
   }
 
   /**
