@@ -67,26 +67,27 @@ export class InventoryTracker {
       return { success: false };
     }
 
-    const itemChanges = this.logParser.extractItemChanges(text);
+    // Use BagMgr@:InitBagData for initialization (provides complete inventory state for all pages)
+    const bagData = this.logParser.extractBagData(text);
 
-    if (itemChanges.length < MIN_BAG_ITEMS_FOR_INIT) {
+    if (bagData.length < MIN_BAG_ITEMS_FOR_INIT) {
       return { success: false };
     }
 
-    logger.info(`Found ${itemChanges.length} ItemChange entries - initializing`);
+    logger.info(`Found ${bagData.length} BagMgr@:InitBagData entries - initializing`);
 
     this.bagState.clear();
     this.itemInstances.clear();
     const itemTotals = new Map<string, number>();
 
-    for (const entry of itemChanges) {
+    for (const entry of bagData) {
       const slotKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
       this.bagState.set(slotKey, entry.count);
 
       const current = itemTotals.get(entry.configBaseId) || 0;
       itemTotals.set(entry.configBaseId, current + entry.count);
 
-      // Store instance with fullId from ItemChange events
+      // Store instance with synthetic fullId (will be replaced when real ItemChange@ appears)
       if (entry.fullId) {
         this.itemInstances.set(entry.fullId, {
           fullId: entry.fullId,
@@ -109,7 +110,7 @@ export class InventoryTracker {
     this.initializationInProgress = false;
 
     logger.info(
-      `Initialization complete: ${itemTotals.size} unique items, ${itemChanges.length} inventory slots`
+      `Initialization complete: ${itemTotals.size} unique items, ${bagData.length} inventory slots (all pages)`
     );
 
     return { success: true, itemCount: itemTotals.size };
