@@ -16,6 +16,7 @@ import {
   LOG_FILE_ROTATION_RETRY_DELAY,
   LOG_POLL_INTERVAL,
   COMPREHENSIVE_ITEM_DATABASE_FILE,
+  MIN_BAG_ITEMS_FOR_INIT,
 } from './constants';
 
 const logger = Logger.getInstance();
@@ -49,9 +50,8 @@ export class LogMonitor extends EventEmitter {
   private lastPriceCheck: number = Date.now();
   private readonly PRICE_BUFFER_INTERVAL = 1000; // Check price buffer every 1 second
 
-  // Buffer for initialization (needs multiple ItemChange entries)
-  private initBuffer: string[] = [];
-  private readonly INIT_BUFFER_SIZE = 100; // Buffer up to 100 lines for initialization
+  // Buffer for initialization (collects BagMgr@:InitBagData entries)
+  private bagMgrBuffer: string[] = [];
 
   // Buffer for pre-map item changes (consumables used right before entering)
   private preMapChanges: Array<{ itemId: string; amount: number; timestamp: number }> = [];
@@ -268,7 +268,7 @@ export class LogMonitor extends EventEmitter {
     }
 
     // Clear initialization buffer
-    this.initBuffer = [];
+    this.bagMgrBuffer = [];
 
     // Clear pre-map changes buffer
     this.preMapChanges = [];
@@ -434,23 +434,25 @@ export class LogMonitor extends EventEmitter {
    * Process a single log line for map state and item tracking.
    */
   private processLogLine(line: string): void {
-    // Check for initialization - buffer lines until we have enough
+    // Check for initialization - buffer BagMgr@:InitBagData lines
     if (this.inventoryTracker['awaitingInitialization']) {
-      this.initBuffer.push(line);
-
-      // Once we have enough lines buffered, try initialization
-      if (this.initBuffer.length >= this.INIT_BUFFER_SIZE) {
-        const bufferedText = this.initBuffer.join('\n');
+      if (line.includes('BagMgr@:InitBagData')) {
+        // This is a BagMgr line, add it to the buffer
+        this.bagMgrBuffer.push(line);
+      } else if (this.bagMgrBuffer.length >= MIN_BAG_ITEMS_FOR_INIT) {
+        // We've collected enough BagMgr entries and now hit a non-BagMgr line
+        // This signals the end of the BagMgr sequence - process the buffer
+        const bufferedText = this.bagMgrBuffer.join('\n');
         const result = this.inventoryTracker.processInitialization(bufferedText);
 
         if (result.success && result.itemCount) {
+          logger.info(`Initialization successful with ${this.bagMgrBuffer.length} BagMgr entries`);
           this.emit('initializationComplete', result.itemCount);
-          this.initBuffer = []; // Clear buffer after successful init
+          this.bagMgrBuffer = []; // Clear buffer after successful init
         } else {
-          // Keep oldest 50 lines, discard oldest half to make room
-          if (this.initBuffer.length >= this.INIT_BUFFER_SIZE * 2) {
-            this.initBuffer = this.initBuffer.slice(this.INIT_BUFFER_SIZE);
-          }
+          // Initialization failed despite having enough entries - log warning
+          logger.warn(`Initialization failed despite buffering ${this.bagMgrBuffer.length} BagMgr entries`);
+          // Keep buffer for next attempt
         }
       }
 
