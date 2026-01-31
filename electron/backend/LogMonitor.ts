@@ -11,13 +11,12 @@ import { FileManager } from './FileManager';
 import { InventoryTracker } from './InventoryTracker';
 import { StatisticsTracker } from './StatisticsTracker';
 import {
-  LOG_BATCH_INTERVAL,
-  LOG_BATCH_SIZE,
   LOG_FILE_REOPEN_INTERVAL,
   LOG_FILE_ROTATION_MAX_RETRIES,
   LOG_FILE_ROTATION_RETRY_DELAY,
   LOG_POLL_INTERVAL,
   COMPREHENSIVE_ITEM_DATABASE_FILE,
+  MIN_BAG_ITEMS_FOR_INIT,
 } from './constants';
 
 const logger = Logger.getInstance();
@@ -40,16 +39,23 @@ export class LogMonitor extends EventEmitter {
   private logFilePosition: number = 0;
   private lastReopenCheck: number = Date.now();
 
-  // Message batching
-  private messageQueue: string[] = [];
-  private batchProcessing: boolean = false;
-  private lastBatchTime: number = Date.now();
-
   // Polling interval handle
   private pollIntervalHandle: NodeJS.Timeout | null = null;
 
   // Pending subregion for map entry
   private pendingSubregion: string | null = null;
+
+  // Buffer for multi-line patterns (like price searches)
+  private priceBuffer: string[] = [];
+  private lastPriceCheck: number = Date.now();
+  private readonly PRICE_BUFFER_INTERVAL = 1000; // Check price buffer every 1 second
+
+  // Buffer for initialization (collects BagMgr@:InitBagData entries)
+  private bagMgrBuffer: string[] = [];
+
+  // Buffer for pre-map item changes (consumables used right before entering)
+  private preMapChanges: Array<{ itemId: string; amount: number; timestamp: number }> = [];
+  private readonly PRE_MAP_WINDOW_MS = 2000; // Track items used within 2 seconds before map entry
 
   constructor(
     logFilePath: string | null,
@@ -250,16 +256,22 @@ export class LogMonitor extends EventEmitter {
       this.pollIntervalHandle = null;
     }
 
-    // Process any remaining messages in queue before shutdown
-    if (this.messageQueue.length > 0) {
-      logger.info(`Processing ${this.messageQueue.length} remaining messages before shutdown`);
+    // Process any remaining price buffer before shutdown
+    if (this.priceBuffer.length > 0) {
+      logger.info(`Processing ${this.priceBuffer.length} remaining price buffer lines before shutdown`);
       try {
-        const text = this.messageQueue.join('\n');
-        this.processLogText(text);
+        const text = this.priceBuffer.join('\n');
+        this.processPriceUpdates(text);
       } catch (error) {
-        logger.error(`Error processing remaining messages: ${error}`);
+        logger.error(`Error processing remaining price buffer: ${error}`);
       }
     }
+
+    // Clear initialization buffer
+    this.bagMgrBuffer = [];
+
+    // Clear pre-map changes buffer
+    this.preMapChanges = [];
 
     // Ensure log file is closed
     this.closeLogFile();
@@ -279,18 +291,19 @@ export class LogMonitor extends EventEmitter {
       // Check if log file needs reopening
       this.checkAndReopenLogFile();
 
-      // Read and queue log file lines for batch processing
+      // Read and process log file lines immediately
       const text = this.readLogFile();
       if (text) {
-        this.queueLogLines(text);
+        this.processLogLines(text);
       }
 
-      // Process any remaining messages in queue
-      if (this.messageQueue.length > 0 && !this.batchProcessing) {
-        const now = Date.now();
-        if (now - this.lastBatchTime >= LOG_BATCH_INTERVAL * 1000) {
-          this.processMessageBatch();
-        }
+      // Process price buffer periodically
+      const now = Date.now();
+      if (this.priceBuffer.length > 0 && now - this.lastPriceCheck >= this.PRICE_BUFFER_INTERVAL) {
+        this.lastPriceCheck = now;
+        const bufferedText = this.priceBuffer.join('\n');
+        this.processPriceUpdates(bufferedText);
+        this.priceBuffer = [];
       }
 
       // Update display with current stats, drops, costs, and map logs
@@ -378,118 +391,156 @@ export class LogMonitor extends EventEmitter {
   }
 
   /**
-   * Add log lines to the processing queue with noise filtering.
+   * Process log lines immediately (line-by-line).
+   * This ensures map state and item tracking remain consistent.
    */
-  private queueLogLines(text: string): void {
+  private processLogLines(text: string): void {
     if (!text) {
       return;
     }
 
-    // Split into lines and filter noise
+    // Split into lines and process each immediately
     const lines = text.split('\n');
     for (const line of lines) {
-      if (this.logParser.shouldProcessLine(line)) {
-        this.messageQueue.push(line);
+      if (!this.logParser.shouldProcessLine(line)) {
+        continue; // Skip noise
       }
-    }
 
-    // Process batch if queue is large enough or enough time has passed
-    const now = Date.now();
-    const shouldProcessBySize = this.messageQueue.length >= LOG_BATCH_SIZE;
-    const shouldProcessByTime = now - this.lastBatchTime >= LOG_BATCH_INTERVAL * 1000;
+      // Add to price buffer for later processing (prices need multi-line context)
+      if (line.includes('XchgSearchPrice') || line.includes('+refer')) {
+        this.priceBuffer.push(line);
+      }
 
-    if (shouldProcessBySize || shouldProcessByTime) {
-      this.processMessageBatch();
-    }
-  }
-
-  /**
-   * Process queued messages in a batch for better performance.
-   */
-  private processMessageBatch(): void {
-    if (this.batchProcessing || this.messageQueue.length === 0) {
-      return;
-    }
-
-    this.batchProcessing = true;
-    this.lastBatchTime = Date.now();
-
-    try {
-      // Get batch of messages to process
-      const batchSize = Math.min(this.messageQueue.length, LOG_BATCH_SIZE);
-      const batch = this.messageQueue.splice(0, batchSize);
-
-      // Combine batch into single text block for processing
-      const text = batch.join('\n');
-
-      // Process the batch
-      this.processLogText(text);
-
-      logger.debug(
-        `Processed batch of ${batchSize} lines, ${this.messageQueue.length} remaining in queue`
-      );
-    } catch (error) {
-      logger.error(`Error processing message batch: ${error}`);
-    } finally {
-      this.batchProcessing = false;
+      // Process line immediately for map state and item changes
+      this.processLogLine(line);
     }
   }
 
   /**
-   * Process new log text.
+   * Process price updates from buffered lines.
+   * Price extraction needs multi-line context, so we buffer and process periodically.
    */
-  private async processLogText(text: string): Promise<void> {
-    // Update prices
+  private async processPriceUpdates(text: string): Promise<void> {
     const pricesUpdated = await this.logParser.updatePricesInTable(text);
 
-    // If prices were updated, recalculate income/costs and refresh the drops display
     if (pricesUpdated > 0) {
       this.statisticsTracker.recalculateIncomeAndCosts();
       this.emit('reshowDrops');
+      logger.debug(`Updated ${pricesUpdated} prices from buffer`);
     }
+  }
 
-    // Check for initialization completion
+  /**
+   * Process a single log line for map state and item tracking.
+   */
+  private processLogLine(line: string): void {
+    // Check for initialization - buffer BagMgr@:InitBagData lines
     if (this.inventoryTracker['awaitingInitialization']) {
-      const result = this.inventoryTracker.processInitialization(text);
-      if (result.success && result.itemCount) {
-        this.emit('initializationComplete', result.itemCount);
+      if (line.includes('BagMgr@:InitBagData')) {
+        // This is a BagMgr line, add it to the buffer
+        this.bagMgrBuffer.push(line);
+      } else if (this.bagMgrBuffer.length >= MIN_BAG_ITEMS_FOR_INIT) {
+        // We've collected enough BagMgr entries and now hit a non-BagMgr line
+        // This signals the end of the BagMgr sequence - process the buffer
+        const bufferedText = this.bagMgrBuffer.join('\n');
+        const result = this.inventoryTracker.processInitialization(bufferedText);
+
+        if (result.success && result.itemCount) {
+          logger.info(`Initialization successful with ${this.bagMgrBuffer.length} BagMgr entries`);
+          this.emit('initializationComplete', result.itemCount);
+          this.bagMgrBuffer = []; // Clear buffer after successful init
+        } else {
+          // Initialization failed despite having enough entries - log warning
+          logger.warn(`Initialization failed despite buffering ${this.bagMgrBuffer.length} BagMgr entries`);
+          // Keep buffer for next attempt
+        }
       }
+
+      // Don't process other events until initialized
+      return;
     }
 
-    // Detect subregion entry (before map change detection so we can use it)
-    const subregion = this.logParser.detectSubregionEntry(text);
+    // Detect subregion entry
+    const subregion = this.logParser.detectSubregionEntry(line);
     if (subregion) {
-      // Update subregion for current map or store for upcoming map entry
       if (this.statisticsTracker.getIsInMap()) {
         this.statisticsTracker.updateSubregion(subregion);
       } else {
-        // Store for upcoming map entry
         this.pendingSubregion = subregion;
       }
     }
 
-    // Detect map changes
-    const mapChange = this.logParser.detectMapChange(text);
+    // Detect sort operations - clear pre-map buffer when sort ends
+    // (sort movements can generate false costs)
+    if (line.includes('Sort operation ended')) {
+      if (this.preMapChanges.length > 0) {
+        logger.info(
+          `Clearing ${this.preMapChanges.length} buffered pre-map changes due to sort operation`
+        );
+        this.preMapChanges = [];
+      }
+    }
+
+    // Detect map changes and update state BEFORE processing items
+    const mapChange = this.logParser.detectMapChange(line);
 
     if (mapChange.entering) {
-      // Use pending subregion if available
       this.statisticsTracker.enterMap(this.pendingSubregion || subregion);
       this.pendingSubregion = null;
       this.inventoryTracker.resetMapBaseline();
+
+      // Apply buffered pre-map item changes if within time window
+      const now = Date.now();
+      const recentChanges = this.preMapChanges.filter(
+        (change) => now - change.timestamp <= this.PRE_MAP_WINDOW_MS
+      );
+
+      if (recentChanges.length > 0) {
+        const changes: Array<[string, number]> = recentChanges.map((c) => [c.itemId, c.amount]);
+        logger.info(
+          `Applying ${changes.length} pre-map item changes (consumed within ${this.PRE_MAP_WINDOW_MS}ms before map entry)`
+        );
+        this.statisticsTracker.processItemChanges(changes);
+        this.emit('reshowDrops');
+      }
+
+      // Clear pre-map buffer
+      this.preMapChanges = [];
     }
 
     if (mapChange.exiting) {
       this.statisticsTracker.exitMap();
+      // Clear any buffered pre-map changes when exiting (shouldn't have any, but just in case)
+      this.preMapChanges = [];
     }
 
-    // Detect item changes - only process if we're actually in a map
-    // This prevents false positives from inventory sorting, buying/selling items outside maps
-    const changes = this.inventoryTracker.scanForChanges(text);
-    if (changes.length > 0 && this.statisticsTracker.getIsInMap()) {
-      this.statisticsTracker.processItemChanges(changes);
-      this.emit('reshowDrops');
+    // Process item changes with current map state
+    const changes = this.inventoryTracker.scanForChanges(line);
+    if (changes.length > 0) {
+      if (this.statisticsTracker.getIsInMap()) {
+        // In map - track immediately
+        this.statisticsTracker.processItemChanges(changes);
+        this.emit('reshowDrops');
+      } else {
+        // Outside map - buffer for potential pre-map application
+        // Only buffer negative changes (costs), not positive (drops picked up in town)
+        const costsOnly = changes.filter(([_, amount]) => amount < 0);
+        if (costsOnly.length > 0) {
+          const now = Date.now();
+          // Add new changes with timestamps
+          for (const [itemId, amount] of costsOnly) {
+            this.preMapChanges.push({ itemId, amount, timestamp: now });
+          }
+
+          // Clean up old buffered changes (keep only recent ones)
+          this.preMapChanges = this.preMapChanges.filter(
+            (change) => now - change.timestamp <= this.PRE_MAP_WINDOW_MS
+          );
+        }
+      }
     }
   }
+
 
   /**
    * Update the log file path and restart monitoring if running.

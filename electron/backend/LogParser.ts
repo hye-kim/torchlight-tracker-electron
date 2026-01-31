@@ -10,6 +10,7 @@ const PATTERN_ITEM_CHANGE = /\[.*?\]GameLog: Display: \[Game\] ItemChange@ (Add|
 const PATTERN_RESET_ITEMS_START = /ItemChange@ ProtoName=ResetItemsLayout start/;
 const PATTERN_RESET_ITEMS_END = /ItemChange@ ProtoName=ResetItemsLayout end/;
 const PATTERN_ITEM_CHANGE_RESET = /ItemChange@ Reset PageId=(\d+)/g;
+const PATTERN_BAG_INIT_DATA = /BagMgr@:InitBagData PageId = (\d+) SlotId = (\d+) ConfigBaseId = (\d+) Num = (\d+)/g;
 const PATTERN_MAP_ENTER = /PageApplyBase@ _UpdateGameEnd: LastSceneName = World'\/Game\/Art\/Maps\/01SD\/XZ_YuJinZhiXiBiNanSuo200\/XZ_YuJinZhiXiBiNanSuo200.XZ_YuJinZhiXiBiNanSuo200' NextSceneName = World'\/Game\/Art\/Maps/;
 const PATTERN_MAP_EXIT = /NextSceneName = World'\/Game\/Art\/Maps\/01SD\/XZ_YuJinZhiXiBiNanSuo200\/XZ_YuJinZhiXiBiNanSuo200.XZ_YuJinZhiXiBiNanSuo200'/;
 const PATTERN_VALUE = /\+\d+\s+\[([\d.]+)\]/g;
@@ -185,6 +186,30 @@ export class LogParser {
         slotId: m[5],
         configBaseId: baseId,
         count: parseInt(m[3]),
+      };
+    });
+  }
+
+  /**
+   * Extract BagMgr@:InitBagData events for complete inventory state.
+   * These events appear during initialization and after sorts, showing all inventory pages.
+   */
+  extractBagData(text: string): BagModification[] {
+    const matches = Array.from(text.matchAll(PATTERN_BAG_INIT_DATA));
+    return matches.map((m) => {
+      const pageId = m[1];
+      const slotId = m[2];
+      const configBaseId = m[3];
+      const count = parseInt(m[4]);
+      // Create synthetic fullId for bag data (will be replaced when real ItemChange@ appears)
+      const syntheticFullId = `${configBaseId}_init_${pageId}_${slotId}`;
+      return {
+        action: 'Update' as 'Add' | 'Update' | 'Remove',
+        fullId: syntheticFullId,
+        pageId: pageId,
+        slotId: slotId,
+        configBaseId: configBaseId,
+        count: count,
       };
     });
   }
