@@ -1,0 +1,107 @@
+.controls-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.control-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid;
+  background: none;
+  outline: none;
+  font-family: inherit;
+}
+
+.control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.control-btn:focus-visible {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 2px;
+}
+
+/* Primary Button (Initialize) */
+.control-btn.primary {
+  background-color: #8b5cf6;
+  border-color: #8b5cf6;
+  color: #ffffff;
+}
+
+.control-btn.primary:hover:not(:disabled) {
+  background-color: #7c3aed;
+  border-color: #7c3aed;
+}
+
+.control-btn.primary:active:not(:disabled) {
+  background-color: #6d28d9;
+}
+
+/* Danger Button (Reset) */
+.control-btn.danger {
+  background-color: #2a2a3e;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.control-btn.danger:hover {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+.control-btn.danger:active {
+  background-color: #dc2626;
+}
+
+/* Secondary Button (Export) */
+.control-btn.secondary {
+  background-color: #2a2a3e;
+  border-color: #4a4a5e;
+  color: #e2e8f0;
+}
+
+.control-btn.secondary:hover {
+  background-color: #363650;
+  border-color: #8b5cf6;
+}
+
+.control-btn.secondary:active {
+  background-color: #2a2a3e;
+}
+
+/* Icon Button (Settings) */
+.control-btn.icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #2a2a3e;
+  border-color: #4a4a5e;
+  color: #94a3b8;
+  margin-left: auto;
+}
+
+.control-btn.icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.control-btn.icon:hover {
+  background-color: #363650;
+  color: #8b5cf6;
+  border-color: #8b5cf6;
+}
+
+.control-btn.icon:active {
+  background-color: #2a2a3e;
+}

@@ -261,6 +261,26 @@ ipcMain.handle('get-map-logs', () => {
   return statisticsTracker.getMapLogs();
 });
 
+ipcMain.handle('get-bag-state', () => {
+  const bagState = inventoryTracker.getBagStateSummary();
+  const fullTable = fileManager.loadFullTable();
+
+  // Convert bag state to array format with item details
+  const bagArray = Object.entries(bagState).map(([itemId, quantity]) => {
+    const itemData = fullTable[itemId];
+    return {
+      itemId,
+      name: itemData?.name || `Item ${itemId}`,
+      quantity,
+      price: itemData?.price || 0,
+      type: itemData?.type || 'Unknown',
+      imageUrl: itemData?.imageUrl,
+    };
+  });
+
+  return bagArray;
+});
+
 ipcMain.handle('initialize-tracker', async () => {
   inventoryTracker.startInitialization();
   return { success: true };

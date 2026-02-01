@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getStats: () => ipcRenderer.invoke('get-stats'),
   getDrops: () => ipcRenderer.invoke('get-drops'),
   getMapLogs: () => ipcRenderer.invoke('get-map-logs'),
+  getBagState: () => ipcRenderer.invoke('get-bag-state'),
 
   // Actions
   initializeTracker: () => ipcRenderer.invoke('initialize-tracker'),
@@ -95,6 +96,7 @@ declare global {
       getStats: () => Promise<any>;
       getDrops: () => Promise<any>;
       getMapLogs: () => Promise<any>;
+      getBagState: () => Promise<any>;
       initializeTracker: () => Promise<{ success: boolean }>;
       exportExcel: () => Promise<{ success: boolean; filePath?: string }>;
       resetStats: () => Promise<{ success: boolean }>;

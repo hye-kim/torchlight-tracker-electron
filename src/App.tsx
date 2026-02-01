@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import StatsCard from './components/StatsCard';
+import NavigationSidebar from './components/NavigationSidebar';
+import StatsBar from './components/StatsBar';
+import ControlsBar from './components/ControlsBar';
+import InventoryView from './components/InventoryView';
 import DropsCard from './components/DropsCard';
-import ControlCard from './components/ControlCard';
 import SettingsDialog from './components/SettingsDialog';
 import OverlaySettings from './components/OverlaySettings';
 import LootSummaryDropdown from './components/LootSummaryDropdown';
@@ -79,6 +81,8 @@ interface CurrentMapData {
   costs?: MapItemData[];
 }
 
+type NavView = 'overview' | 'inventory';
+
 function App() {
   const [config, setConfig] = useState<Config>({ tax: 1, user: '' });
   const [stats, setStats] = useState<Stats | null>(null);
@@ -93,6 +97,8 @@ function App() {
   const [isInMap, setIsInMap] = useState(false);
   const [currentMap, setCurrentMap] = useState<CurrentMapData | null>(null);
   const [selectedMapNumber, setSelectedMapNumber] = useState<number | null>(null);
+  const [activeView, setActiveView] = useState<NavView>('overview');
+  const [bagInventory, setBagInventory] = useState<Drop[]>([]);
 
   useEffect(() => {
     // Load initial config
@@ -109,12 +115,18 @@ function App() {
       if (logs) setMapLogs(logs);
     });
 
+    // Load bag state
+    window.electronAPI.getBagState?.().then((bagState: Drop[]) => {
+      if (bagState) setBagInventory(bagState);
+    });
+
     // Listen for updates
     window.electronAPI.onUpdateDisplay((data: any) => {
       if (data.stats) setStats(data.stats);
       if (data.drops) setDrops(data.drops);
       if (data.costs) setCosts(data.costs);
       if (data.mapLogs) setMapLogs(data.mapLogs);
+      if (data.bagInventory) setBagInventory(data.bagInventory);
       if (data.isInMap !== undefined) setIsInMap(data.isInMap);
       if (data.currentMap) setCurrentMap(data.currentMap);
       if (data.isInitialized !== undefined) setIsInitialized(data.isInitialized);
@@ -138,7 +150,7 @@ function App() {
     if (overlayMode) {
       document.body.style.backgroundColor = 'transparent';
     } else {
-      document.body.style.backgroundColor = '#1e1e2e';
+      document.body.style.backgroundColor = 'transparent';
     }
   }, [config.overlayMode]);
 
@@ -162,13 +174,6 @@ function App() {
     }
   };
 
-  const handleExportDebugLog = async () => {
-    const result = await window.electronAPI.exportDebugLog();
-    if (result.success) {
-      alert(`Debug log exported to: ${result.filePath}`);
-    }
-  };
-
   const handleResetStats = async () => {
     if (confirm('Are you sure you want to reset all statistics?')) {
       await window.electronAPI.resetStats();
@@ -176,6 +181,7 @@ function App() {
       setDrops([]);
       setCosts([]);
       setMapLogs([]);
+      setBagInventory([]);
       setCurrentMap(null);
       setIsInMap(false);
       setSelectedMapNumber(null);
@@ -458,41 +464,47 @@ function App() {
           </div>
         ) : (
           <>
-            <div className="sidebar">
-              <StatsCard stats={stats} />
-              <ControlCard
-                onInitialize={handleInitializeTracker}
-                onExportExcel={handleExportExcel}
-                onExportDebugLog={handleExportDebugLog}
-                onOpenSettings={() => setShowSettings(true)}
-                onResetStats={handleResetStats}
-                onToggleOverlay={handleToggleOverlayMode}
-                isInitialized={isInitialized}
-                isWaitingForInit={isWaitingForInit}
-              />
-            </div>
+            <NavigationSidebar activeView={activeView} onViewChange={setActiveView} />
 
-            <div className="center-panel">
-              <MapLogTable
-                mapLogs={mapLogs}
-                isInitialized={isInitialized}
-                isInMap={isInMap}
-                currentMap={currentMap}
-                mapCount={stats?.total.mapCount || 0}
-                selectedMapNumber={selectedMapNumber}
-                onSelectMap={handleSelectMap}
-              />
-            </div>
+            {activeView === 'overview' ? (
+              <>
+                <div className="center-panel">
+                  <ControlsBar
+                    onInitialize={handleInitializeTracker}
+                    onExportExcel={handleExportExcel}
+                    onOpenSettings={() => setShowSettings(true)}
+                    onResetStats={handleResetStats}
+                    onToggleOverlay={handleToggleOverlayMode}
+                    isInitialized={isInitialized}
+                    isWaitingForInit={isWaitingForInit}
+                  />
+                  <StatsBar stats={stats} />
+                  <MapLogTable
+                    mapLogs={mapLogs}
+                    isInitialized={isInitialized}
+                    isInMap={isInMap}
+                    currentMap={currentMap}
+                    mapCount={stats?.total.mapCount || 0}
+                    selectedMapNumber={selectedMapNumber}
+                    onSelectMap={handleSelectMap}
+                  />
+                </div>
 
-            <div className="right-panel">
-              <DropsCard
-                drops={selectedMapDrops}
-                costs={selectedMapCosts}
-                totalPickedUp={totalPickedUp}
-                totalCost={totalCost}
-                selectedMapName={selectedMapData?.mapName}
-              />
-            </div>
+                <div className="right-panel">
+                  <DropsCard
+                    drops={selectedMapDrops}
+                    costs={selectedMapCosts}
+                    totalPickedUp={totalPickedUp}
+                    totalCost={totalCost}
+                    selectedMapName={selectedMapData?.mapName}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="inventory-panel">
+                <InventoryView drops={bagInventory} />
+              </div>
+            )}
           </>
         )}
       </div>

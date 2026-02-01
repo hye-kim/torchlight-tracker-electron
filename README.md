@@ -81,10 +81,16 @@ electron/
 │   ├── App.tsx              # Main app component
 │   ├── main.tsx             # React entry point
 │   ├── components/          # React components
-│   │   ├── StatsCard.tsx
+│   │   ├── NavigationSidebar.tsx
+│   │   ├── StatsBar.tsx
+│   │   ├── ControlsBar.tsx
+│   │   ├── InventoryView.tsx
 │   │   ├── DropsCard.tsx
-│   │   ├── ControlCard.tsx
-│   │   └── SettingsDialog.tsx
+│   │   ├── MapLogTable.tsx
+│   │   ├── SettingsDialog.tsx
+│   │   ├── OverlaySettings.tsx
+│   │   ├── LootSummaryDropdown.tsx
+│   │   └── InitializationDialog.tsx
 │   └── vite-env.d.ts        # TypeScript definitions
 ├── package.json
 ├── tsconfig.json
