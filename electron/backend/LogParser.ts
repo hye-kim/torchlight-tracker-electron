@@ -109,11 +109,17 @@ export class LogParser {
         's'
       );
 
+      logger.info(`[PRICE DEBUG] extractPriceForItem looking for synid ${synid} in ${text.length} chars of text`);
+      logger.info(`[PRICE DEBUG] First 500 chars of text: ${text.substring(0, 500)}`);
+
       const match = pattern.exec(text);
       if (!match) {
-        logger.debug(`No price data found for ID: ${itemId}`);
+        logger.info(`[PRICE DEBUG] Pattern did not match for synid ${synid}, itemId ${itemId}`);
+        logger.info(`[PRICE DEBUG] Pattern used: ${pattern.source.substring(0, 200)}...`);
         return null;
       }
+
+      logger.info(`[PRICE DEBUG] Pattern matched! Match length: ${match[0].length}, captured group length: ${match[1]?.length || 0}`);
 
       const dataBlock = match[1];
       const values = Array.from(dataBlock.matchAll(PATTERN_VALUE)).map((m) => m[1]);
