@@ -89,7 +89,6 @@ electron/
 │   │   ├── MapLogTable.tsx
 │   │   ├── SettingsDialog.tsx
 │   │   ├── OverlaySettings.tsx
-│   │   ├── LootSummaryDropdown.tsx
 │   │   └── InitializationDialog.tsx
 │   └── vite-env.d.ts        # TypeScript definitions
 ├── package.json

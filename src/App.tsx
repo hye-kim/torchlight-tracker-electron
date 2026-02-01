@@ -6,7 +6,6 @@ import InventoryView from './components/InventoryView';
 import DropsCard from './components/DropsCard';
 import SettingsDialog from './components/SettingsDialog';
 import OverlaySettings from './components/OverlaySettings';
-import LootSummaryDropdown from './components/LootSummaryDropdown';
 import InitializationDialog from './components/InitializationDialog';
 import MapLogTable from './components/MapLogTable';
 import './App.css';
