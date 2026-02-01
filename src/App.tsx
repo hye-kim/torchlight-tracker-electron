@@ -174,13 +174,6 @@ function App() {
     }
   };
 
-  const handleExportDebugLog = async () => {
-    const result = await window.electronAPI.exportDebugLog();
-    if (result.success) {
-      alert(`Debug log exported to: ${result.filePath}`);
-    }
-  };
-
   const handleResetStats = async () => {
     if (confirm('Are you sure you want to reset all statistics?')) {
       await window.electronAPI.resetStats();

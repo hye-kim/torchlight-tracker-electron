@@ -231,16 +231,6 @@
   overflow: hidden;
 }
 
-.sidebar {
-  width: 180px;
-  display: flex;
-  flex-direction: column;
-  background-color: #1e1e2e;
-  border-right: 1px solid #2a2a3e;
-  overflow-y: auto;
-  flex-shrink: 0;
-}
-
 .center-panel {
   flex: 1;
   display: flex;
