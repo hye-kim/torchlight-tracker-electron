@@ -13,6 +13,7 @@ const PATTERN_ITEM_CHANGE_RESET = /ItemChange@ Reset PageId=(\d+)/g;
 const PATTERN_BAG_INIT_DATA = /BagMgr@:InitBagData PageId = (\d+) SlotId = (\d+) ConfigBaseId = (\d+) Num = (\d+)/g;
 const PATTERN_MAP_ENTER = /PageApplyBase@ _UpdateGameEnd: LastSceneName = World'\/Game\/Art\/Maps\/01SD\/XZ_YuJinZhiXiBiNanSuo200\/XZ_YuJinZhiXiBiNanSuo200.XZ_YuJinZhiXiBiNanSuo200' NextSceneName = World'\/Game\/Art\/Maps/;
 const PATTERN_MAP_EXIT = /NextSceneName = World'\/Game\/Art\/Maps\/01SD\/XZ_YuJinZhiXiBiNanSuo200\/XZ_YuJinZhiXiBiNanSuo200.XZ_YuJinZhiXiBiNanSuo200'/;
+const PATTERN_DIXIAZHEN_ENTER = /NextSceneName = World'\/Game\/Art\/Season\/S13\/Maps\/DiXiaZhenSuo\/DiXiaZhenSuo\.DiXiaZhenSuo'/;
 const PATTERN_VALUE = /\+\d+\s+\[([\d.]+)\]/g;
 
 const LOG_NOISE_PATTERNS = [
@@ -245,6 +246,17 @@ export class LogParser {
       const areaId = match[1];
       const areaLevel = parseInt(match[2], 10);
       return getSubregionDisplayName(areaId, areaLevel);
+    }
+    return null;
+  }
+
+  /**
+   * Detect entering DiXiaZhenSuo (Vorax - Shelly's Operating Theater).
+   * @returns Map name if detected, null otherwise.
+   */
+  detectDiXiaZhenEntry(text: string): string | null {
+    if (PATTERN_DIXIAZHEN_ENTER.test(text)) {
+      return "Vorax - Shelly's Operating Theater";
     }
     return null;
   }

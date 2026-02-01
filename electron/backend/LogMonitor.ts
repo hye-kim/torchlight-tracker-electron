@@ -470,6 +470,16 @@ export class LogMonitor extends EventEmitter {
       }
     }
 
+    // Detect DiXiaZhenSuo (Vorax - Shelly's Operating Theater) entry
+    const dixiazhen = this.logParser.detectDiXiaZhenEntry(line);
+    if (dixiazhen) {
+      if (this.statisticsTracker.getIsInMap()) {
+        this.statisticsTracker.updateSubregion(dixiazhen);
+      } else {
+        this.pendingSubregion = dixiazhen;
+      }
+    }
+
     // Detect sort operations - clear pre-map buffer when sort ends
     // (sort movements can generate false costs)
     if (line.includes('Sort operation ended')) {
