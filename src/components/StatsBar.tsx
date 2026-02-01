@@ -69,7 +69,7 @@ const StatsBar: React.FC<StatsBarProps> = ({ stats }) => {
           </div>
           <span className="stat-separator">|</span>
           <div className="stat-item">
-            <span className="stat-label">P/m:</span>
+            <span className="stat-label">Profit / min:</span>
             <span className={`stat-value ${currentProfitPerMin >= 0 ? 'positive' : 'negative'}`}>
               {formatCurrency(currentProfitPerMin)} FE
             </span>
@@ -98,7 +98,7 @@ const StatsBar: React.FC<StatsBarProps> = ({ stats }) => {
           </div>
           <span className="stat-separator">|</span>
           <div className="stat-item">
-            <span className="stat-label">P/m:</span>
+            <span className="stat-label">Profit / min:</span>
             <span className={`stat-value ${totalProfitPerMin >= 0 ? 'positive' : 'negative'}`}>
               {formatCurrency(totalProfitPerMin)} FE
             </span>
