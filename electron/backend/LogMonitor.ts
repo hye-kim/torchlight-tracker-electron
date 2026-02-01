@@ -49,6 +49,7 @@ export class LogMonitor extends EventEmitter {
   private priceBuffer: string[] = [];
   private lastPriceCheck: number = Date.now();
   private readonly PRICE_BUFFER_INTERVAL = 1000; // Check price buffer every 1 second
+  private insidePriceResponse: boolean = false; // Track if we're inside a price response block
 
   // Buffer for initialization (collects BagMgr@:InitBagData entries)
   private bagMgrBuffer: string[] = [];
@@ -267,6 +268,10 @@ export class LogMonitor extends EventEmitter {
       }
     }
 
+    // Reset price buffer state
+    this.priceBuffer = [];
+    this.insidePriceResponse = false;
+
     // Clear initialization buffer
     this.bagMgrBuffer = [];
 
@@ -304,6 +309,7 @@ export class LogMonitor extends EventEmitter {
         const bufferedText = this.priceBuffer.join('\n');
         this.processPriceUpdates(bufferedText);
         this.priceBuffer = [];
+        this.insidePriceResponse = false; // Reset capture state after processing
       }
 
       // Update display with current stats, drops, costs, and map logs
@@ -406,8 +412,26 @@ export class LogMonitor extends EventEmitter {
         continue; // Skip noise
       }
 
-      // Add to price buffer for later processing (prices need multi-line context)
-      if (line.includes('XchgSearchPrice') || line.includes('+refer')) {
+      // Price buffer logic: capture entire price response blocks
+      // Start buffering when we see XchgSearchPrice request or response
+      if (line.includes('XchgSearchPrice')) {
+        this.priceBuffer.push(line);
+
+        // If this is a RecvMessage (response), start capturing all following lines
+        if (line.includes('Socket RecvMessage STT----XchgSearchPrice')) {
+          this.insidePriceResponse = true;
+        }
+      } else if (this.insidePriceResponse) {
+        // We're inside a price response - capture everything until next Socket message
+        if (line.includes('----Socket')) {
+          // Hit next message boundary, stop capturing
+          this.insidePriceResponse = false;
+        } else {
+          // Still inside price response, add this line
+          this.priceBuffer.push(line);
+        }
+      } else if (line.includes('+refer')) {
+        // Also capture +refer lines (item ID references)
         this.priceBuffer.push(line);
       }
 
@@ -426,7 +450,7 @@ export class LogMonitor extends EventEmitter {
     if (pricesUpdated > 0) {
       this.statisticsTracker.recalculateIncomeAndCosts();
       this.emit('reshowDrops');
-      logger.debug(`Updated ${pricesUpdated} prices from buffer`);
+      logger.info(`Updated ${pricesUpdated} prices from buffer`);
     }
   }
 
