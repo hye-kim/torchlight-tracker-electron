@@ -306,7 +306,6 @@ export class LogMonitor extends EventEmitter {
       const now = Date.now();
       if (this.priceBuffer.length > 0 && now - this.lastPriceCheck >= this.PRICE_BUFFER_INTERVAL) {
         this.lastPriceCheck = now;
-        logger.info(`[PRICE DEBUG] Processing price buffer with ${this.priceBuffer.length} lines`);
         const bufferedText = this.priceBuffer.join('\n');
         this.processPriceUpdates(bufferedText);
         this.priceBuffer = [];
@@ -417,28 +416,23 @@ export class LogMonitor extends EventEmitter {
       // Start buffering when we see XchgSearchPrice request or response
       if (line.includes('XchgSearchPrice')) {
         this.priceBuffer.push(line);
-        logger.info(`[PRICE DEBUG] Added XchgSearchPrice line to buffer (size: ${this.priceBuffer.length})`);
 
         // If this is a RecvMessage (response), start capturing all following lines
         if (line.includes('Socket RecvMessage STT----XchgSearchPrice')) {
           this.insidePriceResponse = true;
-          logger.info(`[PRICE DEBUG] Started price response block capture`);
         }
       } else if (this.insidePriceResponse) {
         // We're inside a price response - capture everything until next Socket message
         if (line.includes('----Socket')) {
           // Hit next message boundary, stop capturing
           this.insidePriceResponse = false;
-          logger.info(`[PRICE DEBUG] Ended price response block capture at next Socket message`);
         } else {
           // Still inside price response, add this line
           this.priceBuffer.push(line);
-          logger.info(`[PRICE DEBUG] Added line inside price response (size: ${this.priceBuffer.length})`);
         }
       } else if (line.includes('+refer')) {
         // Also capture +refer lines (item ID references)
         this.priceBuffer.push(line);
-        logger.info(`[PRICE DEBUG] Added +refer line to buffer (size: ${this.priceBuffer.length})`);
       }
 
       // Process line immediately for map state and item changes
@@ -451,10 +445,8 @@ export class LogMonitor extends EventEmitter {
    * Price extraction needs multi-line context, so we buffer and process periodically.
    */
   private async processPriceUpdates(text: string): Promise<void> {
-    logger.info(`[PRICE DEBUG] processPriceUpdates called with ${text.length} chars of text`);
     const pricesUpdated = await this.logParser.updatePricesInTable(text);
 
-    logger.info(`[PRICE DEBUG] updatePricesInTable returned: ${pricesUpdated} prices updated`);
     if (pricesUpdated > 0) {
       this.statisticsTracker.recalculateIncomeAndCosts();
       this.emit('reshowDrops');

@@ -71,32 +71,24 @@ export class LogParser {
 
     try {
       const matches = Array.from(text.matchAll(PATTERN_PRICE_ID));
-      logger.info(`[PRICE DEBUG] extractPriceInfo found ${matches.length} XchgSearchPrice matches`);
 
       for (const match of matches) {
         const synid = match[1];
         const itemId = match[2];
 
-        logger.info(`[PRICE DEBUG] Processing match - synid: ${synid}, itemId: ${itemId}`);
-
         if (itemId === EXCLUDED_ITEM_ID) {
-          logger.info(`[PRICE DEBUG] Skipping excluded item ${itemId}`);
           continue;
         }
 
         const price = this.extractPriceForItem(text, synid, itemId);
         if (price !== null) {
-          logger.info(`[PRICE DEBUG] Extracted price for item ${itemId}: ${price}`);
           priceUpdates.push([itemId, price]);
-        } else {
-          logger.info(`[PRICE DEBUG] extractPriceForItem returned null for item ${itemId}`);
         }
       }
     } catch (error) {
       logger.error('Error extracting price info:', error);
     }
 
-    logger.info(`[PRICE DEBUG] extractPriceInfo returning ${priceUpdates.length} price updates`);
     return priceUpdates;
   }
 
@@ -109,17 +101,11 @@ export class LogParser {
         's'
       );
 
-      logger.info(`[PRICE DEBUG] extractPriceForItem looking for synid ${synid} in ${text.length} chars of text`);
-      logger.info(`[PRICE DEBUG] First 500 chars of text: ${text.substring(0, 500)}`);
-
       const match = pattern.exec(text);
       if (!match) {
-        logger.info(`[PRICE DEBUG] Pattern did not match for synid ${synid}, itemId ${itemId}`);
-        logger.info(`[PRICE DEBUG] Pattern used: ${pattern.source.substring(0, 200)}...`);
+        logger.debug(`No price data found for ID: ${itemId}`);
         return null;
       }
-
-      logger.info(`[PRICE DEBUG] Pattern matched! Match length: ${match[0].length}, captured group length: ${match[1]?.length || 0}`);
 
       const dataBlock = match[1];
       const values = Array.from(dataBlock.matchAll(PATTERN_VALUE)).map((m) => m[1]);
@@ -158,12 +144,8 @@ export class LogParser {
   }
 
   async updatePricesInTable(text: string): Promise<number> {
-    logger.info(`[PRICE DEBUG] updatePricesInTable called with ${text.length} chars`);
     const priceUpdates = this.extractPriceInfo(text);
-    logger.info(`[PRICE DEBUG] extractPriceInfo returned ${priceUpdates.length} updates`);
-
     if (priceUpdates.length === 0) {
-      logger.info(`[PRICE DEBUG] No price updates to process`);
       return 0;
     }
 
@@ -172,27 +154,20 @@ export class LogParser {
     const fullTable = this.fileManager.loadFullTable();
 
     for (const [itemId, price] of priceUpdates) {
-      logger.info(`[PRICE DEBUG] Processing price update for itemId: ${itemId}, price: ${price}`);
-
       if (fullTable[itemId]) {
-        logger.info(`[PRICE DEBUG] Item ${itemId} found in fullTable, calling updateItem`);
         const updated = await this.fileManager.updateItem(itemId, {
           price,
           last_update: currentTime,
         });
 
-        logger.info(`[PRICE DEBUG] updateItem returned: ${updated} for item ${itemId}`);
         if (updated) {
           const itemName = fullTable[itemId].name || itemId;
           logger.info(`Updated price: ${itemName} (ID:${itemId}) = ${price}`);
           updateCount++;
         }
-      } else {
-        logger.info(`[PRICE DEBUG] Item ${itemId} NOT found in fullTable`);
       }
     }
 
-    logger.info(`[PRICE DEBUG] updatePricesInTable completed with ${updateCount} updates`);
     return updateCount;
   }
 
