@@ -485,7 +485,9 @@ export class LogMonitor extends EventEmitter {
     const mapChange = this.logParser.detectMapChange(line);
 
     if (mapChange.entering) {
-      this.statisticsTracker.enterMap(this.pendingSubregion || subregion);
+      // Use subregion from mapChange if provided (e.g., DiXiaZhenSuo), otherwise use pending or detected subregion
+      const mapSubregion = mapChange.subregion || this.pendingSubregion || subregion;
+      this.statisticsTracker.enterMap(mapSubregion);
       this.pendingSubregion = null;
       this.inventoryTracker.resetMapBaseline();
 

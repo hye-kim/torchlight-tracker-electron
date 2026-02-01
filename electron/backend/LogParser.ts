@@ -13,6 +13,7 @@ const PATTERN_ITEM_CHANGE_RESET = /ItemChange@ Reset PageId=(\d+)/g;
 const PATTERN_BAG_INIT_DATA = /BagMgr@:InitBagData PageId = (\d+) SlotId = (\d+) ConfigBaseId = (\d+) Num = (\d+)/g;
 const PATTERN_MAP_ENTER = /PageApplyBase@ _UpdateGameEnd: LastSceneName = World'\/Game\/Art\/Maps\/01SD\/XZ_YuJinZhiXiBiNanSuo200\/XZ_YuJinZhiXiBiNanSuo200.XZ_YuJinZhiXiBiNanSuo200' NextSceneName = World'\/Game\/Art\/Maps/;
 const PATTERN_MAP_EXIT = /NextSceneName = World'\/Game\/Art\/Maps\/01SD\/XZ_YuJinZhiXiBiNanSuo200\/XZ_YuJinZhiXiBiNanSuo200.XZ_YuJinZhiXiBiNanSuo200'/;
+const PATTERN_DIXIAZHEN_ENTER = /NextSceneName = World'\/Game\/Art\/Season\/S13\/Maps\/DiXiaZhenSuo\/DiXiaZhenSuo\.DiXiaZhenSuo'/;
 const PATTERN_VALUE = /\+\d+\s+\[([\d.]+)\]/g;
 
 const LOG_NOISE_PATTERNS = [
@@ -228,7 +229,17 @@ export class LogParser {
     return PATTERN_RESET_ITEMS_END.test(text);
   }
 
-  detectMapChange(text: string): { entering: boolean; exiting: boolean } {
+  detectMapChange(text: string): { entering: boolean; exiting: boolean; subregion?: string } {
+    // Check for DiXiaZhenSuo entry (special seasonal map)
+    const dixiazhenMatch = PATTERN_DIXIAZHEN_ENTER.test(text);
+    if (dixiazhenMatch) {
+      return {
+        entering: true,
+        exiting: false,
+        subregion: "Vorax - Shelly's Operating Theater",
+      };
+    }
+
     return {
       entering: PATTERN_MAP_ENTER.test(text),
       exiting: PATTERN_MAP_EXIT.test(text),
