@@ -150,7 +150,7 @@ function App() {
     if (overlayMode) {
       document.body.style.backgroundColor = 'transparent';
     } else {
-      document.body.style.backgroundColor = '#1e1e2e';
+      document.body.style.backgroundColor = 'transparent';
     }
   }, [config.overlayMode]);
 
