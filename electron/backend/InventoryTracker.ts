@@ -391,11 +391,15 @@ export class InventoryTracker {
     const grouped: Record<string, number> = {};
 
     for (const [key, amount] of this.bagState) {
+      // Skip init: entries as they are baseline/reference values, not actual inventory
+      if (key.startsWith('init:')) {
+        continue;
+      }
+
       let itemId: string;
 
-      if (key.startsWith('init:')) {
-        itemId = key.split(':')[1];
-      } else if (key.includes(':') && key.split(':').length === 3) {
+      if (key.includes(':') && key.split(':').length === 3) {
+        // Format: pageId:slotId:configBaseId
         itemId = key.split(':')[2];
       } else {
         itemId = key;

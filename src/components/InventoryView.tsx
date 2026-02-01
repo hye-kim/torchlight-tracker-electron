@@ -135,14 +135,14 @@ const InventoryView: React.FC<InventoryViewProps> = ({ drops }) => {
   };
 
   const formatCurrency = (value: number): string => {
-    return value.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    return value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
   return (
     <div className="inventory-view">
       <div className="inventory-header">
         <div className="inventory-title">INVENTORY</div>
-        <div className="inventory-total-value">{formatCurrency(totalValue)}c</div>
+        <div className="inventory-total-value">{formatCurrency(totalValue)} FE</div>
         <div className="inventory-item-count">Items: {totalItems}</div>
       </div>
 
@@ -212,7 +212,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({ drops }) => {
                   </svg>
                   <span className="inventory-group-title">{type.toUpperCase()}</span>
                   <span className="inventory-group-meta">
-                    ({items.length} items, {formatCurrency(groupValue)}c)
+                    ({items.length} items, {formatCurrency(groupValue)} FE)
                   </span>
                 </button>
 
@@ -234,11 +234,11 @@ const InventoryView: React.FC<InventoryViewProps> = ({ drops }) => {
                           <div className="inventory-item-name">{item.name}</div>
                           <div className="inventory-item-pricing">
                             <span className="inventory-item-unit-price">
-                              {formatCurrency(item.unitPrice)}c each
+                              {formatCurrency(item.unitPrice)} FE each
                             </span>
                             <span className="inventory-pricing-separator">|</span>
                             <span className="inventory-item-total-value">
-                              {formatCurrency(item.totalValue)}c total
+                              {formatCurrency(item.totalValue)} FE total
                             </span>
                           </div>
                         </div>

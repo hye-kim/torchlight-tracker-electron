@@ -33,12 +33,12 @@ const formatDuration = (seconds: number): string => {
 
 const formatCurrency = (value: number): string => {
   if (value >= 1000000) {
-    return `${(value / 1000000).toFixed(1)}M`;
+    return `${(value / 1000000).toFixed(2)}M`;
   }
   if (value >= 1000) {
-    return `${(value / 1000).toFixed(1)}K`;
+    return `${(value / 1000).toFixed(2)}K`;
   }
-  return value.toFixed(0);
+  return value.toFixed(2);
 };
 
 const StatsBar: React.FC<StatsBarProps> = ({ stats }) => {
@@ -64,14 +64,14 @@ const StatsBar: React.FC<StatsBarProps> = ({ stats }) => {
           <div className="stat-item">
             <span className="stat-label">Profit:</span>
             <span className={`stat-value ${currentProfit >= 0 ? 'positive' : 'negative'}`}>
-              {formatCurrency(currentProfit)}c
+              {formatCurrency(currentProfit)} FE
             </span>
           </div>
           <span className="stat-separator">|</span>
           <div className="stat-item">
             <span className="stat-label">P/m:</span>
             <span className={`stat-value ${currentProfitPerMin >= 0 ? 'positive' : 'negative'}`}>
-              {formatCurrency(currentProfitPerMin)}c
+              {formatCurrency(currentProfitPerMin)} FE
             </span>
           </div>
         </div>
@@ -93,14 +93,14 @@ const StatsBar: React.FC<StatsBarProps> = ({ stats }) => {
           <div className="stat-item">
             <span className="stat-label">Profit:</span>
             <span className={`stat-value ${totalProfit >= 0 ? 'positive' : 'negative'}`}>
-              {formatCurrency(totalProfit)}c
+              {formatCurrency(totalProfit)} FE
             </span>
           </div>
           <span className="stat-separator">|</span>
           <div className="stat-item">
             <span className="stat-label">P/m:</span>
             <span className={`stat-value ${totalProfitPerMin >= 0 ? 'positive' : 'negative'}`}>
-              {formatCurrency(totalProfitPerMin)}c
+              {formatCurrency(totalProfitPerMin)} FE
             </span>
           </div>
         </div>
