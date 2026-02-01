@@ -144,16 +144,6 @@ function App() {
     });
   }, []);
 
-  // Set body background to transparent when in overlay mode
-  useEffect(() => {
-    const overlayMode = config.overlayMode ?? false;
-    if (overlayMode) {
-      document.body.style.backgroundColor = 'transparent';
-    } else {
-      document.body.style.backgroundColor = 'transparent';
-    }
-  }, [config.overlayMode]);
-
   // Auto-select current map when in map
   useEffect(() => {
     if (isInMap && currentMap) {
@@ -455,12 +445,6 @@ function App() {
                 }
               })}
             </div>
-            <LootSummaryDropdown
-              drops={selectedMapDrops}
-              costs={selectedMapCosts}
-              totalPickedUp={totalPickedUp}
-              totalCost={totalCost}
-            />
           </div>
         ) : (
           <>
