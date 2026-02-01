@@ -6,6 +6,7 @@ interface ControlsBarProps {
   onExportExcel: () => void;
   onOpenSettings: () => void;
   onResetStats: () => void;
+  onToggleOverlay: () => void;
   isInitialized: boolean;
   isWaitingForInit: boolean;
 }
@@ -15,6 +16,7 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
   onExportExcel,
   onOpenSettings,
   onResetStats,
+  onToggleOverlay,
   isInitialized,
   isWaitingForInit,
 }) => {
@@ -34,6 +36,10 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
 
       <button className="control-btn secondary" onClick={onExportExcel}>
         Export Data
+      </button>
+
+      <button className="control-btn secondary" onClick={onToggleOverlay}>
+        Enable Overlay Mode
       </button>
 
       <button className="control-btn icon" onClick={onOpenSettings} aria-label="Settings">

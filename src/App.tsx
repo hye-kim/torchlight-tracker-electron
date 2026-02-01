@@ -473,6 +473,7 @@ function App() {
                     onExportExcel={handleExportExcel}
                     onOpenSettings={() => setShowSettings(true)}
                     onResetStats={handleResetStats}
+                    onToggleOverlay={handleToggleOverlayMode}
                     isInitialized={isInitialized}
                     isWaitingForInit={isWaitingForInit}
                   />
