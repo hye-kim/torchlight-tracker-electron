@@ -98,6 +98,7 @@ function App() {
   const [currentMap, setCurrentMap] = useState<CurrentMapData | null>(null);
   const [selectedMapNumber, setSelectedMapNumber] = useState<number | null>(null);
   const [activeView, setActiveView] = useState<NavView>('overview');
+  const [bagInventory, setBagInventory] = useState<Drop[]>([]);
 
   useEffect(() => {
     // Load initial config
@@ -114,12 +115,18 @@ function App() {
       if (logs) setMapLogs(logs);
     });
 
+    // Load bag state
+    window.electronAPI.getBagState?.().then((bagState: Drop[]) => {
+      if (bagState) setBagInventory(bagState);
+    });
+
     // Listen for updates
     window.electronAPI.onUpdateDisplay((data: any) => {
       if (data.stats) setStats(data.stats);
       if (data.drops) setDrops(data.drops);
       if (data.costs) setCosts(data.costs);
       if (data.mapLogs) setMapLogs(data.mapLogs);
+      if (data.bagInventory) setBagInventory(data.bagInventory);
       if (data.isInMap !== undefined) setIsInMap(data.isInMap);
       if (data.currentMap) setCurrentMap(data.currentMap);
       if (data.isInitialized !== undefined) setIsInitialized(data.isInitialized);
@@ -181,6 +188,7 @@ function App() {
       setDrops([]);
       setCosts([]);
       setMapLogs([]);
+      setBagInventory([]);
       setCurrentMap(null);
       setIsInMap(false);
       setSelectedMapNumber(null);
@@ -501,7 +509,7 @@ function App() {
               </>
             ) : (
               <div className="inventory-panel">
-                <InventoryView drops={drops} />
+                <InventoryView drops={bagInventory} />
               </div>
             )}
           </>

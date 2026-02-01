@@ -369,6 +369,21 @@ export class LogMonitor extends EventEmitter {
       const isInMap = this.statisticsTracker.getIsInMap();
       const currentMap = this.statisticsTracker.getCurrentMapData();
 
+      // Get current bag state
+      const bagState = this.inventoryTracker.getBagStateSummary();
+      const bagArray = Object.entries(bagState).map(([itemId, quantity]) => {
+        const itemData = fullTable[itemId];
+        return {
+          itemId,
+          name: itemData?.name || `Item ${itemId}`,
+          quantity,
+          price: itemData?.price || 0,
+          type: itemData?.type || 'Unknown',
+          timestamp: Date.now(),
+          imageUrl: getItemImageUrl(itemId),
+        };
+      });
+
       this.emit('updateDisplay', {
         stats: {
           currentMap: {
@@ -389,6 +404,7 @@ export class LogMonitor extends EventEmitter {
         mapLogs: mapLogs,
         isInMap: isInMap,
         currentMap: currentMap,
+        bagInventory: bagArray,
       });
     } catch (error) {
       logger.error(`Error in log monitor poll: ${error}`);
