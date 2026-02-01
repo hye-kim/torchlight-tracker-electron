@@ -470,16 +470,6 @@ export class LogMonitor extends EventEmitter {
       }
     }
 
-    // Detect DiXiaZhenSuo (Vorax - Shelly's Operating Theater) entry
-    const dixiazhen = this.logParser.detectDiXiaZhenEntry(line);
-    if (dixiazhen) {
-      if (this.statisticsTracker.getIsInMap()) {
-        this.statisticsTracker.updateSubregion(dixiazhen);
-      } else {
-        this.pendingSubregion = dixiazhen;
-      }
-    }
-
     // Detect sort operations - clear pre-map buffer when sort ends
     // (sort movements can generate false costs)
     if (line.includes('Sort operation ended')) {
@@ -495,7 +485,9 @@ export class LogMonitor extends EventEmitter {
     const mapChange = this.logParser.detectMapChange(line);
 
     if (mapChange.entering) {
-      this.statisticsTracker.enterMap(this.pendingSubregion || subregion);
+      // Use subregion from mapChange if provided (e.g., DiXiaZhenSuo), otherwise use pending or detected subregion
+      const mapSubregion = mapChange.subregion || this.pendingSubregion || subregion;
+      this.statisticsTracker.enterMap(mapSubregion);
       this.pendingSubregion = null;
       this.inventoryTracker.resetMapBaseline();
 

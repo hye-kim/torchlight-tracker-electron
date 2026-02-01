@@ -229,7 +229,17 @@ export class LogParser {
     return PATTERN_RESET_ITEMS_END.test(text);
   }
 
-  detectMapChange(text: string): { entering: boolean; exiting: boolean } {
+  detectMapChange(text: string): { entering: boolean; exiting: boolean; subregion?: string } {
+    // Check for DiXiaZhenSuo entry (special seasonal map)
+    const dixiazhenMatch = PATTERN_DIXIAZHEN_ENTER.test(text);
+    if (dixiazhenMatch) {
+      return {
+        entering: true,
+        exiting: false,
+        subregion: "Vorax - Shelly's Operating Theater",
+      };
+    }
+
     return {
       entering: PATTERN_MAP_ENTER.test(text),
       exiting: PATTERN_MAP_EXIT.test(text),
@@ -246,17 +256,6 @@ export class LogParser {
       const areaId = match[1];
       const areaLevel = parseInt(match[2], 10);
       return getSubregionDisplayName(areaId, areaLevel);
-    }
-    return null;
-  }
-
-  /**
-   * Detect entering DiXiaZhenSuo (Vorax - Shelly's Operating Theater).
-   * @returns Map name if detected, null otherwise.
-   */
-  detectDiXiaZhenEntry(text: string): string | null {
-    if (PATTERN_DIXIAZHEN_ENTER.test(text)) {
-      return "Vorax - Shelly's Operating Theater";
     }
     return null;
   }
