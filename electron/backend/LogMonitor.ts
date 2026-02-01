@@ -49,6 +49,7 @@ export class LogMonitor extends EventEmitter {
   private priceBuffer: string[] = [];
   private lastPriceCheck: number = Date.now();
   private readonly PRICE_BUFFER_INTERVAL = 1000; // Check price buffer every 1 second
+  private insidePriceResponse: boolean = false; // Track if we're inside a price response block
 
   // Buffer for initialization (collects BagMgr@:InitBagData entries)
   private bagMgrBuffer: string[] = [];
@@ -267,6 +268,10 @@ export class LogMonitor extends EventEmitter {
       }
     }
 
+    // Reset price buffer state
+    this.priceBuffer = [];
+    this.insidePriceResponse = false;
+
     // Clear initialization buffer
     this.bagMgrBuffer = [];
 
@@ -305,6 +310,7 @@ export class LogMonitor extends EventEmitter {
         const bufferedText = this.priceBuffer.join('\n');
         this.processPriceUpdates(bufferedText);
         this.priceBuffer = [];
+        this.insidePriceResponse = false; // Reset capture state after processing
       }
 
       // Update display with current stats, drops, costs, and map logs
@@ -407,10 +413,32 @@ export class LogMonitor extends EventEmitter {
         continue; // Skip noise
       }
 
-      // Add to price buffer for later processing (prices need multi-line context)
-      if (line.includes('XchgSearchPrice') || line.includes('+refer')) {
+      // Price buffer logic: capture entire price response blocks
+      // Start buffering when we see XchgSearchPrice request or response
+      if (line.includes('XchgSearchPrice')) {
         this.priceBuffer.push(line);
-        logger.info(`[PRICE DEBUG] Added line to price buffer (buffer size: ${this.priceBuffer.length})`);
+        logger.info(`[PRICE DEBUG] Added XchgSearchPrice line to buffer (size: ${this.priceBuffer.length})`);
+
+        // If this is a RecvMessage (response), start capturing all following lines
+        if (line.includes('Socket RecvMessage STT----XchgSearchPrice')) {
+          this.insidePriceResponse = true;
+          logger.info(`[PRICE DEBUG] Started price response block capture`);
+        }
+      } else if (this.insidePriceResponse) {
+        // We're inside a price response - capture everything until next Socket message
+        if (line.includes('----Socket')) {
+          // Hit next message boundary, stop capturing
+          this.insidePriceResponse = false;
+          logger.info(`[PRICE DEBUG] Ended price response block capture at next Socket message`);
+        } else {
+          // Still inside price response, add this line
+          this.priceBuffer.push(line);
+          logger.info(`[PRICE DEBUG] Added line inside price response (size: ${this.priceBuffer.length})`);
+        }
+      } else if (line.includes('+refer')) {
+        // Also capture +refer lines (item ID references)
+        this.priceBuffer.push(line);
+        logger.info(`[PRICE DEBUG] Added +refer line to buffer (size: ${this.priceBuffer.length})`);
       }
 
       // Process line immediately for map state and item changes
