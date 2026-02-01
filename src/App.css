@@ -232,14 +232,13 @@
 }
 
 .sidebar {
-  width: 300px;
+  width: 180px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 16px;
-  background-color: #2a2a3e;
-  border-right: 1px solid #4a4a5e;
+  background-color: #1e1e2e;
+  border-right: 1px solid #2a2a3e;
   overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .center-panel {
@@ -256,6 +255,15 @@
   flex: 1;
   padding: 16px;
   overflow-y: auto;
+  min-width: 0;
+}
+
+.inventory-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  overflow: hidden;
   min-width: 0;
 }
 
