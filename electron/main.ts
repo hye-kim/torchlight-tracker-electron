@@ -106,9 +106,8 @@ app.whenReady().then(async () => {
   });
   await fileManager.initializeFullTableFromEnTable();
 
-  // Initialize session manager
+  // Initialize session manager (cleanup old sessions, but don't start a new one yet)
   sessionManager.cleanupOldSessions();
-  sessionManager.startNewSession();
 
   // Sync prices from API in the background
   logger.info('Fetching latest prices from API...');
@@ -316,6 +315,14 @@ ipcMain.handle('get-bag-state', () => {
 });
 
 ipcMain.handle('initialize-tracker', async () => {
+  // End current session if one exists, then start a new session
+  const currentSession = sessionManager.getCurrentSession();
+  if (currentSession) {
+    sessionManager.endCurrentSession();
+  }
+  sessionManager.startNewSession();
+  sessionManager.saveSessions();
+
   inventoryTracker.startInitialization();
   return { success: true };
 });
@@ -370,6 +377,13 @@ ipcMain.handle('export-excel', async () => {
 });
 
 ipcMain.handle('reset-stats', () => {
+  // End current session when stats are reset
+  const currentSession = sessionManager.getCurrentSession();
+  if (currentSession) {
+    sessionManager.endCurrentSession();
+    sessionManager.saveSessions();
+  }
+
   statisticsTracker.reset();
   return { success: true };
 });
