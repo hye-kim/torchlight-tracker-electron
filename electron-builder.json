@@ -29,6 +29,10 @@
       {
         "target": "nsis",
         "arch": ["x64"]
+      },
+      {
+        "target": "portable",
+        "arch": ["x64"]
       }
     ],
     "icon": "build-resources/icon.ico",
@@ -44,6 +48,7 @@
     "installerIcon": "build-resources/icon.ico",
     "uninstallerIcon": "build-resources/icon.ico",
     "installerHeaderIcon": "build-resources/icon.ico",
+    "artifactName": "${productName}-${version}-Setup.${ext}",
     "license": "LICENSE.txt"
   },
   "portable": {
