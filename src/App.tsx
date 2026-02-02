@@ -207,11 +207,11 @@ function App() {
 
   const handleToggleOverlayMode = async () => {
     const newOverlayMode = !overlayMode;
-    const updates = { overlayMode: newOverlayMode };
-    const newConfig = await window.electronAPI.updateConfig(updates);
-    setConfig(newConfig);
 
-    // Apply overlay mode immediately
+    // Update local state only (do not persist to config)
+    setConfig((prev) => ({ ...prev, overlayMode: newOverlayMode }));
+
+    // Apply overlay mode to window
     if (window.electronAPI) {
       await window.electronAPI.toggleOverlayMode(newOverlayMode);
     }
@@ -219,11 +219,11 @@ function App() {
 
   const handleToggleClickThrough = async () => {
     const newClickThrough = !config.clickThrough;
-    const updates = { clickThrough: newClickThrough };
-    const newConfig = await window.electronAPI.updateConfig(updates);
-    setConfig(newConfig);
 
-    // Apply click-through
+    // Update local state only (do not persist to config)
+    setConfig((prev) => ({ ...prev, clickThrough: newClickThrough }));
+
+    // Apply click-through to window
     if (window.electronAPI) {
       await window.electronAPI.toggleClickThrough(newClickThrough);
     }
