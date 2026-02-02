@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Torchlight Infinite Price Tracker - Electron Edition",
   "main": "dist-electron/main.js",
-  "author": "Torchlight Tracker Team",
+  "author": "Hye Kim",
   "license": "MIT",
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
@@ -17,6 +17,7 @@
     "build:win-portable": "npm run build && electron-builder --win portable --config electron-builder.json",
     "dist": "npm run build && electron-builder --config electron-builder.json",
     "preview": "vite preview",
+    "release": "npm run build && electron-builder --publish always --config electron-builder.json",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

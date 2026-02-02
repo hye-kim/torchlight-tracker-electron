@@ -1,7 +1,7 @@
 {
   "appId": "com.torchlight.tracker",
   "productName": "Torchlight Tracker",
-  "copyright": "Copyright © 2024",
+  "copyright": "Copyright © 2026",
   "directories": {
     "output": "release",
     "buildResources": "build-resources"
@@ -33,7 +33,7 @@
     ],
     "icon": "build-resources/icon.ico",
     "artifactName": "${productName}-${version}-Setup.${ext}",
-    "publisherName": "Torchlight Tracker Team"
+    "publisherName": "Hye Kim"
   },
   "nsis": {
     "oneClick": false,
