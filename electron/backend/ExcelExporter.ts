@@ -28,7 +28,6 @@ export class ExcelExporter {
 
       // Define columns for drops table
       worksheet.columns = [
-        { header: 'Time', key: 'time', width: 20 },
         { header: 'Item Name', key: 'name', width: 35 },
         { header: 'Type', key: 'type', width: 20 },
         { header: 'Quantity', key: 'quantity', width: 12 },
@@ -55,7 +54,6 @@ export class ExcelExporter {
         const rowNum = i + 2; // Excel row number (1-indexed, starting after header)
 
         const row = worksheet.addRow({
-          time: new Date(drop.timestamp).toLocaleString(),
           name: drop.name,
           type: drop.type || 'Unknown',
           quantity: drop.quantity,
@@ -64,11 +62,11 @@ export class ExcelExporter {
         });
 
         // Set formula for total value (quantity * unit price)
-        worksheet.getCell(`F${rowNum}`).value = { formula: `D${rowNum}*E${rowNum}` };
+        worksheet.getCell(`E${rowNum}`).value = { formula: `C${rowNum}*D${rowNum}` };
 
         // Format unit price and total value as numbers with 2 decimal places
+        worksheet.getCell(`D${rowNum}`).numFmt = '0.00';
         worksheet.getCell(`E${rowNum}`).numFmt = '0.00';
-        worksheet.getCell(`F${rowNum}`).numFmt = '0.00';
       }
 
       // Add costs table
@@ -85,10 +83,10 @@ export class ExcelExporter {
       worksheet.getCell(`A${costsStartRow}`).alignment = { vertical: 'middle', horizontal: 'center' };
 
       // Merge cells for costs header
-      worksheet.mergeCells(`A${costsStartRow}:F${costsStartRow}`);
+      worksheet.mergeCells(`A${costsStartRow}:E${costsStartRow}`);
 
       const costsHeaderRow = costsStartRow + 1;
-      ['Time', 'Item Name', 'Type', 'Quantity', 'Unit Price', 'Total Cost'].forEach((header, idx) => {
+      ['Item Name', 'Type', 'Quantity', 'Unit Price', 'Total Cost'].forEach((header, idx) => {
         const cell = worksheet.getCell(costsHeaderRow, idx + 1);
         cell.value = header;
         cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
@@ -108,7 +106,6 @@ export class ExcelExporter {
         const rowNum = costsHeaderRow + 1 + i;
 
         const row = worksheet.addRow({
-          time: new Date(cost.timestamp).toLocaleString(),
           name: cost.name,
           type: cost.type || 'Unknown',
           quantity: cost.quantity,
@@ -117,11 +114,11 @@ export class ExcelExporter {
         });
 
         // Set formula for total cost (quantity * unit price)
-        worksheet.getCell(`F${rowNum}`).value = { formula: `D${rowNum}*E${rowNum}` };
+        worksheet.getCell(`E${rowNum}`).value = { formula: `C${rowNum}*D${rowNum}` };
 
         // Format unit price and total cost as numbers with 2 decimal places
+        worksheet.getCell(`D${rowNum}`).numFmt = '0.00';
         worksheet.getCell(`E${rowNum}`).numFmt = '0.00';
-        worksheet.getCell(`F${rowNum}`).numFmt = '0.00';
       }
 
       // Add summary row for total value (drops - costs)
@@ -133,8 +130,8 @@ export class ExcelExporter {
       worksheet.getCell(`A${summaryRowIndex}`).font = { bold: true };
 
       // Calculate total value as sum of drops - sum of costs
-      const dropsFormula = drops.length > 0 ? `SUM(F2:F${dropsEndRow})` : '0';
-      const costsFormula = costs.length > 0 ? `SUM(F${costsHeaderRow + 1}:F${costsEndRow})` : '0';
+      const dropsFormula = drops.length > 0 ? `SUM(E2:E${dropsEndRow})` : '0';
+      const costsFormula = costs.length > 0 ? `SUM(E${costsHeaderRow + 1}:E${costsEndRow})` : '0';
 
       worksheet.getCell(`B${summaryRowIndex}`).value = {
         formula: `${dropsFormula}-${costsFormula}`,
