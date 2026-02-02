@@ -8,6 +8,8 @@ import SettingsDialog from './components/SettingsDialog';
 import OverlaySettings from './components/OverlaySettings';
 import InitializationDialog from './components/InitializationDialog';
 import MapLogTable from './components/MapLogTable';
+import UpdateNotification from './components/UpdateNotification';
+import UpdateDialog from './components/UpdateDialog';
 import './App.css';
 
 interface DisplayItem {
@@ -98,6 +100,9 @@ function App() {
   const [selectedMapNumber, setSelectedMapNumber] = useState<number | null>(null);
   const [activeView, setActiveView] = useState<NavView>('overview');
   const [bagInventory, setBagInventory] = useState<Drop[]>([]);
+  const [updateInfo, setUpdateInfo] = useState<any>(null);
+  const [showUpdateNotification, setShowUpdateNotification] = useState(false);
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
 
   useEffect(() => {
     // Load initial config
@@ -140,6 +145,20 @@ function App() {
     // Listen for overlay mode changes
     window.electronAPI.onOverlayModeChanged((overlayMode: boolean) => {
       setConfig((prev) => ({ ...prev, overlayMode }));
+    });
+
+    // Listen for update events
+    window.electronAPI.onUpdateAvailable((info: any) => {
+      setUpdateInfo(info);
+      setShowUpdateNotification(true);
+    });
+
+    window.electronAPI.onUpdateNotAvailable(() => {
+      // Update not available - no action needed
+    });
+
+    window.electronAPI.onUpdateError((error: any) => {
+      console.error('Update error:', error);
     });
   }, []);
 
@@ -226,6 +245,22 @@ function App() {
     // Apply click-through to window
     if (window.electronAPI) {
       await window.electronAPI.toggleClickThrough(newClickThrough);
+    }
+  };
+
+  const handleDownloadUpdate = () => {
+    setShowUpdateNotification(false);
+    setShowUpdateDialog(true);
+  };
+
+  const handleDismissUpdate = () => {
+    setShowUpdateNotification(false);
+  };
+
+  const handleSkipUpdate = async () => {
+    if (updateInfo) {
+      await window.electronAPI.skipUpdateVersion(updateInfo.version);
+      setShowUpdateNotification(false);
     }
   };
 
@@ -509,6 +544,22 @@ function App() {
 
       {showInitDialog && (
         <InitializationDialog onClose={() => setShowInitDialog(false)} />
+      )}
+
+      {showUpdateNotification && updateInfo && (
+        <UpdateNotification
+          updateInfo={updateInfo}
+          onDownload={handleDownloadUpdate}
+          onDismiss={handleDismissUpdate}
+          onSkip={handleSkipUpdate}
+        />
+      )}
+
+      {showUpdateDialog && updateInfo && (
+        <UpdateDialog
+          updateInfo={updateInfo}
+          onClose={() => setShowUpdateDialog(false)}
+        />
       )}
     </div>
   );

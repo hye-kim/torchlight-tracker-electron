@@ -9,6 +9,7 @@ import { GameDetector } from './backend/GameDetector';
 import { LogMonitor } from './backend/LogMonitor';
 import { Logger } from './backend/Logger';
 import { ExcelExporter } from './backend/ExcelExporter';
+import { UpdateManager } from './backend/UpdateManager';
 import { CONFIG_FILE } from './backend/constants';
 
 const logger = Logger.getInstance();
@@ -25,6 +26,7 @@ const inventoryTracker = new InventoryTracker(logParser);
 const statisticsTracker = new StatisticsTracker(fileManager, configManager);
 const gameDetector = new GameDetector();
 const excelExporter = new ExcelExporter(fileManager);
+const updateManager = new UpdateManager(logger);
 
 function createWindow() {
   const config = configManager.getConfig();
@@ -130,6 +132,32 @@ app.whenReady().then(async () => {
   const { gameFound, logFilePath } = await gameDetector.detectGame();
 
   createWindow();
+
+  // Set main window for update manager
+  if (mainWindow) {
+    updateManager.setMainWindow(mainWindow);
+  }
+
+  // Check for updates on startup (after 10 second delay)
+  if (mainWindow && !isDev) {
+    setTimeout(async () => {
+      const shouldCheck = configManager.getAutoCheckUpdates();
+      if (shouldCheck) {
+        logger.info('Checking for updates on startup...');
+        try {
+          const updateInfo = await updateManager.checkForUpdates();
+          const skipVersion = configManager.getSkipVersion();
+
+          // Don't notify if this version was explicitly skipped
+          if (updateInfo && skipVersion !== updateInfo.version) {
+            configManager.setLastCheckTime(Date.now());
+          }
+        } catch (error) {
+          logger.error('Startup update check failed:', error);
+        }
+      }
+    }, 10000); // 10 second delay
+  }
 
   // Show warning if game not found
   if (!gameFound && mainWindow) {
@@ -468,4 +496,55 @@ ipcMain.handle('get-window-bounds', () => {
     return mainWindow.getBounds();
   }
   return { x: 0, y: 0, width: 400, height: 600 };
+});
+
+// Update IPC handlers
+ipcMain.handle('check-for-updates', async () => {
+  try {
+    const updateInfo = await updateManager.checkForUpdates();
+    if (updateInfo) {
+      configManager.setLastCheckTime(Date.now());
+    }
+    return { success: true, updateInfo };
+  } catch (error) {
+    logger.error('Error checking for updates:', error);
+    return { success: false, error: String(error) };
+  }
+});
+
+ipcMain.handle('download-update', async () => {
+  try {
+    await updateManager.downloadUpdate();
+    return { success: true };
+  } catch (error) {
+    logger.error('Error downloading update:', error);
+    return { success: false, error: String(error) };
+  }
+});
+
+ipcMain.handle('install-update', () => {
+  updateManager.quitAndInstall();
+  return { success: true };
+});
+
+ipcMain.handle('get-app-version', () => {
+  return updateManager.getCurrentVersion();
+});
+
+ipcMain.handle('get-update-status', () => {
+  return updateManager.getUpdateStatus();
+});
+
+ipcMain.handle('get-update-config', () => {
+  return configManager.getUpdateConfig();
+});
+
+ipcMain.handle('set-update-config', (_, updateConfig) => {
+  configManager.setUpdateConfig(updateConfig);
+  return { success: true };
+});
+
+ipcMain.handle('skip-update-version', (_, version: string) => {
+  configManager.setSkipVersion(version);
+  return { success: true };
 });

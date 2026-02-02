@@ -33,9 +33,44 @@ contextBridge.exposeInMainWorld('electronAPI', {
   windowResize: (width: number, height: number) => ipcRenderer.invoke('window-resize', width, height),
   getWindowBounds: () => ipcRenderer.invoke('get-window-bounds'),
 
+  // Update checks
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  downloadUpdate: () => ipcRenderer.invoke('download-update'),
+  installUpdate: () => ipcRenderer.invoke('install-update'),
+  getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+  getUpdateStatus: () => ipcRenderer.invoke('get-update-status'),
+  getUpdateConfig: () => ipcRenderer.invoke('get-update-config'),
+  setUpdateConfig: (updateConfig: any) => ipcRenderer.invoke('set-update-config', updateConfig),
+  skipUpdateVersion: (version: string) => ipcRenderer.invoke('skip-update-version', version),
+
   // Listen for updates
   onUpdateDisplay: (callback: (data: any) => void) => {
     ipcRenderer.on('update-display', (_, data) => callback(data));
+  },
+
+  // Update event listeners
+  onCheckingForUpdate: (callback: () => void) => {
+    ipcRenderer.on('checking-for-update', () => callback());
+  },
+
+  onUpdateAvailable: (callback: (info: any) => void) => {
+    ipcRenderer.on('update-available', (_, info) => callback(info));
+  },
+
+  onUpdateNotAvailable: (callback: (info: any) => void) => {
+    ipcRenderer.on('update-not-available', (_, info) => callback(info));
+  },
+
+  onUpdateError: (callback: (error: any) => void) => {
+    ipcRenderer.on('update-error', (_, error) => callback(error));
+  },
+
+  onDownloadProgress: (callback: (progress: any) => void) => {
+    ipcRenderer.on('download-progress', (_, progress) => callback(progress));
+  },
+
+  onUpdateDownloaded: (callback: (info: any) => void) => {
+    ipcRenderer.on('update-downloaded', (_, info) => callback(info));
   },
 
   onInitializationComplete: (callback: () => void) => {
@@ -111,7 +146,21 @@ declare global {
       windowClose: () => Promise<{ success: boolean }>;
       windowResize: (width: number, height: number) => Promise<{ success: boolean }>;
       getWindowBounds: () => Promise<{ x: number; y: number; width: number; height: number }>;
+      checkForUpdates: () => Promise<{ success: boolean; updateInfo?: any }>;
+      downloadUpdate: () => Promise<{ success: boolean; error?: string }>;
+      installUpdate: () => Promise<{ success: boolean }>;
+      getAppVersion: () => Promise<string>;
+      getUpdateStatus: () => Promise<any>;
+      getUpdateConfig: () => Promise<any>;
+      setUpdateConfig: (updateConfig: any) => Promise<{ success: boolean }>;
+      skipUpdateVersion: (version: string) => Promise<{ success: boolean }>;
       onUpdateDisplay: (callback: (data: any) => void) => void;
+      onCheckingForUpdate: (callback: () => void) => void;
+      onUpdateAvailable: (callback: (info: any) => void) => void;
+      onUpdateNotAvailable: (callback: (info: any) => void) => void;
+      onUpdateError: (callback: (error: any) => void) => void;
+      onDownloadProgress: (callback: (progress: any) => void) => void;
+      onUpdateDownloaded: (callback: (info: any) => void) => void;
       onInitializationComplete: (callback: () => void) => void;
       onOverlayModeChanged: (callback: (overlayMode: boolean) => void) => void;
     };
