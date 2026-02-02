@@ -339,7 +339,7 @@ function App() {
           </div>
       ) : (
         <div className="header">
-          <div className="title-bar">
+          <div className="window-controls-container">
             <div className="window-controls">
               <button className="window-btn minimize" onClick={handleWindowMinimize} title="Minimize">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5">
