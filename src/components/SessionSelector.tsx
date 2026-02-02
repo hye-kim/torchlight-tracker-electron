@@ -72,6 +72,35 @@ const SessionSelector: React.FC<SessionSelectorProps> = ({
     return `${sign}${Math.floor(profit).toLocaleString()} FE`;
   };
 
+  const formatDate = (timestamp: number): string => {
+    const date = new Date(timestamp);
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = months[date.getMonth()];
+    const day = date.getDate();
+    const year = date.getFullYear();
+    return `${month} ${day} ${year}`;
+  };
+
+  const formatTime = (timestamp: number): string => {
+    const date = new Date(timestamp);
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // 0 should be 12
+    const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+    return `${hours}:${minutesStr} ${ampm}`;
+  };
+
+  const formatDuration = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+    return `${minutes}m`;
+  };
+
   // Sort sessions by start time (newest first)
   const sortedSessions = [...sessions].sort((a, b) => b.startTime - a.startTime);
 
@@ -114,30 +143,26 @@ const SessionSelector: React.FC<SessionSelectorProps> = ({
           <p>No sessions found. Start playing to create your first session!</p>
         </div>
       ) : (
-        <div className="session-list">
+        <div className="session-grid">
           {sortedSessions.map(session => (
             <div
               key={session.sessionId}
-              className={`session-item ${selectedSessionIds.includes(session.sessionId) ? 'selected' : ''}`}
+              className={`session-box ${selectedSessionIds.includes(session.sessionId) ? 'selected' : ''} ${session.isActive ? 'active' : ''}`}
               onClick={() => handleToggleSession(session.sessionId)}
             >
-              <input
-                type="checkbox"
-                checked={selectedSessionIds.includes(session.sessionId)}
-                onChange={() => handleToggleSession(session.sessionId)}
-                onClick={(e) => e.stopPropagation()}
-              />
-              <div className="session-item-content">
-                <div className="session-item-title">
-                  {session.title}
-                  {session.isActive && <span className="session-active-badge">Active</span>}
+              <div className="session-box-row">
+                <div className="session-date-time">
+                  <span className="session-date">{formatDate(session.startTime)}</span>
+                  <span className="session-time">{formatTime(session.startTime)}</span>
                 </div>
-                <div className="session-item-stats">
-                  <span>{session.stats.mapsCompleted} maps</span>
-                  <span className={session.stats.totalProfit >= 0 ? 'profit-positive' : 'profit-negative'}>
-                    {formatProfit(session.stats.totalProfit)}
-                  </span>
-                </div>
+                {session.isActive && <span className="session-active-badge">Active</span>}
+              </div>
+              <div className="session-box-row session-stats-row">
+                <span className="session-stat">{formatDuration(session.duration)}</span>
+                <span className="session-stat">{session.stats.mapsCompleted} maps</span>
+                <span className={`session-stat ${session.stats.totalProfit >= 0 ? 'profit-positive' : 'profit-negative'}`}>
+                  {formatProfit(session.stats.totalProfit)}
+                </span>
               </div>
             </div>
           ))}
