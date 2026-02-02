@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './NavigationSidebar.css';
 
 type NavView = 'overview' | 'inventory';
@@ -9,6 +9,13 @@ interface NavigationSidebarProps {
 }
 
 const NavigationSidebar: React.FC<NavigationSidebarProps> = ({ activeView, onViewChange }) => {
+  const [appVersion, setAppVersion] = useState<string>('');
+
+  useEffect(() => {
+    // Load app version
+    window.electronAPI.getAppVersion().then(setAppVersion);
+  }, []);
+
   return (
     <nav className="nav-sidebar" aria-label="Main navigation">
       <div className="nav-branding">
@@ -17,7 +24,7 @@ const NavigationSidebar: React.FC<NavigationSidebarProps> = ({ activeView, onVie
           <br />
           Tracker
         </div>
-        <div className="nav-version">v1.0.0</div>
+        <div className="nav-version">v{appVersion}</div>
       </div>
 
       <ul className="nav-menu" role="list">

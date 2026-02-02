@@ -10,6 +10,12 @@ export interface DisplayItem {
   order: number;
 }
 
+export interface UpdateConfig {
+  autoCheck: boolean;
+  skipVersion?: string;
+  lastCheckTime?: number;
+}
+
 export interface Config {
   opacity: number;
   tax: number;
@@ -25,6 +31,7 @@ export interface Config {
   clickThrough?: boolean;
   fontSize?: number;
   displayItems?: DisplayItem[];
+  updates?: UpdateConfig;
 }
 
 export class ConfigManager {
@@ -67,6 +74,9 @@ export class ConfigManager {
         { id: 'totalDuration', label: 'Total Duration', enabled: true, order: 7 },
         { id: 'mapCount', label: 'Map Count', enabled: true, order: 8 },
       ],
+      updates: {
+        autoCheck: true,
+      },
     };
   }
 
@@ -167,5 +177,41 @@ export class ConfigManager {
   setDisplayItems(displayItems: DisplayItem[]): void {
     this.config.displayItems = displayItems;
     this.saveConfig();
+  }
+
+  getUpdateConfig(): UpdateConfig {
+    return this.config.updates || { autoCheck: true };
+  }
+
+  setUpdateConfig(updateConfig: Partial<UpdateConfig>): void {
+    this.config.updates = {
+      ...this.getUpdateConfig(),
+      ...updateConfig,
+    };
+    this.saveConfig();
+  }
+
+  getAutoCheckUpdates(): boolean {
+    return this.config.updates?.autoCheck ?? true;
+  }
+
+  setAutoCheckUpdates(autoCheck: boolean): void {
+    this.setUpdateConfig({ autoCheck });
+  }
+
+  getSkipVersion(): string | undefined {
+    return this.config.updates?.skipVersion;
+  }
+
+  setSkipVersion(version: string | undefined): void {
+    this.setUpdateConfig({ skipVersion: version });
+  }
+
+  getLastCheckTime(): number | undefined {
+    return this.config.updates?.lastCheckTime;
+  }
+
+  setLastCheckTime(time: number): void {
+    this.setUpdateConfig({ lastCheckTime: time });
   }
 }

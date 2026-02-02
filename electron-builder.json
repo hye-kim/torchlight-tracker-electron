@@ -6,6 +6,12 @@
     "output": "release",
     "buildResources": "build-resources"
   },
+  "publish": {
+    "provider": "github",
+    "owner": "hye-kim",
+    "repo": "torchlight-tracker-electron",
+    "releaseType": "release"
+  },
   "files": [
     "dist-electron/**/*",
     "dist-react/**/*",
