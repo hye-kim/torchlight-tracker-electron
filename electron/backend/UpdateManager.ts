@@ -1,6 +1,6 @@
 import { autoUpdater, UpdateInfo } from 'electron-updater';
 import { BrowserWindow } from 'electron';
-import { Logger } from './Logger';
+import type winston from 'winston';
 
 export interface UpdateStatus {
   checking: boolean;
@@ -17,7 +17,7 @@ export interface UpdateStatus {
 }
 
 export class UpdateManager {
-  private logger: Logger;
+  private logger: winston.Logger;
   private mainWindow: BrowserWindow | null = null;
   private status: UpdateStatus = {
     checking: false,
@@ -29,7 +29,7 @@ export class UpdateManager {
     progress: null,
   };
 
-  constructor(logger: Logger) {
+  constructor(logger: winston.Logger) {
     this.logger = logger;
     this.setupAutoUpdater();
   }
