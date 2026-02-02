@@ -284,6 +284,7 @@ ipcMain.handle('export-excel', async () => {
   if (filePath) {
     try {
       const totalStats = statisticsTracker.getTotalStats();
+      const allCosts = statisticsTracker.getAllCosts();
       const fullTable = fileManager.loadFullTable();
       const config = configManager.getConfig();
 
@@ -300,7 +301,20 @@ ipcMain.handle('export-excel', async () => {
         };
       });
 
-      await excelExporter.exportDropsToExcel(dropRecords, filePath, config.tax === 1);
+      // Convert costs to DropRecord format
+      const costRecords = Object.entries(allCosts).map(([itemId, quantity]) => {
+        const itemData = fullTable[itemId];
+        return {
+          itemId,
+          name: itemData?.name || `Item ${itemId}`,
+          quantity,
+          price: itemData?.price || 0,
+          type: itemData?.type || 'Unknown',
+          timestamp: Date.now(),
+        };
+      });
+
+      await excelExporter.exportDropsToExcel(dropRecords, costRecords, filePath, config.tax === 1);
       return { success: true, filePath };
     } catch (error) {
       logger.error('Error exporting to Excel:', error);

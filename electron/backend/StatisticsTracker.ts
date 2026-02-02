@@ -495,6 +495,17 @@ export class StatisticsTracker extends EventEmitter {
   }
 
   /**
+   * Get all costs as a Record.
+   */
+  getAllCosts(): Record<string, number> {
+    const costs: Record<string, number> = {};
+    for (const [itemId, count] of this.costListAll) {
+      costs[itemId] = count;
+    }
+    return costs;
+  }
+
+  /**
    * Get current map drops as an array.
    */
   getCurrentDrops(): Array<{ itemId: string; quantity: number }> {
