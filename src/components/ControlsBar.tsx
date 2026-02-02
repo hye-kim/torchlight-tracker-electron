@@ -35,7 +35,7 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
       </button>
 
       <button className="control-btn secondary" onClick={onExportExcel}>
-        Export Data
+        Export Excel
       </button>
 
       <button className="control-btn secondary" onClick={onToggleOverlay}>
