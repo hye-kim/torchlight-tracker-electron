@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import NavigationSidebar from './components/NavigationSidebar';
+import NavigationSidebar, { NavView } from './components/NavigationSidebar';
 import StatsBar from './components/StatsBar';
 import ControlsBar from './components/ControlsBar';
 import InventoryView from './components/InventoryView';
+import HistoryView from './components/HistoryView';
 import DropsCard from './components/DropsCard';
 import SettingsDialog from './components/SettingsDialog';
 import OverlaySettings from './components/OverlaySettings';
@@ -81,8 +82,6 @@ interface CurrentMapData {
   drops?: MapItemData[];
   costs?: MapItemData[];
 }
-
-type NavView = 'overview' | 'inventory';
 
 function App() {
   const [config, setConfig] = useState<Config>({ tax: 1, user: '' });
@@ -517,9 +516,13 @@ function App() {
                   />
                 </div>
               </>
-            ) : (
+            ) : activeView === 'inventory' ? (
               <div className="inventory-panel">
                 <InventoryView drops={bagInventory} />
+              </div>
+            ) : (
+              <div className="history-panel">
+                <HistoryView />
               </div>
             )}
           </>

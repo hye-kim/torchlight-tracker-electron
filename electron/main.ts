@@ -10,6 +10,7 @@ import { LogMonitor } from './backend/LogMonitor';
 import { Logger } from './backend/Logger';
 import { ExcelExporter } from './backend/ExcelExporter';
 import { UpdateManager } from './backend/UpdateManager';
+import { SessionManager } from './backend/SessionManager';
 import { CONFIG_FILE } from './backend/constants';
 
 const logger = Logger.getInstance();
@@ -24,6 +25,7 @@ const fileManager = new FileManager();
 const logParser = new LogParser(fileManager);
 const inventoryTracker = new InventoryTracker(logParser);
 const statisticsTracker = new StatisticsTracker(fileManager, configManager);
+const sessionManager = new SessionManager();
 const gameDetector = new GameDetector();
 const excelExporter = new ExcelExporter(fileManager);
 const updateManager = new UpdateManager(logger);
@@ -104,6 +106,10 @@ app.whenReady().then(async () => {
   });
   await fileManager.initializeFullTableFromEnTable();
 
+  // Initialize session manager
+  sessionManager.cleanupOldSessions();
+  sessionManager.startNewSession();
+
   // Sync prices from API in the background
   logger.info('Fetching latest prices from API...');
   fileManager.syncAllPricesFromAPI().then((count) => {
@@ -175,6 +181,12 @@ app.whenReady().then(async () => {
     }, 500);
   }
 
+  // Set up StatisticsTracker event listener for map completion
+  statisticsTracker.on('mapCompleted', (mapLog) => {
+    sessionManager.addMapToCurrentSession(mapLog);
+    sessionManager.saveSessions();
+  });
+
   // Start log monitoring
   if (logFilePath) {
     logMonitor = new LogMonitor(
@@ -214,6 +226,11 @@ app.on('window-all-closed', () => {
   if (logMonitor) {
     logMonitor.stop();
   }
+
+  // End current session and save
+  sessionManager.endCurrentSession();
+  sessionManager.saveSessions();
+
   logger.info('Application shut down');
   app.quit();
 });
@@ -546,5 +563,23 @@ ipcMain.handle('set-update-config', (_, updateConfig) => {
 
 ipcMain.handle('skip-update-version', (_, version: string) => {
   configManager.setSkipVersion(version);
+  return { success: true };
+});
+
+// Session management IPC handlers
+ipcMain.handle('get-sessions', () => {
+  return sessionManager.getAllSessions();
+});
+
+ipcMain.handle('get-session', (_, sessionId: string) => {
+  return sessionManager.getSessionById(sessionId);
+});
+
+ipcMain.handle('get-current-session', () => {
+  return sessionManager.getCurrentSession();
+});
+
+ipcMain.handle('delete-sessions', (_, sessionIds: string[]) => {
+  sessionManager.deleteSessions(sessionIds);
   return { success: true };
 });

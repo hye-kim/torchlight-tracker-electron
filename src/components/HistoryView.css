@@ -1,0 +1,54 @@
+.history-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #1e1e2e;
+}
+
+.history-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.history-tables {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.history-map-log {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.history-loot-summary {
+  width: 400px;
+  min-width: 400px;
+  overflow: hidden;
+}
+
+/* Responsive layout */
+@media (max-width: 1200px) {
+  .history-tables {
+    flex-direction: column;
+  }
+
+  .history-loot-summary {
+    width: 100%;
+    min-width: unset;
+    height: 400px;
+  }
+}
+
+.history-panel {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}

@@ -1,0 +1,230 @@
+.session-selector {
+  background-color: #363650;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #4a4a5e;
+}
+
+.session-selector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #4a4a5e;
+}
+
+.session-selector-header h2 {
+  color: #e2e8f0;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.session-selector-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.session-control-btn {
+  padding: 6px 12px;
+  background-color: #2a2a3e;
+  border: 1px solid #4a4a5e;
+  border-radius: 4px;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.session-control-btn:hover:not(:disabled) {
+  background-color: #363650;
+  border-color: #8b5cf6;
+  color: #e2e8f0;
+}
+
+.session-control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.session-control-btn.delete-btn:hover:not(:disabled) {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.session-empty-state {
+  padding: 32px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.session-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.session-list::-webkit-scrollbar-track {
+  background: #2a2a3e;
+  border-radius: 4px;
+}
+
+.session-list::-webkit-scrollbar-thumb {
+  background: #4a4a5e;
+  border-radius: 4px;
+}
+
+.session-list::-webkit-scrollbar-thumb:hover {
+  background: #6a6a7e;
+}
+
+.session-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: #2a2a3e;
+  border: 1px solid #4a4a5e;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.session-item:hover {
+  background-color: #363650;
+  border-color: #8b5cf6;
+}
+
+.session-item.selected {
+  background-color: #363650;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 1px #8b5cf6;
+}
+
+.session-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #8b5cf6;
+}
+
+.session-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.session-item-title {
+  color: #e2e8f0;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.session-active-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  background-color: #10b981;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 3px;
+}
+
+.session-item-stats {
+  display: flex;
+  gap: 12px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.profit-positive {
+  color: #10b981;
+}
+
+.profit-negative {
+  color: #ef4444;
+}
+
+/* Delete confirmation modal */
+.delete-confirm-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.delete-confirm-content {
+  background-color: #363650;
+  border: 1px solid #4a4a5e;
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+}
+
+.delete-confirm-content h3 {
+  color: #e2e8f0;
+  margin: 0 0 16px 0;
+  font-size: 18px;
+}
+
+.delete-confirm-content p {
+  color: #94a3b8;
+  margin: 0 0 24px 0;
+  line-height: 1.6;
+}
+
+.delete-confirm-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.delete-confirm-buttons button {
+  padding: 8px 16px;
+  border: 1px solid #4a4a5e;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-confirm-buttons button:first-child {
+  background-color: #2a2a3e;
+  color: #94a3b8;
+}
+
+.delete-confirm-buttons button:first-child:hover {
+  background-color: #363650;
+  color: #e2e8f0;
+}
+
+.delete-confirm-buttons .delete-confirm-btn {
+  background-color: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+}
+
+.delete-confirm-buttons .delete-confirm-btn:hover {
+  background-color: #dc2626;
+  border-color: #dc2626;
+}
