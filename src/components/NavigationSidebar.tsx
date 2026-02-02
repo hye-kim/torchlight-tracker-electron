@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './NavigationSidebar.css';
 
-type NavView = 'overview' | 'inventory';
+export type NavView = 'overview' | 'inventory' | 'history';
 
 interface NavigationSidebarProps {
   activeView: NavView;
@@ -72,6 +72,28 @@ const NavigationSidebar: React.FC<NavigationSidebarProps> = ({ activeView, onVie
               <line x1="12" y1="22.08" x2="12" y2="12" />
             </svg>
             <span className="nav-item-label">Inventory</span>
+          </button>
+        </li>
+
+        <li role="listitem">
+          <button
+            className={`nav-item ${activeView === 'history' ? 'active' : ''}`}
+            onClick={() => onViewChange('history')}
+            aria-current={activeView === 'history' ? 'page' : undefined}
+            aria-label="History"
+          >
+            <svg
+              className="nav-item-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <span className="nav-item-label">History</span>
           </button>
         </li>
       </ul>

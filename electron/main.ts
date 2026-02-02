@@ -10,6 +10,7 @@ import { LogMonitor } from './backend/LogMonitor';
 import { Logger } from './backend/Logger';
 import { ExcelExporter } from './backend/ExcelExporter';
 import { UpdateManager } from './backend/UpdateManager';
+import { SessionManager } from './backend/SessionManager';
 import { CONFIG_FILE } from './backend/constants';
 
 const logger = Logger.getInstance();
@@ -24,6 +25,7 @@ const fileManager = new FileManager();
 const logParser = new LogParser(fileManager);
 const inventoryTracker = new InventoryTracker(logParser);
 const statisticsTracker = new StatisticsTracker(fileManager, configManager);
+const sessionManager = new SessionManager();
 const gameDetector = new GameDetector();
 const excelExporter = new ExcelExporter(fileManager);
 const updateManager = new UpdateManager(logger);
@@ -104,6 +106,9 @@ app.whenReady().then(async () => {
   });
   await fileManager.initializeFullTableFromEnTable();
 
+  // Initialize session manager (cleanup old sessions, but don't start a new one yet)
+  sessionManager.cleanupOldSessions();
+
   // Sync prices from API in the background
   logger.info('Fetching latest prices from API...');
   fileManager.syncAllPricesFromAPI().then((count) => {
@@ -175,6 +180,12 @@ app.whenReady().then(async () => {
     }, 500);
   }
 
+  // Set up StatisticsTracker event listener for map completion
+  statisticsTracker.on('mapCompleted', (mapLog) => {
+    sessionManager.addMapToCurrentSession(mapLog);
+    sessionManager.saveSessions();
+  });
+
   // Start log monitoring
   if (logFilePath) {
     logMonitor = new LogMonitor(
@@ -214,6 +225,11 @@ app.on('window-all-closed', () => {
   if (logMonitor) {
     logMonitor.stop();
   }
+
+  // End current session and save
+  sessionManager.endCurrentSession();
+  sessionManager.saveSessions();
+
   logger.info('Application shut down');
   app.quit();
 });
@@ -299,6 +315,14 @@ ipcMain.handle('get-bag-state', () => {
 });
 
 ipcMain.handle('initialize-tracker', async () => {
+  // End current session if one exists, then start a new session
+  const currentSession = sessionManager.getCurrentSession();
+  if (currentSession) {
+    sessionManager.endCurrentSession();
+  }
+  sessionManager.startNewSession();
+  sessionManager.saveSessions();
+
   inventoryTracker.startInitialization();
   return { success: true };
 });
@@ -353,6 +377,13 @@ ipcMain.handle('export-excel', async () => {
 });
 
 ipcMain.handle('reset-stats', () => {
+  // End current session when stats are reset
+  const currentSession = sessionManager.getCurrentSession();
+  if (currentSession) {
+    sessionManager.endCurrentSession();
+    sessionManager.saveSessions();
+  }
+
   statisticsTracker.reset();
   return { success: true };
 });
@@ -546,5 +577,23 @@ ipcMain.handle('set-update-config', (_, updateConfig) => {
 
 ipcMain.handle('skip-update-version', (_, version: string) => {
   configManager.setSkipVersion(version);
+  return { success: true };
+});
+
+// Session management IPC handlers
+ipcMain.handle('get-sessions', () => {
+  return sessionManager.getAllSessions();
+});
+
+ipcMain.handle('get-session', (_, sessionId: string) => {
+  return sessionManager.getSessionById(sessionId);
+});
+
+ipcMain.handle('get-current-session', () => {
+  return sessionManager.getCurrentSession();
+});
+
+ipcMain.handle('delete-sessions', (_, sessionIds: string[]) => {
+  sessionManager.deleteSessions(sessionIds);
   return { success: true };
 });

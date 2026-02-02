@@ -43,6 +43,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   setUpdateConfig: (updateConfig: any) => ipcRenderer.invoke('set-update-config', updateConfig),
   skipUpdateVersion: (version: string) => ipcRenderer.invoke('skip-update-version', version),
 
+  // Session management
+  getSessions: () => ipcRenderer.invoke('get-sessions'),
+  getSession: (sessionId: string) => ipcRenderer.invoke('get-session', sessionId),
+  getCurrentSession: () => ipcRenderer.invoke('get-current-session'),
+  deleteSessions: (sessionIds: string[]) => ipcRenderer.invoke('delete-sessions', sessionIds),
+
   // Listen for updates
   onUpdateDisplay: (callback: (data: any) => void) => {
     ipcRenderer.on('update-display', (_, data) => callback(data));
@@ -154,6 +160,10 @@ declare global {
       getUpdateConfig: () => Promise<any>;
       setUpdateConfig: (updateConfig: any) => Promise<{ success: boolean }>;
       skipUpdateVersion: (version: string) => Promise<{ success: boolean }>;
+      getSessions: () => Promise<any[]>;
+      getSession: (sessionId: string) => Promise<any | null>;
+      getCurrentSession: () => Promise<any | null>;
+      deleteSessions: (sessionIds: string[]) => Promise<{ success: boolean }>;
       onUpdateDisplay: (callback: (data: any) => void) => void;
       onCheckingForUpdate: (callback: () => void) => void;
       onUpdateAvailable: (callback: (info: any) => void) => void;
