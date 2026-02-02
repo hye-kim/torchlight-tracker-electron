@@ -109,8 +109,27 @@ export class UpdateManager {
   async checkForUpdates(): Promise<UpdateInfo | null> {
     try {
       this.logger.info('Starting update check...');
+
+      // Create a promise that resolves when we get the appropriate event
+      const statusPromise = new Promise<boolean>((resolve) => {
+        const availableHandler = () => {
+          autoUpdater.off('update-not-available', notAvailableHandler);
+          resolve(true);
+        };
+        const notAvailableHandler = () => {
+          autoUpdater.off('update-available', availableHandler);
+          resolve(false);
+        };
+
+        autoUpdater.once('update-available', availableHandler);
+        autoUpdater.once('update-not-available', notAvailableHandler);
+      });
+
       const result = await autoUpdater.checkForUpdates();
-      return result?.updateInfo || null;
+      const isUpdateAvailable = await statusPromise;
+
+      // Only return updateInfo if an update is actually available
+      return isUpdateAvailable ? (result?.updateInfo || null) : null;
     } catch (error) {
       this.logger.error('Error checking for updates:', error);
       this.status.error = error instanceof Error ? error.message : 'Unknown error';

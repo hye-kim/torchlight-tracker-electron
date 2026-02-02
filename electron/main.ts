@@ -143,7 +143,7 @@ app.whenReady().then(async () => {
     updateManager.setMainWindow(mainWindow);
   }
 
-  // Check for updates on startup (after 10 second delay)
+  // Check for updates on startup (after 5 second delay)
   if (mainWindow && !isDev) {
     setTimeout(async () => {
       const shouldCheck = configManager.getAutoCheckUpdates();
@@ -161,7 +161,7 @@ app.whenReady().then(async () => {
           logger.error('Startup update check failed:', error);
         }
       }
-    }, 10000); // 10 second delay
+    }, 5000); // 5 second delay
   }
 
   // Show warning if game not found
