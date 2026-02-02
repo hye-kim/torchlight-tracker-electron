@@ -76,18 +76,28 @@ export class ConfigManager {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
-      fs.writeFileSync(this.configPath, JSON.stringify(this.config, null, 2), 'utf-8');
+      // Filter out overlayMode and clickThrough before saving
+      const { overlayMode, clickThrough, ...configToSave } = this.config;
+      fs.writeFileSync(this.configPath, JSON.stringify(configToSave, null, 2), 'utf-8');
     } catch (error) {
       console.error('Error saving config:', error);
     }
   }
 
   getConfig(): Config {
-    return { ...this.config };
+    // Always return overlayMode and clickThrough as false
+    // These states should not be persisted
+    return {
+      ...this.config,
+      overlayMode: false,
+      clickThrough: false
+    };
   }
 
   updateConfig(updates: Partial<Config>): void {
-    this.config = { ...this.config, ...updates };
+    // Filter out overlayMode and clickThrough - these should never be persisted
+    const { overlayMode, clickThrough, ...persistableUpdates } = updates;
+    this.config = { ...this.config, ...persistableUpdates };
     this.saveConfig();
   }
 
@@ -118,8 +128,8 @@ export class ConfigManager {
   }
 
   setOverlayMode(overlayMode: boolean): void {
-    this.config.overlayMode = overlayMode;
-    this.saveConfig();
+    // Do not save overlay mode - it should not be persisted
+    // This method is kept for compatibility but does nothing
   }
 
   getClickThrough(): boolean {
@@ -127,8 +137,8 @@ export class ConfigManager {
   }
 
   setClickThrough(clickThrough: boolean): void {
-    this.config.clickThrough = clickThrough;
-    this.saveConfig();
+    // Do not save click through - it should not be persisted
+    // This method is kept for compatibility but does nothing
   }
 
   getFontSize(): number {

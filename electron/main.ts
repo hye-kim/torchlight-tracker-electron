@@ -28,7 +28,8 @@ const excelExporter = new ExcelExporter(fileManager);
 
 function createWindow() {
   const config = configManager.getConfig();
-  const overlayMode = config.overlayMode ?? false;
+  // Always start in non-overlay mode with click through disabled
+  const overlayMode = false;
 
   const width = overlayMode ? (config.overlay_width || 400) : (config.window_width || 1300);
   const height = overlayMode ? (config.overlay_height || 1000) : (config.window_height || 900);
@@ -51,10 +52,8 @@ function createWindow() {
     icon: path.join(__dirname, '../build-resources/icon.ico'),
   });
 
-  // Apply click-through if enabled
-  if (config.clickThrough) {
-    mainWindow.setIgnoreMouseEvents(true, { forward: true });
-  }
+  // Click through is always disabled on startup
+  // No need to apply click-through settings
 
   if (isDev) {
     mainWindow.loadURL('http://localhost:5174');
@@ -66,25 +65,15 @@ function createWindow() {
   mainWindow.on('close', () => {
     if (mainWindow) {
       const bounds = mainWindow.getBounds();
-      const currentConfig = configManager.getConfig();
-      const isOverlay = currentConfig.overlayMode ?? false;
 
-      // Save dimensions based on current mode
-      if (isOverlay) {
-        configManager.updateConfig({
-          window_x: bounds.x,
-          window_y: bounds.y,
-          overlay_width: bounds.width,
-          overlay_height: bounds.height,
-        });
-      } else {
-        configManager.updateConfig({
-          window_x: bounds.x,
-          window_y: bounds.y,
-          window_width: bounds.width,
-          window_height: bounds.height,
-        });
-      }
+      // Always save dimensions as normal window (non-overlay mode)
+      // since app always starts in non-overlay mode
+      configManager.updateConfig({
+        window_x: bounds.x,
+        window_y: bounds.y,
+        window_width: bounds.width,
+        window_height: bounds.height,
+      });
     }
   });
 
@@ -345,10 +334,8 @@ ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
     const config = configManager.getConfig();
     const currentBounds = mainWindow.getBounds();
 
-    // Prepare config update with current dimensions and new overlay mode
-    const configUpdate: Partial<Config> = {
-      overlayMode: enabled,
-    };
+    // Prepare config update for window dimensions only (not overlay mode state)
+    const configUpdate: Partial<Config> = {};
 
     // Save current dimensions to the mode we're switching FROM
     // If enabled=true, we're switching TO overlay, so we're currently in normal mode
@@ -385,8 +372,10 @@ ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
       mainWindow.setAlwaysOnTop(false);
     }
 
-    // Apply all config updates at once
-    configManager.updateConfig(configUpdate);
+    // Save only window dimensions, not overlay mode state
+    if (Object.keys(configUpdate).length > 0) {
+      configManager.updateConfig(configUpdate);
+    }
 
     // Notify renderer to update UI layout
     mainWindow.webContents.send('overlay-mode-changed', enabled);
@@ -395,7 +384,7 @@ ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
 });
 
 ipcMain.handle('toggle-click-through', (_, enabled: boolean) => {
-  configManager.setClickThrough(enabled);
+  // Apply click-through to window but don't save to config
   if (mainWindow) {
     mainWindow.setIgnoreMouseEvents(enabled, { forward: true });
   }
