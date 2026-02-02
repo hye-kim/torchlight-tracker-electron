@@ -39,6 +39,12 @@ export class UpdateManager {
     autoUpdater.autoDownload = false; // User-prompted downloads only
     autoUpdater.autoInstallOnAppQuit = false; // User-prompted installs only
 
+    // Disable signature verification (app is not code-signed)
+    // Code signing requires a purchased certificate, so we disable verification for now
+    if (process.platform === 'win32') {
+      (autoUpdater as any).verifyUpdateCodeSignature = false;
+    }
+
     // Set up event listeners
     autoUpdater.on('checking-for-update', () => {
       this.logger.info('Checking for updates...');

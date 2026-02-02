@@ -36,8 +36,7 @@
       }
     ],
     "icon": "build-resources/icon.ico",
-    "artifactName": "${productName}-${version}-Setup.${ext}",
-    "publisherName": "Hye Kim"
+    "artifactName": "${productName}-${version}-Setup.${ext}"
   },
   "nsis": {
     "oneClick": false,
