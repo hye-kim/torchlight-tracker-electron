@@ -582,7 +582,40 @@ ipcMain.handle('skip-update-version', (_, version: string) => {
 
 // Session management IPC handlers
 ipcMain.handle('get-sessions', () => {
-  return sessionManager.getAllSessions();
+  const sessions = sessionManager.getAllSessions();
+  const fullTable = fileManager.loadFullTable();
+
+  // Enrich drops and costs in each mapLog with item data
+  return sessions.map(session => ({
+    ...session,
+    mapLogs: session.mapLogs.map(mapLog => ({
+      ...mapLog,
+      drops: mapLog.drops?.map(drop => {
+        const itemData = fullTable[drop.itemId];
+        return {
+          itemId: drop.itemId,
+          name: itemData?.name || `Item ${drop.itemId}`,
+          quantity: drop.quantity,
+          price: itemData?.price || 0,
+          type: itemData?.type || 'Unknown',
+          timestamp: mapLog.startTime,
+          imageUrl: itemData?.imageUrl,
+        };
+      }) || [],
+      costs: mapLog.costs?.map(cost => {
+        const itemData = fullTable[cost.itemId];
+        return {
+          itemId: cost.itemId,
+          name: itemData?.name || `Item ${cost.itemId}`,
+          quantity: cost.quantity,
+          price: itemData?.price || 0,
+          type: itemData?.type || 'Unknown',
+          timestamp: mapLog.startTime,
+          imageUrl: itemData?.imageUrl,
+        };
+      }) || [],
+    })),
+  }));
 });
 
 ipcMain.handle('get-session', (_, sessionId: string) => {

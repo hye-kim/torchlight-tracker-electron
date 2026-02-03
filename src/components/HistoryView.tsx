@@ -118,37 +118,29 @@ const HistoryView: React.FC = () => {
       // Find the specific map
       const selectedMap = combinedMapLogs.find(m => m.mapNumber === selectedMapNumber);
       if (selectedMap && selectedMap.drops) {
-        // Convert to Drop format (we'll need item data)
-        return selectedMap.drops.map((drop: any) => ({
-          itemId: drop.itemId,
-          name: drop.itemId, // Will be enriched with actual name
-          quantity: drop.quantity,
-          price: 0, // Will be enriched
-          type: 'Unknown',
-          timestamp: selectedMap.startTime,
-        }));
+        // Data is already enriched by backend
+        return selectedMap.drops;
       }
       return [];
     } else {
       // Aggregate all drops from all maps in selected sessions
-      const aggregatedDrops = new Map<string, number>();
+      const aggregatedDrops = new Map<string, Drop>();
       combinedMapLogs.forEach(mapLog => {
         if (mapLog.drops) {
-          mapLog.drops.forEach((drop: any) => {
-            const current = aggregatedDrops.get(drop.itemId) || 0;
-            aggregatedDrops.set(drop.itemId, current + drop.quantity);
+          mapLog.drops.forEach((drop: Drop) => {
+            const existing = aggregatedDrops.get(drop.itemId);
+            if (existing) {
+              // Update quantity while keeping other enriched data
+              existing.quantity += drop.quantity;
+            } else {
+              // Clone the drop to avoid mutating original data
+              aggregatedDrops.set(drop.itemId, { ...drop });
+            }
           });
         }
       });
 
-      return Array.from(aggregatedDrops.entries()).map(([itemId, quantity]) => ({
-        itemId,
-        name: itemId,
-        quantity,
-        price: 0,
-        type: 'Unknown',
-        timestamp: Date.now(),
-      }));
+      return Array.from(aggregatedDrops.values());
     }
   }, [combinedMapLogs, selectedMapNumber]);
 
@@ -157,35 +149,28 @@ const HistoryView: React.FC = () => {
     if (selectedMapNumber !== null) {
       const selectedMap = combinedMapLogs.find(m => m.mapNumber === selectedMapNumber);
       if (selectedMap && selectedMap.costs) {
-        return selectedMap.costs.map((cost: any) => ({
-          itemId: cost.itemId,
-          name: cost.itemId,
-          quantity: cost.quantity,
-          price: 0,
-          type: 'Unknown',
-          timestamp: selectedMap.startTime,
-        }));
+        // Data is already enriched by backend
+        return selectedMap.costs;
       }
       return [];
     } else {
-      const aggregatedCosts = new Map<string, number>();
+      const aggregatedCosts = new Map<string, Drop>();
       combinedMapLogs.forEach(mapLog => {
         if (mapLog.costs) {
-          mapLog.costs.forEach((cost: any) => {
-            const current = aggregatedCosts.get(cost.itemId) || 0;
-            aggregatedCosts.set(cost.itemId, current + cost.quantity);
+          mapLog.costs.forEach((cost: Drop) => {
+            const existing = aggregatedCosts.get(cost.itemId);
+            if (existing) {
+              // Update quantity while keeping other enriched data
+              existing.quantity += cost.quantity;
+            } else {
+              // Clone the cost to avoid mutating original data
+              aggregatedCosts.set(cost.itemId, { ...cost });
+            }
           });
         }
       });
 
-      return Array.from(aggregatedCosts.entries()).map(([itemId, quantity]) => ({
-        itemId,
-        name: itemId,
-        quantity,
-        price: 0,
-        type: 'Unknown',
-        timestamp: Date.now(),
-      }));
+      return Array.from(aggregatedCosts.values());
     }
   }, [combinedMapLogs, selectedMapNumber]);
 
