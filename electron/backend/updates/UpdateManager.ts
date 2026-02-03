@@ -77,7 +77,7 @@ export class UpdateManager {
       this.sendStatusToRenderer('update-error', { message: error.message });
     });
 
-    autoUpdater.on('download-progress', (progressObj) => {
+    autoUpdater.on('download-progress', (progressObj: { percent: number; transferred: number; total: number }) => {
       this.status.progress = {
         percent: progressObj.percent,
         transferred: progressObj.transferred,

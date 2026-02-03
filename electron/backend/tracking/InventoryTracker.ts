@@ -1,6 +1,6 @@
-import { LogParser, BagModification } from './LogParser';
-import { Logger } from './Logger';
-import { MIN_BAG_ITEMS_FOR_INIT, MIN_BAG_ITEMS_LEGACY } from './constants';
+import { LogParser, BagModification } from '../game/LogParser';
+import { Logger } from '../core/Logger';
+import { MIN_BAG_ITEMS_FOR_INIT, MIN_BAG_ITEMS_LEGACY } from '../core/constants';
 
 const logger = Logger.getInstance();
 
@@ -15,7 +15,8 @@ interface ItemInstance {
 export class InventoryTracker {
   private bagState: Map<string, number> = new Map();
   private bagInitialized: boolean = false;
-  private initializationComplete: boolean = false;
+  // @ts-expect-error - Reserved for future use
+  private _initializationComplete: boolean = false;
   private awaitingInitialization: boolean = false;
   private initializationInProgress: boolean = false;
   private firstScan: boolean = true;
@@ -28,25 +29,31 @@ export class InventoryTracker {
   // Phase 3: FullId-based tracking
   private itemInstances: Map<string, ItemInstance> = new Map();
 
-  // Phase 4: Batch processing
-  private changeBuffer: BagModification[] = [];
-  private lastProcessTime: number = 0;
-  private readonly BATCH_WINDOW_MS = 1000; // 1 second batch window
+  // Phase 4: Batch processing (currently unused but reserved for future optimization)
+  // @ts-expect-error - Reserved for future use
+  private _changeBuffer: BagModification[] = [];
+  // @ts-expect-error - Reserved for future use
+  private _lastProcessTime: number = 0;
+  // private readonly BATCH_WINDOW_MS = 1000; // 1 second batch window (reserved)
 
   constructor(private logParser: LogParser) {}
+
+  isAwaitingInitialization(): boolean {
+    return this.awaitingInitialization;
+  }
 
   reset(): void {
     this.bagState.clear();
     this.bagInitialized = false;
-    this.initializationComplete = false;
+    this._initializationComplete = false;
     this.awaitingInitialization = false;
     this.initializationInProgress = false;
     this.firstScan = true;
     this.isInSortOperation = false;
     this.sortStartTime = 0;
     this.itemInstances.clear();
-    this.changeBuffer = [];
-    this.lastProcessTime = 0;
+    this._changeBuffer = [];
+    this._lastProcessTime = 0;
     logger.info('Inventory tracker reset');
   }
 
@@ -105,7 +112,7 @@ export class InventoryTracker {
     }
 
     this.bagInitialized = true;
-    this.initializationComplete = true;
+    this._initializationComplete = true;
     this.awaitingInitialization = false;
     this.initializationInProgress = false;
 
@@ -313,8 +320,6 @@ export class InventoryTracker {
           });
         } else {
           // First time seeing this fullId - might be replacing a synthetic one or from sorting
-          const slotKey = `${change.pageId}:${change.slotId}:${change.configBaseId}`;
-
           // Check if there's a synthetic fullId for this slot (from InitBagData)
           const syntheticFullId = `${change.configBaseId}_init_${change.pageId}_${change.slotId}`;
           const syntheticInstance = this.itemInstances.get(syntheticFullId);
@@ -362,8 +367,9 @@ export class InventoryTracker {
     for (const [key] of this.bagState) {
       if (!key.startsWith('init:')) {
         // Check if this slot belongs to an affected page
-        const pageId = key.split(':')[0];
-        if (affectedPages.has(pageId)) {
+        const parts = key.split(':');
+        const pageId = parts[0];
+        if (pageId && affectedPages.has(pageId)) {
           keysToDelete.push(key);
         }
       }
@@ -413,7 +419,7 @@ export class InventoryTracker {
     for (const [key, value] of this.bagState) {
       if (!key.startsWith('init:') && key.includes(':')) {
         const parts = key.split(':');
-        if (parts.length === 3) {
+        if (parts.length === 3 && parts[2]) {
           const itemId = parts[2];
           itemTotals.set(itemId, (itemTotals.get(itemId) || 0) + value);
         }
@@ -440,9 +446,14 @@ export class InventoryTracker {
 
       let itemId: string;
 
-      if (key.includes(':') && key.split(':').length === 3) {
-        // Format: pageId:slotId:configBaseId
-        itemId = key.split(':')[2];
+      if (key.includes(':')) {
+        const parts = key.split(':');
+        if (parts.length === 3 && parts[2]) {
+          // Format: pageId:slotId:configBaseId
+          itemId = parts[2];
+        } else {
+          itemId = key;
+        }
       } else {
         itemId = key;
       }

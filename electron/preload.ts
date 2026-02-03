@@ -52,7 +52,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Listen for updates
   onUpdateDisplay: (callback: (data: any) => void) => {
-    ipcRenderer.on('update-display', (_, data) => callback(data));
+    ipcRenderer.on('update-display', (_event: Electron.IpcRendererEvent, data: any) => callback(data));
   },
 
   // Update event listeners
@@ -61,23 +61,23 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
 
   onUpdateAvailable: (callback: (info: any) => void) => {
-    ipcRenderer.on('update-available', (_, info) => callback(info));
+    ipcRenderer.on('update-available', (_event: Electron.IpcRendererEvent, info: any) => callback(info));
   },
 
   onUpdateNotAvailable: (callback: (info: any) => void) => {
-    ipcRenderer.on('update-not-available', (_, info) => callback(info));
+    ipcRenderer.on('update-not-available', (_event: Electron.IpcRendererEvent, info: any) => callback(info));
   },
 
   onUpdateError: (callback: (error: any) => void) => {
-    ipcRenderer.on('update-error', (_, error) => callback(error));
+    ipcRenderer.on('update-error', (_event: Electron.IpcRendererEvent, error: any) => callback(error));
   },
 
   onDownloadProgress: (callback: (progress: any) => void) => {
-    ipcRenderer.on('download-progress', (_, progress) => callback(progress));
+    ipcRenderer.on('download-progress', (_event: Electron.IpcRendererEvent, progress: any) => callback(progress));
   },
 
   onUpdateDownloaded: (callback: (info: any) => void) => {
-    ipcRenderer.on('update-downloaded', (_, info) => callback(info));
+    ipcRenderer.on('update-downloaded', (_event: Electron.IpcRendererEvent, info: any) => callback(info));
   },
 
   onInitializationComplete: (callback: () => void) => {
@@ -85,7 +85,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
 
   onOverlayModeChanged: (callback: (overlayMode: boolean) => void) => {
-    ipcRenderer.on('overlay-mode-changed', (_, overlayMode) => callback(overlayMode));
+    ipcRenderer.on('overlay-mode-changed', (_event: Electron.IpcRendererEvent, overlayMode: boolean) => callback(overlayMode));
   },
 });
 

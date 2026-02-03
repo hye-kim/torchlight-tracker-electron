@@ -18,7 +18,7 @@ export class Logger {
             format: 'YYYY-MM-DD HH:mm:ss',
           }),
           winston.format.printf(
-            (info) => `${info.timestamp} - ${info.level.toUpperCase()}: ${info.message}`
+            (info: winston.Logform.TransformableInfo) => `${info.timestamp} - ${info.level.toUpperCase()}: ${info.message}`
           )
         ),
         transports: [

@@ -7,7 +7,7 @@ import path from 'path';
 import fs from 'fs';
 import { EventEmitter } from 'events';
 import { execSync } from 'child_process';
-import { Logger } from './Logger';
+import { Logger } from '../core/Logger';
 
 const logger = Logger.getInstance();
 
@@ -22,8 +22,21 @@ interface ProcessInfo {
   exePath: string;
 }
 
+export interface GameDetectorEvents {
+  gameDetected: (info: { logFilePath: string; gameExePath: string }) => void;
+}
+
+export declare interface GameDetector {
+  on<K extends keyof GameDetectorEvents>(event: K, listener: GameDetectorEvents[K]): this;
+  emit<K extends keyof GameDetectorEvents>(
+    event: K,
+    ...args: Parameters<GameDetectorEvents[K]>
+  ): boolean;
+}
+
 export class GameDetector extends EventEmitter {
-  private gameFound: boolean = false;
+  // @ts-expect-error - Reserved for future use
+  private _gameFound: boolean = false;
   private logFilePath: string | null = null;
   private gameExePath: string | null = null;
 
@@ -47,14 +60,14 @@ export class GameDetector extends EventEmitter {
 
       const processList: ProcessInfo[] = [];
       const candidateProcesses: Array<{ name: string; pid: number }> = [];
-      const lines = tasklistOutput.split('\n').filter((line) => line.trim());
+      const lines = tasklistOutput.split('\n').filter((line: string) => line.trim());
 
       // Parse tasklist output and identify candidates
       for (const line of lines) {
         if (!line.trim()) continue;
 
         const match = line.match(/"([^"]+)","(\d+)"/);
-        if (!match) continue;
+        if (!match || !match[1] || !match[2]) continue;
 
         const exeName = match[1];
         const pid = parseInt(match[2], 10);
@@ -88,12 +101,16 @@ export class GameDetector extends EventEmitter {
             timeout: 1000,
           });
 
-          const wmicLines = wmicOutput.split('\n').filter((l) => l.trim());
+          const wmicLines = wmicOutput.split('\n').filter((l: string) => l.trim());
           if (wmicLines.length > 1) {
-            const exePath = wmicLines[1].split(',')[1]?.trim();
-            if (exePath) {
-              processList.push({ pid, name, exePath });
-              continue;
+            const line = wmicLines[1];
+            if (line) {
+              const parts = line.split(',');
+              const exePath = parts[1]?.trim();
+              if (exePath) {
+                processList.push({ pid, name, exePath });
+                continue;
+              }
             }
           }
         } catch (wmicError) {
@@ -325,10 +342,13 @@ export class GameDetector extends EventEmitter {
         return { gameFound: false, logFilePath: null };
       }
 
-      this.gameFound = true;
+      this._gameFound = true;
       logger.info(`✓ Game detected! Log file: ${this.logFilePath}`);
 
-      this.emit('gameDetected', { logFilePath: this.logFilePath, gameExePath: exePath });
+      // At this point, logFilePath is guaranteed to be non-null
+      if (this.logFilePath) {
+        this.emit('gameDetected', { logFilePath: this.logFilePath, gameExePath: exePath });
+      }
 
       return { gameFound: true, logFilePath: this.logFilePath };
     } catch (error) {

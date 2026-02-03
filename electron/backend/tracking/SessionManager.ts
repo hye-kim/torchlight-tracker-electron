@@ -6,7 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 import { app } from 'electron';
-import { Logger } from './Logger';
+import { Logger } from '../core/Logger';
 import { MapLog } from './StatisticsTracker';
 
 const logger = Logger.getInstance();
