@@ -11,7 +11,7 @@ import { Logger } from './backend/Logger';
 import { ExcelExporter } from './backend/ExcelExporter';
 import { UpdateManager } from './backend/UpdateManager';
 import { SessionManager } from './backend/SessionManager';
-import { CONFIG_FILE } from './backend/constants';
+import { CONFIG_FILE, COMPREHENSIVE_ITEM_DATABASE_FILE } from './backend/constants';
 
 const logger = Logger.getInstance();
 const isDev = process.env.NODE_ENV === 'development';
@@ -582,7 +582,46 @@ ipcMain.handle('skip-update-version', (_, version: string) => {
 
 // Session management IPC handlers
 ipcMain.handle('get-sessions', () => {
-  return sessionManager.getAllSessions();
+  const sessions = sessionManager.getAllSessions();
+  const fullTable = fileManager.loadFullTable();
+  const itemMapping = fileManager.loadJson<Record<string, { id: string; img?: string; name_en?: string; type_en?: string }>>(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
+
+  // Helper to get item image URL from comprehensive mapping
+  const getItemImageUrl = (itemId: string): string | undefined => {
+    return itemMapping[itemId]?.img;
+  };
+
+  // Enrich drops and costs in each mapLog with item data
+  return sessions.map(session => ({
+    ...session,
+    mapLogs: session.mapLogs.map(mapLog => ({
+      ...mapLog,
+      drops: mapLog.drops?.map(drop => {
+        const itemData = fullTable[drop.itemId];
+        return {
+          itemId: drop.itemId,
+          name: itemData?.name || `Item ${drop.itemId}`,
+          quantity: drop.quantity,
+          price: itemData?.price || 0,
+          type: itemData?.type || 'Unknown',
+          timestamp: mapLog.startTime,
+          imageUrl: getItemImageUrl(drop.itemId),
+        };
+      }) || [],
+      costs: mapLog.costs?.map(cost => {
+        const itemData = fullTable[cost.itemId];
+        return {
+          itemId: cost.itemId,
+          name: itemData?.name || `Item ${cost.itemId}`,
+          quantity: cost.quantity,
+          price: itemData?.price || 0,
+          type: itemData?.type || 'Unknown',
+          timestamp: mapLog.startTime,
+          imageUrl: getItemImageUrl(cost.itemId),
+        };
+      }) || [],
+    })),
+  }));
 });
 
 ipcMain.handle('get-session', (_, sessionId: string) => {

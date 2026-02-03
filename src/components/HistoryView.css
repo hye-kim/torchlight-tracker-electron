@@ -25,13 +25,15 @@
 .history-map-log {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .history-loot-summary {
-  width: 400px;
-  min-width: 400px;
+  flex: 1;
   overflow: hidden;
+  min-width: 0;
 }
 
 /* Responsive layout */
