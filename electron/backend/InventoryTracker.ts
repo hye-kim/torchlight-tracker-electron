@@ -214,7 +214,6 @@ export class InventoryTracker {
    */
   private processItemChangesWithFullId(changes: BagModification[]): Array<[string, number]> {
     const realChanges = new Map<string, number>();
-    const slotsToDelete = new Set<string>();
 
     logger.debug(`Processing ${changes.length} ItemChange events with fullId tracking (${this.itemInstances.size} instances tracked)`);
 
@@ -255,12 +254,6 @@ export class InventoryTracker {
             realChanges.set(change.configBaseId, netChange + delta);
             logger.debug(`Item count changed (Add as Update): ${change.fullId} (${change.configBaseId}) ${previousInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`);
           }
-          // Mark old slot for deletion if it changed
-          const slotChanged = previousInstance.slotId !== change.slotId || previousInstance.pageId !== change.pageId;
-          if (slotChanged) {
-            const oldSlotKey = `${previousInstance.pageId}:${previousInstance.slotId}:${previousInstance.baseId}`;
-            slotsToDelete.add(oldSlotKey);
-          }
         } else {
           // Normal Add - new item
           const netChange = realChanges.get(change.configBaseId) || 0;
@@ -293,12 +286,6 @@ export class InventoryTracker {
             logger.debug(`Item quantity changed: ${change.fullId} (${change.configBaseId}) ${previousInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`);
           }
 
-          // If slot changed, mark old slot for deletion
-          if (slotChanged) {
-            const oldSlotKey = `${previousInstance.pageId}:${previousInstance.slotId}:${previousInstance.baseId}`;
-            slotsToDelete.add(oldSlotKey);
-          }
-
           // Update instance state
           this.itemInstances.set(change.fullId, {
             fullId: change.fullId,
@@ -308,9 +295,8 @@ export class InventoryTracker {
             count: change.count,
           });
         } else {
-          // First time seeing this fullId - might be replacing a synthetic one
+          // First time seeing this fullId - might be replacing a synthetic one or from sorting
           const slotKey = `${change.pageId}:${change.slotId}:${change.configBaseId}`;
-          const previousCount = this.bagState.get(slotKey) || 0;
 
           // Check if there's a synthetic fullId for this slot (from InitBagData)
           const syntheticFullId = `${change.configBaseId}_init_${change.pageId}_${change.slotId}`;
@@ -329,13 +315,9 @@ export class InventoryTracker {
               logger.debug(`Item count changed: ${change.fullId} (${change.configBaseId}) ${syntheticInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`);
             }
           } else {
-            // No synthetic fullId - calculate delta from bagState
-            const delta = change.count - previousCount;
-            if (delta !== 0) {
-              const netChange = realChanges.get(change.configBaseId) || 0;
-              realChanges.set(change.configBaseId, netChange + delta);
-              logger.debug(`Item tracked (first fullId): ${change.fullId} (${change.configBaseId}) ${previousCount} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`);
-            }
+            // New fullId without synthetic - likely from sorting or lost tracking
+            // Don't calculate delta because we don't know where this came from
+            logger.debug(`Tracking new fullId without previous instance: ${change.fullId} (${change.configBaseId}) x${change.count} in slot ${change.slotId}`);
           }
 
           // Track this item instance going forward with real fullId
@@ -350,30 +332,29 @@ export class InventoryTracker {
       }
     }
 
-    // Delete old slot entries first to prevent double counting
-    for (const slotKey of slotsToDelete) {
-      this.bagState.delete(slotKey);
-    }
-
-    // Update bagState for compatibility with existing code
-    for (const change of changes) {
-      if (change.fullId) {
-        const slotKey = `${change.pageId}:${change.slotId}:${change.configBaseId}`;
-        if (change.action === 'Remove') {
-          this.bagState.delete(slotKey);
-        } else {
-          // Before setting the new slot, delete all other slots with the same item
-          // This prevents double counting when items move to new slots
-          for (const [key] of this.bagState) {
-            if (key !== slotKey && !key.startsWith('init:') && key.endsWith(`:${change.configBaseId}`)) {
-              logger.debug(`Cleaning up duplicate slot entry: ${key} (keeping ${slotKey})`);
-              this.bagState.delete(key);
-            }
-          }
-          this.bagState.set(slotKey, change.count);
-        }
+    // Reconcile bagState with itemInstances to ensure consistency
+    // Clear all non-init slot entries
+    const keysToDelete: string[] = [];
+    for (const [key] of this.bagState) {
+      if (!key.startsWith('init:')) {
+        keysToDelete.push(key);
       }
     }
+    for (const key of keysToDelete) {
+      this.bagState.delete(key);
+    }
+
+    // Rebuild bagState from itemInstances
+    for (const [fullId, instance] of this.itemInstances) {
+      // Skip synthetic init entries
+      if (fullId.includes('_init_')) {
+        continue;
+      }
+      const slotKey = `${instance.pageId}:${instance.slotId}:${instance.baseId}`;
+      this.bagState.set(slotKey, instance.count);
+    }
+
+    logger.debug(`Reconciled bagState: ${this.itemInstances.size} instances tracked, ${keysToDelete.length} old slots cleared`);
 
     // Convert to array and filter out zero changes
     const result: Array<[string, number]> = [];
