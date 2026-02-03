@@ -53,9 +53,7 @@ export class APIClient {
     const now = Date.now() / 1000; // Convert to seconds
 
     // Remove timestamps outside the current window
-    this.requestTimestamps = this.requestTimestamps.filter(
-      (ts) => ts > now - this.rateLimitWindow
-    );
+    this.requestTimestamps = this.requestTimestamps.filter((ts) => ts > now - this.rateLimitWindow);
 
     // If at limit, wait until oldest request falls outside window
     if (this.requestTimestamps.length >= this.rateLimitCalls) {
@@ -113,7 +111,13 @@ export class APIClient {
         const statusCode = error.response?.status;
 
         // Don't retry on client errors (4xx) except timeout-related ones
-        if (statusCode && statusCode >= 400 && statusCode < 500 && statusCode !== 408 && statusCode !== 429) {
+        if (
+          statusCode &&
+          statusCode >= 400 &&
+          statusCode < 500 &&
+          statusCode !== 408 &&
+          statusCode !== 429
+        ) {
           logger.error(`Client error ${statusCode} for ${method} ${url}, not retrying`);
           return null;
         }
@@ -150,7 +154,10 @@ export class APIClient {
     return false;
   }
 
-  async getAllItems(itemType?: string, useCache: boolean = true): Promise<Record<string, ItemData> | null> {
+  async getAllItems(
+    itemType?: string,
+    useCache: boolean = true
+  ): Promise<Record<string, ItemData> | null> {
     // Check cache
     if (useCache && this.isCacheValid()) {
       const cachedData: Record<string, ItemData> = {};
@@ -163,7 +170,12 @@ export class APIClient {
     }
 
     const params = itemType ? { item_type: itemType } : undefined;
-    const data = await this.makeRequest<Record<string, ItemData>>('GET', '/items', undefined, params);
+    const data = await this.makeRequest<Record<string, ItemData>>(
+      'GET',
+      '/items',
+      undefined,
+      params
+    );
 
     if (data) {
       // Update cache only if we fetched all items

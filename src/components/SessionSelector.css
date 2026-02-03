@@ -110,7 +110,9 @@
 .session-box.selected {
   background-color: #3e3e60;
   border-color: #8b5cf6;
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3), 0 4px 12px rgba(139, 92, 246, 0.4);
+  box-shadow:
+    0 0 0 2px rgba(139, 92, 246, 0.3),
+    0 4px 12px rgba(139, 92, 246, 0.4);
   transform: translateY(-2px);
 }
 
@@ -120,7 +122,9 @@
 
 .session-box.active.selected {
   border-color: #8b5cf6;
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3), 0 0 0 4px rgba(16, 185, 129, 0.2);
+  box-shadow:
+    0 0 0 2px rgba(139, 92, 246, 0.3),
+    0 0 0 4px rgba(16, 185, 129, 0.2);
 }
 
 .session-box-row {

@@ -38,7 +38,8 @@ export const LOG_FILE_ROTATION_MAX_RETRIES = 5; // Maximum retries when log file
 export const LOG_FILE_ROTATION_RETRY_DELAY = 0.2; // seconds - Delay between rotation retry attempts
 
 // Regular Expression Patterns
-export const PATTERN_SUBREGION_ENTER = /MysteryAreaModel@UpdateMysteryMapDataList AreaId == (\d+)\s+AreaLv == (\d+)/;
+export const PATTERN_SUBREGION_ENTER =
+  /MysteryAreaModel@UpdateMysteryMapDataList AreaId == (\d+)\s+AreaLv == (\d+)/;
 
 // Subregion Name Translations
 export const SUBREGION_NAMES: Record<string, string> = {

@@ -216,7 +216,9 @@ export class InventoryTracker {
     const realChanges = new Map<string, number>();
     const affectedPages = new Set<string>();
 
-    logger.debug(`Processing ${changes.length} ItemChange events with fullId tracking (${this.itemInstances.size} instances tracked)`);
+    logger.debug(
+      `Processing ${changes.length} ItemChange events with fullId tracking (${this.itemInstances.size} instances tracked)`
+    );
 
     for (const change of changes) {
       if (!change.fullId) {
@@ -235,7 +237,9 @@ export class InventoryTracker {
           const netChange = realChanges.get(previousInstance.baseId) || 0;
           realChanges.set(previousInstance.baseId, netChange - previousInstance.count);
           this.itemInstances.delete(change.fullId);
-          logger.debug(`Item removed: ${change.fullId} (${previousInstance.baseId}) x${previousInstance.count}`);
+          logger.debug(
+            `Item removed: ${change.fullId} (${previousInstance.baseId}) x${previousInstance.count}`
+          );
         } else {
           // No previousInstance - use bagState as fallback
           const slotKey = `${change.pageId}:${change.slotId}:${change.configBaseId}`;
@@ -243,7 +247,9 @@ export class InventoryTracker {
           if (previousCount > 0) {
             const netChange = realChanges.get(change.configBaseId) || 0;
             realChanges.set(change.configBaseId, netChange - previousCount);
-            logger.debug(`Item removed (no instance): ${change.fullId} (${change.configBaseId}) x${previousCount} from bagState`);
+            logger.debug(
+              `Item removed (no instance): ${change.fullId} (${change.configBaseId}) x${previousCount} from bagState`
+            );
           }
         }
       } else if (change.action === 'Add') {
@@ -256,7 +262,9 @@ export class InventoryTracker {
           if (delta !== 0) {
             const netChange = realChanges.get(change.configBaseId) || 0;
             realChanges.set(change.configBaseId, netChange + delta);
-            logger.debug(`Item count changed (Add as Update): ${change.fullId} (${change.configBaseId}) ${previousInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`);
+            logger.debug(
+              `Item count changed (Add as Update): ${change.fullId} (${change.configBaseId}) ${previousInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`
+            );
           }
         } else {
           // Normal Add - new item
@@ -276,18 +284,23 @@ export class InventoryTracker {
       } else if (change.action === 'Update') {
         if (previousInstance) {
           // Check if this is a movement or a quantity change
-          const slotChanged = previousInstance.slotId !== change.slotId || previousInstance.pageId !== change.pageId;
+          const slotChanged =
+            previousInstance.slotId !== change.slotId || previousInstance.pageId !== change.pageId;
           const countChanged = previousInstance.count !== change.count;
 
           if (slotChanged && !countChanged) {
             // Pure movement - ignore
-            logger.debug(`Item moved: ${change.fullId} from slot ${previousInstance.slotId} to ${change.slotId} (no change)`);
+            logger.debug(
+              `Item moved: ${change.fullId} from slot ${previousInstance.slotId} to ${change.slotId} (no change)`
+            );
           } else if (countChanged) {
             // Quantity changed (with or without movement)
             const delta = change.count - previousInstance.count;
             const netChange = realChanges.get(change.configBaseId) || 0;
             realChanges.set(change.configBaseId, netChange + delta);
-            logger.debug(`Item quantity changed: ${change.fullId} (${change.configBaseId}) ${previousInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`);
+            logger.debug(
+              `Item quantity changed: ${change.fullId} (${change.configBaseId}) ${previousInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`
+            );
           }
 
           // Update instance state
@@ -309,19 +322,25 @@ export class InventoryTracker {
           if (syntheticInstance) {
             // Replace synthetic fullId with real one
             this.itemInstances.delete(syntheticFullId);
-            logger.debug(`Replacing synthetic fullId ${syntheticFullId} with real fullId ${change.fullId}`);
+            logger.debug(
+              `Replacing synthetic fullId ${syntheticFullId} with real fullId ${change.fullId}`
+            );
 
             // Compare with synthetic instance count
             const delta = change.count - syntheticInstance.count;
             if (delta !== 0) {
               const netChange = realChanges.get(change.configBaseId) || 0;
               realChanges.set(change.configBaseId, netChange + delta);
-              logger.debug(`Item count changed: ${change.fullId} (${change.configBaseId}) ${syntheticInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`);
+              logger.debug(
+                `Item count changed: ${change.fullId} (${change.configBaseId}) ${syntheticInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`
+              );
             }
           } else {
             // New fullId without synthetic - likely from sorting or lost tracking
             // Don't calculate delta because we don't know where this came from
-            logger.debug(`Tracking new fullId without previous instance: ${change.fullId} (${change.configBaseId}) x${change.count} in slot ${change.slotId}`);
+            logger.debug(
+              `Tracking new fullId without previous instance: ${change.fullId} (${change.configBaseId}) x${change.count} in slot ${change.slotId}`
+            );
           }
 
           // Track this item instance going forward with real fullId
@@ -366,7 +385,9 @@ export class InventoryTracker {
       }
     }
 
-    logger.debug(`Reconciled bagState for pages [${Array.from(affectedPages).join(', ')}]: ${keysToDelete.length} old slots cleared`);
+    logger.debug(
+      `Reconciled bagState for pages [${Array.from(affectedPages).join(', ')}]: ${keysToDelete.length} old slots cleared`
+    );
 
     // Convert to array and filter out zero changes
     const result: Array<[string, number]> = [];
@@ -377,7 +398,9 @@ export class InventoryTracker {
     }
 
     if (result.length > 0) {
-      logger.info(`Detected ${result.length} real changes via fullId tracking: ${result.map(([id, amt]) => `${id}:${amt > 0 ? '+' : ''}${amt}`).join(', ')}`);
+      logger.info(
+        `Detected ${result.length} real changes via fullId tracking: ${result.map(([id, amt]) => `${id}:${amt > 0 ? '+' : ''}${amt}`).join(', ')}`
+      );
     }
 
     return result;

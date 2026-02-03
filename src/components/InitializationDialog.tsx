@@ -5,7 +5,6 @@ interface InitializationDialogProps {
 }
 
 function InitializationDialog({ onClose }: InitializationDialogProps) {
-
   return (
     <div className="dialog-overlay">
       <div className="init-dialog-content" onClick={(e) => e.stopPropagation()}>
@@ -24,10 +23,12 @@ function InitializationDialog({ onClose }: InitializationDialogProps) {
                 <strong>Open your Inventory</strong> in Torchlight: Infinite
               </li>
               <li>
-                <strong>Wait for Initialization</strong> - The tracker will scan your current inventory
+                <strong>Wait for Initialization</strong> - The tracker will scan your current
+                inventory
               </li>
               <li>
-                <strong>Enter a Map</strong> - Start running maps to begin tracking drops and statistics
+                <strong>Enter a Map</strong> - Start running maps to begin tracking drops and
+                statistics
               </li>
             </ol>
           </div>
@@ -35,7 +36,7 @@ function InitializationDialog({ onClose }: InitializationDialogProps) {
           <div className="tip-section">
             <h4>💡 Tips:</h4>
             <ul>
-              <li>Make sure the game is running before clicking "Initialize Tracker"</li>
+              <li>Make sure the game is running before clicking &quot;Initialize Tracker&quot;</li>
               <li>The tracker monitors the game log file to detect items picked up and used</li>
               <li>All prices are automatically fetched from the API</li>
               <li>Tax calculation (12.5%) is enabled by default in Settings</li>
@@ -45,11 +46,22 @@ function InitializationDialog({ onClose }: InitializationDialogProps) {
           <div className="info-section">
             <h4>📊 What Gets Tracked:</h4>
             <ul>
-              <li><strong>Loot:</strong> All items picked up while in a map</li>
-              <li><strong>Costs:</strong> Items consumed when entering a map (compasses, tickets, etc.)</li>
-              <li><strong>Revenue:</strong> Total value of items looted</li>
-              <li><strong>Profit:</strong> Revenue minus costs</li>
-              <li><strong>Duration:</strong> Time spent in each map</li>
+              <li>
+                <strong>Loot:</strong> All items picked up while in a map
+              </li>
+              <li>
+                <strong>Costs:</strong> Items consumed when entering a map (compasses, tickets,
+                etc.)
+              </li>
+              <li>
+                <strong>Revenue:</strong> Total value of items looted
+              </li>
+              <li>
+                <strong>Profit:</strong> Revenue minus costs
+              </li>
+              <li>
+                <strong>Duration:</strong> Time spent in each map
+              </li>
             </ul>
           </div>
         </div>

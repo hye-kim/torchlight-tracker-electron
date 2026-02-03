@@ -37,14 +37,14 @@ const SessionSelector: React.FC<SessionSelectorProps> = ({
 
   const handleToggleSession = (sessionId: string) => {
     if (selectedSessionIds.includes(sessionId)) {
-      onSelectionChange(selectedSessionIds.filter(id => id !== sessionId));
+      onSelectionChange(selectedSessionIds.filter((id) => id !== sessionId));
     } else {
       onSelectionChange([...selectedSessionIds, sessionId]);
     }
   };
 
   const handleSelectAll = () => {
-    onSelectionChange(sessions.map(s => s.sessionId));
+    onSelectionChange(sessions.map((s) => s.sessionId));
   };
 
   const handleClearAll = () => {
@@ -53,8 +53,8 @@ const SessionSelector: React.FC<SessionSelectorProps> = ({
 
   const handleDelete = () => {
     // Filter out active sessions from deletion
-    const sessionsToDelete = selectedSessionIds.filter(id => {
-      const session = sessions.find(s => s.sessionId === id);
+    const sessionsToDelete = selectedSessionIds.filter((id) => {
+      const session = sessions.find((s) => s.sessionId === id);
       return session && !session.isActive;
     });
 
@@ -74,7 +74,20 @@ const SessionSelector: React.FC<SessionSelectorProps> = ({
 
   const formatDate = (timestamp: number): string => {
     const date = new Date(timestamp);
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     const month = months[date.getMonth()];
     const day = date.getDate();
     const year = date.getFullYear();
@@ -104,8 +117,8 @@ const SessionSelector: React.FC<SessionSelectorProps> = ({
   // Sort sessions by start time (newest first)
   const sortedSessions = [...sessions].sort((a, b) => b.startTime - a.startTime);
 
-  const selectedNonActiveSessions = selectedSessionIds.filter(id => {
-    const session = sessions.find(s => s.sessionId === id);
+  const selectedNonActiveSessions = selectedSessionIds.filter((id) => {
+    const session = sessions.find((s) => s.sessionId === id);
     return session && !session.isActive;
   });
 
@@ -144,7 +157,7 @@ const SessionSelector: React.FC<SessionSelectorProps> = ({
         </div>
       ) : (
         <div className="session-grid">
-          {sortedSessions.map(session => (
+          {sortedSessions.map((session) => (
             <div
               key={session.sessionId}
               className={`session-box ${selectedSessionIds.includes(session.sessionId) ? 'selected' : ''} ${session.isActive ? 'active' : ''}`}
@@ -160,7 +173,9 @@ const SessionSelector: React.FC<SessionSelectorProps> = ({
               <div className="session-box-row session-stats-row">
                 <span className="session-stat">{formatDuration(session.duration)}</span>
                 <span className="session-stat">{session.stats.mapsCompleted} maps</span>
-                <span className={`session-stat ${session.stats.totalProfit >= 0 ? 'profit-positive' : 'profit-negative'}`}>
+                <span
+                  className={`session-stat ${session.stats.totalProfit >= 0 ? 'profit-positive' : 'profit-negative'}`}
+                >
                   {formatProfit(session.stats.totalProfit)}
                 </span>
               </div>

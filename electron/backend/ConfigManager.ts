@@ -100,7 +100,7 @@ export class ConfigManager {
     return {
       ...this.config,
       overlayMode: false,
-      clickThrough: false
+      clickThrough: false,
     };
   }
 
@@ -161,17 +161,19 @@ export class ConfigManager {
   }
 
   getDisplayItems(): DisplayItem[] {
-    return this.config.displayItems ?? [
-      { id: 'status', label: 'Status: Not Recording / Recording', enabled: true, order: 0 },
-      { id: 'currentMap', label: 'Current Map', enabled: true, order: 1 },
-      { id: 'currentProfitPerMin', label: 'Current Profit / min', enabled: true, order: 2 },
-      { id: 'currentProfit', label: 'Current Profit', enabled: true, order: 3 },
-      { id: 'totalProfitPerMin', label: 'Total Profit / min', enabled: true, order: 4 },
-      { id: 'totalProfit', label: 'Total Profit', enabled: true, order: 5 },
-      { id: 'mapDuration', label: 'Map Duration', enabled: true, order: 6 },
-      { id: 'totalDuration', label: 'Total Duration', enabled: true, order: 7 },
-      { id: 'mapCount', label: 'Map Count', enabled: true, order: 8 },
-    ];
+    return (
+      this.config.displayItems ?? [
+        { id: 'status', label: 'Status: Not Recording / Recording', enabled: true, order: 0 },
+        { id: 'currentMap', label: 'Current Map', enabled: true, order: 1 },
+        { id: 'currentProfitPerMin', label: 'Current Profit / min', enabled: true, order: 2 },
+        { id: 'currentProfit', label: 'Current Profit', enabled: true, order: 3 },
+        { id: 'totalProfitPerMin', label: 'Total Profit / min', enabled: true, order: 4 },
+        { id: 'totalProfit', label: 'Total Profit', enabled: true, order: 5 },
+        { id: 'mapDuration', label: 'Map Duration', enabled: true, order: 6 },
+        { id: 'totalDuration', label: 'Total Duration', enabled: true, order: 7 },
+        { id: 'mapCount', label: 'Map Count', enabled: true, order: 8 },
+      ]
+    );
   }
 
   setDisplayItems(displayItems: DisplayItem[]): void {

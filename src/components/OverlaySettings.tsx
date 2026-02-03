@@ -83,9 +83,7 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
 
   const toggleItemEnabled = (id: string) => {
     setDisplayItems((items) =>
-      items.map((item) =>
-        item.id === id ? { ...item, enabled: !item.enabled } : item
-      )
+      items.map((item) => (item.id === id ? { ...item, enabled: !item.enabled } : item))
     );
   };
 
@@ -112,11 +110,7 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
   };
 
   return (
-    <div
-      className="dialog-overlay"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <div className="dialog-overlay" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <div className="dialog-content overlay-settings" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
           <h2>Display Settings</h2>

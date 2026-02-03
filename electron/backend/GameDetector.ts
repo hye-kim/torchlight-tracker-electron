@@ -123,16 +123,17 @@ export class GameDetector extends EventEmitter {
       logger.info(`Scanning ${processes.length} running processes...`);
 
       // DEBUG: Log all processes that might be related to Torchlight
-      const torchlightRelated = processes.filter(p =>
-        p.name.toLowerCase().includes('torch') ||
-        p.name.toLowerCase().includes('tl') ||
-        p.name.toLowerCase().includes('ue_') ||
-        p.exePath.toLowerCase().includes('torch') ||
-        p.exePath.toLowerCase().includes('ue_game')
+      const torchlightRelated = processes.filter(
+        (p) =>
+          p.name.toLowerCase().includes('torch') ||
+          p.name.toLowerCase().includes('tl') ||
+          p.name.toLowerCase().includes('ue_') ||
+          p.exePath.toLowerCase().includes('torch') ||
+          p.exePath.toLowerCase().includes('ue_game')
       );
       if (torchlightRelated.length > 0) {
         logger.info(`DEBUG: Found ${torchlightRelated.length} potentially related processes:`);
-        torchlightRelated.forEach(p => {
+        torchlightRelated.forEach((p) => {
           const exeFile = p.exePath ? path.basename(p.exePath) : 'N/A';
           logger.info(`  - Name: "${p.name}", Exe: "${exeFile}", Path: "${p.exePath || 'N/A'}"`);
         });
@@ -169,7 +170,8 @@ export class GameDetector extends EventEmitter {
           // If we have a path, verify it's in the actual game directory
           if (exePath) {
             const isRealGameDir =
-              (exePath.includes('win64') && (exePath.includes('binaries') || exePath.includes('ue_game'))) ||
+              (exePath.includes('win64') &&
+                (exePath.includes('binaries') || exePath.includes('ue_game'))) ||
               (exePath.includes('torchlight') && exePath.includes('win64'));
 
             if (isRealGameDir) {
@@ -182,7 +184,9 @@ export class GameDetector extends EventEmitter {
           } else {
             // No path available (no admin rights), but name matches
             // Try to find the game installation by searching common locations
-            logger.info(`✓ Found Torchlight: Infinite game by name: ${proc.name}.exe (PID: ${proc.pid})`);
+            logger.info(
+              `✓ Found Torchlight: Infinite game by name: ${proc.name}.exe (PID: ${proc.pid})`
+            );
             logger.warn(`  No executable path available (tracker not running as admin)`);
             logger.info(`  Searching for game installation in common locations...`);
 
@@ -192,11 +196,13 @@ export class GameDetector extends EventEmitter {
               return {
                 pid: proc.pid,
                 name: proc.name,
-                exePath: foundPath
+                exePath: foundPath,
               };
             } else {
               logger.error(`  Could not find game installation automatically`);
-              logger.error(`  Please run the tracker as administrator, or manually configure the log file path`);
+              logger.error(
+                `  Please run the tracker as administrator, or manually configure the log file path`
+              );
               return null;
             }
           }
@@ -306,8 +312,13 @@ export class GameDetector extends EventEmitter {
         const stats = fs.statSync(this.logFilePath);
         logger.info(`Log file size: ${stats.size} bytes`);
 
-        const preview = fs.readFileSync(this.logFilePath, { encoding: 'utf-8', flag: 'r' }).substring(0, 100);
-        const previewClean = preview.replace(/\ufeff/g, '').replace(/\r/g, '').replace(/\n/g, ' ');
+        const preview = fs
+          .readFileSync(this.logFilePath, { encoding: 'utf-8', flag: 'r' })
+          .substring(0, 100);
+        const previewClean = preview
+          .replace(/\ufeff/g, '')
+          .replace(/\r/g, '')
+          .replace(/\n/g, ' ');
         logger.info(`Log file preview: ${previewClean.substring(0, 50)}...`);
       } catch (error) {
         logger.error(`Cannot read log file: ${error}`);

@@ -129,7 +129,7 @@ export class UpdateManager {
       const isUpdateAvailable = await statusPromise;
 
       // Only return updateInfo if an update is actually available
-      return isUpdateAvailable ? (result?.updateInfo || null) : null;
+      return isUpdateAvailable ? result?.updateInfo || null : null;
     } catch (error) {
       this.logger.error('Error checking for updates:', error);
       this.status.error = error instanceof Error ? error.message : 'Unknown error';

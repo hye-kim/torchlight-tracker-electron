@@ -1,0 +1,23 @@
+# Build outputs
+dist/
+dist-electron/
+build/
+
+# Dependencies
+node_modules/
+
+# Config files
+*.config.js
+*.config.ts
+vite.config.ts
+electron-builder.json
+
+# Logs
+*.log
+
+# Test coverage
+coverage/
+
+# OS files
+.DS_Store
+Thumbs.db

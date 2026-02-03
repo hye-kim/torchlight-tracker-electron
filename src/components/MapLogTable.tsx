@@ -34,7 +34,15 @@ interface MapLogTableProps {
 type SortColumn = 'mapNumber' | 'revenue' | 'cost' | 'profit' | 'duration';
 type SortDirection = 'asc' | 'desc';
 
-function MapLogTable({ mapLogs, isInitialized, isInMap, currentMap, mapCount, selectedMapNumber, onSelectMap }: MapLogTableProps) {
+function MapLogTable({
+  mapLogs,
+  isInitialized,
+  isInMap,
+  currentMap,
+  mapCount,
+  selectedMapNumber,
+  onSelectMap,
+}: MapLogTableProps) {
   const [sortColumn, setSortColumn] = useState<SortColumn>('mapNumber');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
@@ -58,7 +66,7 @@ function MapLogTable({ mapLogs, isInitialized, isInMap, currentMap, mapCount, se
     return date.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
-      hour12: true
+      hour12: true,
     });
   };
 
@@ -93,9 +101,13 @@ function MapLogTable({ mapLogs, isInitialized, isInMap, currentMap, mapCount, se
 
   // Create display list with current map at top if active
   // Filter out current map from sorted logs to prevent duplication
-  const displayLogs: Array<MapLog & { isActive?: boolean }> = isInMap && currentMap
-    ? [{ ...currentMap, isActive: true }, ...sortedLogs.filter(log => log.mapNumber !== currentMap.mapNumber)]
-    : sortedLogs;
+  const displayLogs: Array<MapLog & { isActive?: boolean }> =
+    isInMap && currentMap
+      ? [
+          { ...currentMap, isActive: true },
+          ...sortedLogs.filter((log) => log.mapNumber !== currentMap.mapNumber),
+        ]
+      : sortedLogs;
 
   const handleRowClick = (mapNumber: number) => {
     onSelectMap(mapNumber);
@@ -138,7 +150,9 @@ function MapLogTable({ mapLogs, isInitialized, isInMap, currentMap, mapCount, se
           <tbody>
             {displayLogs.length === 0 ? (
               <tr>
-                <td colSpan={5} className="no-maps">No maps completed yet</td>
+                <td colSpan={5} className="no-maps">
+                  No maps completed yet
+                </td>
               </tr>
             ) : (
               displayLogs.map((log) => {

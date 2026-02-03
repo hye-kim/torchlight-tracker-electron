@@ -14,7 +14,12 @@ interface UpdateNotificationProps {
   onSkip: () => void;
 }
 
-function UpdateNotification({ updateInfo, onDownload, onDismiss, onSkip }: UpdateNotificationProps) {
+function UpdateNotification({
+  updateInfo,
+  onDownload,
+  onDismiss,
+  onSkip,
+}: UpdateNotificationProps) {
   const [currentVersion, setCurrentVersion] = useState<string>('');
 
   useEffect(() => {
@@ -28,12 +33,8 @@ function UpdateNotification({ updateInfo, onDownload, onDismiss, onSkip }: Updat
       <div className="update-notification-content">
         <div className="update-notification-icon">🎉</div>
         <div className="update-notification-text">
-          <div className="update-notification-title">
-            Update Available: v{updateInfo.version}
-          </div>
-          <div className="update-notification-subtitle">
-            Current version: v{currentVersion}
-          </div>
+          <div className="update-notification-title">Update Available: v{updateInfo.version}</div>
+          <div className="update-notification-subtitle">Current version: v{currentVersion}</div>
         </div>
         <div className="update-notification-actions">
           <button className="btn-primary" onClick={onDownload}>

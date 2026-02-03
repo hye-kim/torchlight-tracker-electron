@@ -35,8 +35,8 @@ function createWindow() {
   // Always start in non-overlay mode with click through disabled
   const overlayMode = false;
 
-  const width = overlayMode ? (config.overlay_width || 400) : (config.window_width || 1300);
-  const height = overlayMode ? (config.overlay_height || 1000) : (config.window_height || 900);
+  const width = overlayMode ? config.overlay_width || 400 : config.window_width || 1300;
+  const height = overlayMode ? config.overlay_height || 1000 : config.window_height || 900;
 
   mainWindow = new BrowserWindow({
     width,
@@ -93,7 +93,8 @@ app.whenReady().then(async () => {
   session.defaultSession.webRequest.onBeforeSendHeaders(
     { urls: ['https://cdn.tlidb.com/*'] },
     (details, callback) => {
-      details.requestHeaders['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+      details.requestHeaders['User-Agent'] =
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
       details.requestHeaders['Referer'] = 'https://www.tlidb.com/';
       callback({ requestHeaders: details.requestHeaders });
     }
@@ -111,26 +112,32 @@ app.whenReady().then(async () => {
 
   // Sync prices from API in the background
   logger.info('Fetching latest prices from API...');
-  fileManager.syncAllPricesFromAPI().then((count) => {
-    if (count > 0) {
-      logger.info(`Successfully synced ${count} prices from API`);
-    } else {
-      logger.warn('No prices synced from API (API may be unavailable)');
-    }
-  }).catch((error) => {
-    logger.error('Failed to sync prices from API:', error);
-  });
+  fileManager
+    .syncAllPricesFromAPI()
+    .then((count) => {
+      if (count > 0) {
+        logger.info(`Successfully synced ${count} prices from API`);
+      } else {
+        logger.warn('No prices synced from API (API may be unavailable)');
+      }
+    })
+    .catch((error) => {
+      logger.error('Failed to sync prices from API:', error);
+    });
 
   // Periodically refresh prices from API every hour
   setInterval(() => {
     logger.info('Periodic API price refresh...');
-    fileManager.syncAllPricesFromAPI().then((count) => {
-      if (count > 0) {
-        logger.info(`Periodic refresh: synced ${count} prices from API`);
-      }
-    }).catch((error) => {
-      logger.error('Periodic API refresh failed:', error);
-    });
+    fileManager
+      .syncAllPricesFromAPI()
+      .then((count) => {
+        if (count > 0) {
+          logger.info(`Periodic refresh: synced ${count} prices from API`);
+        }
+      })
+      .catch((error) => {
+        logger.error('Periodic API refresh failed:', error);
+      });
   }, 3600 * 1000); // 1 hour in milliseconds
 
   // Detect game
@@ -172,7 +179,7 @@ app.whenReady().then(async () => {
         title: 'Game Not Found',
         message:
           'Could not find Torchlight: Infinite game process or log file.\n\n' +
-          'The tool will continue running but won\'t be able to track drops ' +
+          "The tool will continue running but won't be able to track drops " +
           'until the game is started.\n\n' +
           'Please make sure the game is running with logging enabled, ' +
           'then restart this tool.',
@@ -584,7 +591,9 @@ ipcMain.handle('skip-update-version', (_, version: string) => {
 ipcMain.handle('get-sessions', () => {
   const sessions = sessionManager.getAllSessions();
   const fullTable = fileManager.loadFullTable();
-  const itemMapping = fileManager.loadJson<Record<string, { id: string; img?: string; name_en?: string; type_en?: string }>>(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
+  const itemMapping = fileManager.loadJson<
+    Record<string, { id: string; img?: string; name_en?: string; type_en?: string }>
+  >(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
 
   // Helper to get item image URL from comprehensive mapping
   const getItemImageUrl = (itemId: string): string | undefined => {
@@ -592,34 +601,36 @@ ipcMain.handle('get-sessions', () => {
   };
 
   // Enrich drops and costs in each mapLog with item data
-  return sessions.map(session => ({
+  return sessions.map((session) => ({
     ...session,
-    mapLogs: session.mapLogs.map(mapLog => ({
+    mapLogs: session.mapLogs.map((mapLog) => ({
       ...mapLog,
-      drops: mapLog.drops?.map(drop => {
-        const itemData = fullTable[drop.itemId];
-        return {
-          itemId: drop.itemId,
-          name: itemData?.name || `Item ${drop.itemId}`,
-          quantity: drop.quantity,
-          price: itemData?.price || 0,
-          type: itemData?.type || 'Unknown',
-          timestamp: mapLog.startTime,
-          imageUrl: getItemImageUrl(drop.itemId),
-        };
-      }) || [],
-      costs: mapLog.costs?.map(cost => {
-        const itemData = fullTable[cost.itemId];
-        return {
-          itemId: cost.itemId,
-          name: itemData?.name || `Item ${cost.itemId}`,
-          quantity: cost.quantity,
-          price: itemData?.price || 0,
-          type: itemData?.type || 'Unknown',
-          timestamp: mapLog.startTime,
-          imageUrl: getItemImageUrl(cost.itemId),
-        };
-      }) || [],
+      drops:
+        mapLog.drops?.map((drop) => {
+          const itemData = fullTable[drop.itemId];
+          return {
+            itemId: drop.itemId,
+            name: itemData?.name || `Item ${drop.itemId}`,
+            quantity: drop.quantity,
+            price: itemData?.price || 0,
+            type: itemData?.type || 'Unknown',
+            timestamp: mapLog.startTime,
+            imageUrl: getItemImageUrl(drop.itemId),
+          };
+        }) || [],
+      costs:
+        mapLog.costs?.map((cost) => {
+          const itemData = fullTable[cost.itemId];
+          return {
+            itemId: cost.itemId,
+            name: itemData?.name || `Item ${cost.itemId}`,
+            quantity: cost.quantity,
+            price: itemData?.price || 0,
+            type: itemData?.type || 'Unknown',
+            timestamp: mapLog.startTime,
+            imageUrl: getItemImageUrl(cost.itemId),
+          };
+        }) || [],
     })),
   }));
 });

@@ -64,7 +64,7 @@ const TYPE_COLORS: Record<string, string> = {
   'prism calibrator': '#14b8a6',
   'prism level': '#14b8a6',
   'prism repairer': '#14b8a6',
-  '特殊棱镜': '#14b8a6',
+  特殊棱镜: '#14b8a6',
 
   // Cores & Organs
   'desire core': '#a855f7',
@@ -114,10 +114,10 @@ const TYPE_COLORS: Record<string, string> = {
   'labyrinth echo': '#fbbf24',
   'inverse image echo': '#fbbf24',
   fate: '#f472b6',
-  '命运相关': '#f472b6',
+  命运相关: '#f472b6',
   'fog city tales': '#94a3b8',
   'legendary gear': '#fcd34d',
-  '装备蓝图': '#fcd34d',
+  装备蓝图: '#fcd34d',
   pactspirit: '#f0abfc',
   probe: '#38bdf8',
   'proof of valor': '#fbbf24',
@@ -157,12 +157,15 @@ function DropsCard({ drops, costs, totalPickedUp, totalCost, selectedMapName }: 
   });
 
   // Calculate FE totals by item type for the percentage bar (loot only)
-  const typeBreakdown = sortedDrops.reduce((acc, item) => {
-    const type = (item.type || 'unknown').toLowerCase();
-    const total = item.price * item.quantity;
-    acc[type] = (acc[type] || 0) + total;
-    return acc;
-  }, {} as Record<string, number>);
+  const typeBreakdown = sortedDrops.reduce(
+    (acc, item) => {
+      const type = (item.type || 'unknown').toLowerCase();
+      const total = item.price * item.quantity;
+      acc[type] = (acc[type] || 0) + total;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   // Get sorted types by FE value for consistent display
   const sortedTypes = Object.entries(typeBreakdown)
@@ -237,39 +240,40 @@ function DropsCard({ drops, costs, totalPickedUp, totalCost, selectedMapName }: 
         ) : (
           <>
             {/* Drops Section */}
-            {lootView === 'drops' && sortedDrops.map((item, index) => {
-              const totalFE = item.price * item.quantity;
-              return (
-                <div key={`drop-${item.itemId}-${index}`} className="drop-item">
-                  <div className="drop-main">
-                    <div className="drop-left">
-                      <div className="item-image-wrapper">
-                        {item.imageUrl ? (
-                          <img src={item.imageUrl} alt={item.name} className="item-image" />
-                        ) : (
-                          <div className="item-image-placeholder" />
-                        )}
-                        <div className="quantity-badge">{item.quantity}</div>
+            {lootView === 'drops' &&
+              sortedDrops.map((item, index) => {
+                const totalFE = item.price * item.quantity;
+                return (
+                  <div key={`drop-${item.itemId}-${index}`} className="drop-item">
+                    <div className="drop-main">
+                      <div className="drop-left">
+                        <div className="item-image-wrapper">
+                          {item.imageUrl ? (
+                            <img src={item.imageUrl} alt={item.name} className="item-image" />
+                          ) : (
+                            <div className="item-image-placeholder" />
+                          )}
+                          <div className="quantity-badge">{item.quantity}</div>
+                        </div>
+                        <div className="drop-name">{item.name}</div>
                       </div>
-                      <div className="drop-name">{item.name}</div>
+                      <div className="drop-right">
+                        <div className="price-row">
+                          <span className="price-label">Unit Price</span>
+                          <span className="price-value">{item.price.toFixed(2)}</span>
+                        </div>
+                        <div className="price-row total-row">
+                          <span className="price-label">Total Value</span>
+                          <span className="price-value positive">{totalFE.toFixed(2)}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="drop-right">
-                      <div className="price-row">
-                        <span className="price-label">Unit Price</span>
-                        <span className="price-value">{item.price.toFixed(2)}</span>
-                      </div>
-                      <div className="price-row total-row">
-                        <span className="price-label">Total Value</span>
-                        <span className="price-value positive">{totalFE.toFixed(2)}</span>
-                      </div>
+                    <div className="drop-info">
+                      <span className="drop-type">{item.type || 'Unknown'}</span>
                     </div>
                   </div>
-                  <div className="drop-info">
-                    <span className="drop-type">{item.type || 'Unknown'}</span>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
 
             {/* Costs Section */}
             {lootView === 'costs' && sortedCosts.length > 0 && (
@@ -327,7 +331,8 @@ function DropsCard({ drops, costs, totalPickedUp, totalCost, selectedMapName }: 
           <div className="summary-row profit-row">
             <span className="summary-label">Profit</span>
             <span className={`summary-value ${totalProfit >= 0 ? 'positive' : 'negative'}`}>
-              {totalProfit >= 0 ? '' : '-'}{Math.abs(totalProfit).toFixed(2)}
+              {totalProfit >= 0 ? '' : '-'}
+              {Math.abs(totalProfit).toFixed(2)}
             </span>
           </div>
         </div>

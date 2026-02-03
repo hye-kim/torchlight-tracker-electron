@@ -122,9 +122,7 @@ function SettingsDialog({ config, onSave, onClose }: SettingsDialogProps) {
               <input
                 type="checkbox"
                 checked={updateConfig.autoCheck}
-                onChange={(e) =>
-                  setUpdateConfig({ ...updateConfig, autoCheck: e.target.checked })
-                }
+                onChange={(e) => setUpdateConfig({ ...updateConfig, autoCheck: e.target.checked })}
               />
               <span>Check for updates on startup</span>
             </label>
@@ -141,9 +139,7 @@ function SettingsDialog({ config, onSave, onClose }: SettingsDialogProps) {
             >
               {isCheckingUpdate ? 'Checking...' : 'Check for Updates Now'}
             </button>
-            {lastCheckMessage && (
-              <span className="update-check-message">{lastCheckMessage}</span>
-            )}
+            {lastCheckMessage && <span className="update-check-message">{lastCheckMessage}</span>}
             {updateConfig.lastCheckTime && (
               <span className="form-hint">
                 Last checked: {formatLastCheckTime(updateConfig.lastCheckTime)}
