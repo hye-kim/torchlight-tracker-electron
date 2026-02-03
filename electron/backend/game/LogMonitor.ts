@@ -5,11 +5,11 @@
 
 import fs from 'fs';
 import { EventEmitter } from 'events';
-import { Logger } from './Logger';
+import { Logger } from '../core/Logger';
 import { LogParser } from './LogParser';
-import { FileManager } from './FileManager';
-import { InventoryTracker } from './InventoryTracker';
-import { StatisticsTracker } from './StatisticsTracker';
+import { FileManager } from '../data/FileManager';
+import { InventoryTracker } from '../tracking/InventoryTracker';
+import { StatisticsTracker } from '../tracking/StatisticsTracker';
 import {
   LOG_FILE_REOPEN_INTERVAL,
   LOG_FILE_ROTATION_MAX_RETRIES,
@@ -17,15 +17,23 @@ import {
   LOG_POLL_INTERVAL,
   COMPREHENSIVE_ITEM_DATABASE_FILE,
   MIN_BAG_ITEMS_FOR_INIT,
-} from './constants';
+} from '../core/constants';
 
 const logger = Logger.getInstance();
 
 export interface LogMonitorEvents {
   initializationComplete: (itemCount: number) => void;
-  updateDisplay: () => void;
+  updateDisplay: (data: unknown) => void;
   reshowDrops: () => void;
   error: (error: Error) => void;
+}
+
+export declare interface LogMonitor {
+  on<K extends keyof LogMonitorEvents>(event: K, listener: LogMonitorEvents[K]): this;
+  emit<K extends keyof LogMonitorEvents>(
+    event: K,
+    ...args: Parameters<LogMonitorEvents[K]>
+  ): boolean;
 }
 
 export class LogMonitor extends EventEmitter {
@@ -324,7 +332,8 @@ export class LogMonitor extends EventEmitter {
 
       // Helper to get item image URL from comprehensive mapping
       const getItemImageUrl = (itemId: string): string | undefined => {
-        return itemMapping[itemId]?.img;
+        const item = itemMapping[itemId];
+        return item?.img;
       };
 
       // Convert drops to array format for UI
@@ -479,7 +488,7 @@ export class LogMonitor extends EventEmitter {
    */
   private processLogLine(line: string): void {
     // Check for initialization - buffer BagMgr@:InitBagData lines
-    if (this.inventoryTracker['awaitingInitialization']) {
+    if (this.inventoryTracker.isAwaitingInitialization()) {
       if (line.includes('BagMgr@:InitBagData')) {
         // This is a BagMgr line, add it to the buffer
         this.bagMgrBuffer.push(line);

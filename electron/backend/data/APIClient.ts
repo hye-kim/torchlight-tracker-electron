@@ -4,13 +4,13 @@
  */
 
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { Logger } from './Logger';
+import { Logger } from '../core/Logger';
 import {
   API_CACHE_TTL,
   API_RATE_LIMIT_CALLS,
   API_RATE_LIMIT_WINDOW,
   API_RETRY_BASE_DELAY,
-} from './constants';
+} from '../core/constants';
 
 const logger = Logger.getInstance();
 
@@ -58,6 +58,9 @@ export class APIClient {
     // If at limit, wait until oldest request falls outside window
     if (this.requestTimestamps.length >= this.rateLimitCalls) {
       const oldestRequest = this.requestTimestamps[0];
+      if (!oldestRequest) {
+        return; // Should never happen, but guard against undefined
+      }
       const waitTime = this.rateLimitWindow - (now - oldestRequest);
       if (waitTime > 0) {
         logger.warn(`Rate limit reached. Waiting ${waitTime.toFixed(1)}s before next request`);
@@ -138,6 +141,10 @@ export class APIClient {
       }
     }
 
+    // All retries exhausted
+    if (lastError) {
+      logger.error(`All ${this.maxRetries} retry attempts failed for ${method} ${url}:`, lastError);
+    }
     return null;
   }
 

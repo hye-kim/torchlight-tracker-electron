@@ -1,17 +1,17 @@
-import { app, BrowserWindow, ipcMain, dialog, session } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, session, IpcMainInvokeEvent, IpcMainEvent } from 'electron';
 import path from 'path';
-import { ConfigManager, Config } from './backend/ConfigManager';
-import { FileManager } from './backend/FileManager';
-import { LogParser } from './backend/LogParser';
-import { InventoryTracker } from './backend/InventoryTracker';
-import { StatisticsTracker } from './backend/StatisticsTracker';
-import { GameDetector } from './backend/GameDetector';
-import { LogMonitor } from './backend/LogMonitor';
-import { Logger } from './backend/Logger';
-import { ExcelExporter } from './backend/ExcelExporter';
-import { UpdateManager } from './backend/UpdateManager';
-import { SessionManager } from './backend/SessionManager';
-import { CONFIG_FILE, COMPREHENSIVE_ITEM_DATABASE_FILE } from './backend/constants';
+import { ConfigManager, Config } from './backend/core/ConfigManager';
+import { FileManager } from './backend/data/FileManager';
+import { LogParser } from './backend/game/LogParser';
+import { InventoryTracker } from './backend/tracking/InventoryTracker';
+import { StatisticsTracker } from './backend/tracking/StatisticsTracker';
+import { GameDetector } from './backend/game/GameDetector';
+import { LogMonitor } from './backend/game/LogMonitor';
+import { Logger } from './backend/core/Logger';
+import { ExcelExporter } from './backend/export/ExcelExporter';
+import { UpdateManager } from './backend/updates/UpdateManager';
+import { SessionManager } from './backend/tracking/SessionManager';
+import { CONFIG_FILE, COMPREHENSIVE_ITEM_DATABASE_FILE } from './backend/core/constants';
 
 const logger = Logger.getInstance();
 const isDev = process.env.NODE_ENV === 'development';
@@ -92,7 +92,7 @@ app.whenReady().then(async () => {
   // Set up web request interceptor to fix 403 errors from CDN
   session.defaultSession.webRequest.onBeforeSendHeaders(
     { urls: ['https://cdn.tlidb.com/*'] },
-    (details, callback) => {
+    (details: Electron.OnBeforeSendHeadersListenerDetails, callback: (beforeSendResponse: Electron.BeforeSendResponse) => void) => {
       details.requestHeaders['User-Agent'] =
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
       details.requestHeaders['Referer'] = 'https://www.tlidb.com/';
@@ -252,7 +252,7 @@ ipcMain.handle('get-config', () => {
   return configManager.getConfig();
 });
 
-ipcMain.handle('update-config', (_, updates) => {
+ipcMain.handle('update-config', (_event: IpcMainInvokeEvent, updates: Partial<Config>) => {
   configManager.updateConfig(updates);
   return configManager.getConfig();
 });
@@ -409,7 +409,7 @@ ipcMain.handle('export-debug-log', async () => {
 });
 
 // Overlay mode IPC handlers
-ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
+ipcMain.handle('toggle-overlay-mode', (_event: IpcMainInvokeEvent, enabled: boolean) => {
   if (mainWindow) {
     const config = configManager.getConfig();
     const currentBounds = mainWindow.getBounds();
@@ -463,7 +463,7 @@ ipcMain.handle('toggle-overlay-mode', (_, enabled: boolean) => {
   return { success: true };
 });
 
-ipcMain.handle('toggle-click-through', (_, enabled: boolean) => {
+ipcMain.handle('toggle-click-through', (_event: IpcMainInvokeEvent, enabled: boolean) => {
   // Apply click-through to window but don't save to config
   if (mainWindow) {
     mainWindow.setIgnoreMouseEvents(enabled, { forward: true });
@@ -471,7 +471,7 @@ ipcMain.handle('toggle-click-through', (_, enabled: boolean) => {
   return { success: true };
 });
 
-ipcMain.handle('set-ignore-mouse-events', (_, ignore: boolean) => {
+ipcMain.handle('set-ignore-mouse-events', (_event: IpcMainInvokeEvent, ignore: boolean) => {
   if (mainWindow) {
     mainWindow.setIgnoreMouseEvents(ignore, { forward: true });
   }
@@ -479,19 +479,21 @@ ipcMain.handle('set-ignore-mouse-events', (_, ignore: boolean) => {
 });
 
 // Handle set-ignore-mouse-events from ipcRenderer.send (used by preload for interactive elements)
-ipcMain.on('set-ignore-mouse-events', (_, ignore: boolean, options?: any) => {
+ipcMain.on('set-ignore-mouse-events', (_event: IpcMainEvent, ignore: boolean, options?: any) => {
   if (mainWindow) {
     mainWindow.setIgnoreMouseEvents(ignore, options || { forward: true });
   }
 });
 
-ipcMain.handle('set-font-size', (_, fontSize: number) => {
+ipcMain.handle('set-font-size', (_event: IpcMainInvokeEvent, fontSize: number) => {
   configManager.setFontSize(fontSize);
   return { success: true };
 });
 
-ipcMain.handle('set-display-items', (_, displayItems) => {
-  configManager.setDisplayItems(displayItems);
+ipcMain.handle('set-display-items', (_event: IpcMainInvokeEvent, displayItems: Config['displayItems']) => {
+  if (displayItems) {
+    configManager.setDisplayItems(displayItems);
+  }
   return { success: true };
 });
 
@@ -521,10 +523,16 @@ ipcMain.handle('window-close', () => {
   return { success: true };
 });
 
-ipcMain.handle('window-resize', (_, width: number, height: number) => {
+ipcMain.handle('window-resize', (_event: IpcMainInvokeEvent, width: number, height: number) => {
   if (mainWindow) {
     const currentSize = mainWindow.getSize();
-    mainWindow.setSize(width || currentSize[0], height || currentSize[1], true);
+    const currentWidth = currentSize[0];
+    const currentHeight = currentSize[1];
+    mainWindow.setSize(
+      width || (currentWidth ?? 400),
+      height || (currentHeight ?? 600),
+      true
+    );
   }
   return { success: true };
 });
@@ -577,12 +585,15 @@ ipcMain.handle('get-update-config', () => {
   return configManager.getUpdateConfig();
 });
 
-ipcMain.handle('set-update-config', (_, updateConfig) => {
-  configManager.setUpdateConfig(updateConfig);
-  return { success: true };
-});
+ipcMain.handle(
+  'set-update-config',
+  (_event: IpcMainInvokeEvent, updateConfig: { autoCheck: boolean; skipVersion?: string }) => {
+    configManager.setUpdateConfig(updateConfig);
+    return { success: true };
+  }
+);
 
-ipcMain.handle('skip-update-version', (_, version: string) => {
+ipcMain.handle('skip-update-version', (_event: IpcMainInvokeEvent, version: string) => {
   configManager.setSkipVersion(version);
   return { success: true };
 });
@@ -597,7 +608,8 @@ ipcMain.handle('get-sessions', () => {
 
   // Helper to get item image URL from comprehensive mapping
   const getItemImageUrl = (itemId: string): string | undefined => {
-    return itemMapping[itemId]?.img;
+    const item = itemMapping[itemId];
+    return item?.img;
   };
 
   // Enrich drops and costs in each mapLog with item data
@@ -635,7 +647,7 @@ ipcMain.handle('get-sessions', () => {
   }));
 });
 
-ipcMain.handle('get-session', (_, sessionId: string) => {
+ipcMain.handle('get-session', (_event: IpcMainInvokeEvent, sessionId: string) => {
   return sessionManager.getSessionById(sessionId);
 });
 
@@ -643,7 +655,7 @@ ipcMain.handle('get-current-session', () => {
   return sessionManager.getCurrentSession();
 });
 
-ipcMain.handle('delete-sessions', (_, sessionIds: string[]) => {
+ipcMain.handle('delete-sessions', (_event: IpcMainInvokeEvent, sessionIds: string[]) => {
   sessionManager.deleteSessions(sessionIds);
   return { success: true };
 });

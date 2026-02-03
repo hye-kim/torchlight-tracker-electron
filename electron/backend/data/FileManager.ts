@@ -1,8 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { app } from 'electron';
-import axios from 'axios';
-import { Logger } from './Logger';
+import { Logger } from '../core/Logger';
 import { APIClient } from './APIClient';
 import {
   API_UPDATE_THROTTLE,
@@ -10,7 +9,7 @@ import {
   FULL_TABLE_FILE,
   COMPREHENSIVE_ITEM_DATABASE_FILE,
   DROP_LOG_FILE,
-} from './constants';
+} from '../core/constants';
 
 const logger = Logger.getInstance();
 
@@ -34,7 +33,8 @@ export interface ComprehensiveItemEntry {
 
 export class FileManager {
   private fullTableCache: Record<string, ItemData> | null = null;
-  private cacheTimestamp: number = 0;
+  // @ts-expect-error - Reserved for future cache invalidation
+  private _cacheTimestamp: number = 0;
   private apiUrl: string;
   private userDataPath: string;
   private resourcePath: string;

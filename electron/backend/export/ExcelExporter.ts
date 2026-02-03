@@ -1,6 +1,6 @@
 import ExcelJS from 'exceljs';
-import { FileManager } from './FileManager';
-import { Logger } from './Logger';
+import { FileManager } from '../data/FileManager';
+import { Logger } from '../core/Logger';
 
 const logger = Logger.getInstance();
 
@@ -14,7 +14,8 @@ export interface DropRecord {
 }
 
 export class ExcelExporter {
-  constructor(private fileManager: FileManager) {}
+  // @ts-expect-error - Reserved for future use
+  constructor(private _fileManager: FileManager) {}
 
   async exportDropsToExcel(
     drops: DropRecord[],
@@ -49,11 +50,13 @@ export class ExcelExporter {
       // Add drops data rows
       for (let i = 0; i < drops.length; i++) {
         const drop = drops[i];
+        if (!drop) continue;
+
         const taxMultiplier = applyTax ? 0.875 : 1.0; // 12.5% tax
         const effectivePrice = drop.price * taxMultiplier;
         const rowNum = i + 2; // Excel row number (1-indexed, starting after header)
 
-        const row = worksheet.addRow({
+        worksheet.addRow({
           name: drop.name,
           type: drop.type || 'Unknown',
           quantity: drop.quantity,
@@ -104,11 +107,13 @@ export class ExcelExporter {
       // Add costs data rows
       for (let i = 0; i < costs.length; i++) {
         const cost = costs[i];
+        if (!cost) continue;
+
         const taxMultiplier = applyTax ? 0.875 : 1.0; // 12.5% tax
         const effectivePrice = cost.price * taxMultiplier;
         const rowNum = costsHeaderRow + 1 + i;
 
-        const row = worksheet.addRow({
+        worksheet.addRow({
           name: cost.name,
           type: cost.type || 'Unknown',
           quantity: cost.quantity,
@@ -143,8 +148,8 @@ export class ExcelExporter {
       worksheet.getCell(`B${summaryRowIndex}`).numFmt = '0.00';
 
       // Add borders to all cells
-      worksheet.eachRow({ includeEmpty: false }, (row) => {
-        row.eachCell((cell) => {
+      worksheet.eachRow({ includeEmpty: false }, (row: ExcelJS.Row) => {
+        row.eachCell((cell: ExcelJS.Cell) => {
           cell.border = {
             top: { style: 'thin', color: { argb: 'FF4A4A5E' } },
             left: { style: 'thin', color: { argb: 'FF4A4A5E' } },

@@ -1,11 +1,11 @@
-import { FileManager, ItemData } from './FileManager';
-import { Logger } from './Logger';
+import { FileManager } from '../data/FileManager';
+import { Logger } from '../core/Logger';
 import {
   PATTERN_SUBREGION_ENTER,
   getSubregionDisplayName,
   EXCLUDED_ITEM_ID,
   PRICE_SAMPLE_SIZE,
-} from './constants';
+} from '../core/constants';
 
 const logger = Logger.getInstance();
 
@@ -15,7 +15,7 @@ const PATTERN_ITEM_CHANGE =
   /\[.*?\]GameLog: Display: \[Game\] ItemChange@ (Add|Update|Remove) Id=(\d+_[^ ]+) BagNum=(\d+) in PageId=(\d+) SlotId=(\d+)/g;
 const PATTERN_RESET_ITEMS_START = /ItemChange@ ProtoName=ResetItemsLayout start/;
 const PATTERN_RESET_ITEMS_END = /ItemChange@ ProtoName=ResetItemsLayout end/;
-const PATTERN_ITEM_CHANGE_RESET = /ItemChange@ Reset PageId=(\d+)/g;
+// const PATTERN_ITEM_CHANGE_RESET = /ItemChange@ Reset PageId=(\d+)/g; // Reserved for future use
 const PATTERN_BAG_INIT_DATA =
   /BagMgr@:InitBagData PageId = (\d+) SlotId = (\d+) ConfigBaseId = (\d+) Num = (\d+)/g;
 const PATTERN_MAP_ENTER =
@@ -86,6 +86,10 @@ export class LogParser {
         const synid = match[1];
         const itemId = match[2];
 
+        if (!synid || !itemId) {
+          continue;
+        }
+
         if (itemId === EXCLUDED_ITEM_ID) {
           continue;
         }
@@ -112,13 +116,15 @@ export class LogParser {
       );
 
       const match = pattern.exec(text);
-      if (!match) {
+      if (!match || !match[1]) {
         logger.debug(`No price data found for ID: ${itemId}`);
         return null;
       }
 
       const dataBlock = match[1];
-      const values = Array.from(dataBlock.matchAll(PATTERN_VALUE)).map((m) => m[1]);
+      const values = Array.from(dataBlock.matchAll(PATTERN_VALUE))
+        .map((m) => m[1])
+        .filter((v): v is string => v !== undefined);
 
       if (values.length === 0) {
         return -1.0;
@@ -136,7 +142,8 @@ export class LogParser {
         counter.set(value, (counter.get(value) || 0) + 1);
       }
 
-      const mostCommon = Array.from(counter.entries()).sort((a, b) => b[1] - a[1])[0];
+      const entries = Array.from(counter.entries()).sort((a, b) => b[1] - a[1]);
+      const mostCommon = entries[0];
 
       // Use mode if it appears at least 30% of the time
       if (mostCommon && mostCommon[1] >= roundedValues.length * 0.3) {
@@ -146,9 +153,21 @@ export class LogParser {
       // Fallback to median
       const sorted = roundedValues.sort((a, b) => a - b);
       const mid = Math.floor(sorted.length / 2);
-      const median = sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+      const leftValue = sorted[mid - 1];
+      const rightValue = sorted[mid];
 
-      return Math.round(median * 10000) / 10000;
+      if (sorted.length % 2 === 0) {
+        if (leftValue === undefined || rightValue === undefined) {
+          return null;
+        }
+        const median = (leftValue + rightValue) / 2;
+        return Math.round(median * 10000) / 10000;
+      } else {
+        if (rightValue === undefined) {
+          return null;
+        }
+        return Math.round(rightValue * 10000) / 10000;
+      }
     } catch (error) {
       logger.error(`Error extracting price for item ${itemId}:`, error);
       return null;
@@ -166,14 +185,15 @@ export class LogParser {
     const fullTable = this.fileManager.loadFullTable();
 
     for (const [itemId, price] of priceUpdates) {
-      if (fullTable[itemId]) {
+      const item = fullTable[itemId];
+      if (item) {
         const updated = await this.fileManager.updateItem(itemId, {
           price,
           last_update: currentTime,
         });
 
         if (updated) {
-          const itemName = fullTable[itemId].name || itemId;
+          const itemName = item.name || itemId;
           logger.info(`Updated price: ${itemName} (ID:${itemId}) = ${price}`);
           updateCount++;
         }
@@ -189,18 +209,21 @@ export class LogParser {
    */
   extractItemChanges(text: string): BagModification[] {
     const matches = Array.from(text.matchAll(PATTERN_ITEM_CHANGE));
-    return matches.map((m) => {
-      const fullId = m[2];
-      const baseId = fullId.split('_')[0]; // Extract base ID from fullId
-      return {
-        action: m[1] as 'Add' | 'Update' | 'Remove',
-        fullId: fullId,
-        pageId: m[4],
-        slotId: m[5],
-        configBaseId: baseId,
-        count: parseInt(m[3]),
-      };
-    });
+    return matches
+      .filter((m) => m[1] && m[2] && m[3] && m[4] && m[5])
+      .map((m) => {
+        const fullId = m[2]!;
+        const baseIdParts = fullId.split('_');
+        const baseId = baseIdParts[0] || fullId; // Extract base ID from fullId
+        return {
+          action: m[1] as 'Add' | 'Update' | 'Remove',
+          fullId: fullId,
+          pageId: m[4]!,
+          slotId: m[5]!,
+          configBaseId: baseId,
+          count: parseInt(m[3]!),
+        };
+      });
   }
 
   /**
@@ -209,22 +232,24 @@ export class LogParser {
    */
   extractBagData(text: string): BagModification[] {
     const matches = Array.from(text.matchAll(PATTERN_BAG_INIT_DATA));
-    return matches.map((m) => {
-      const pageId = m[1];
-      const slotId = m[2];
-      const configBaseId = m[3];
-      const count = parseInt(m[4]);
-      // Create synthetic fullId for bag data (will be replaced when real ItemChange@ appears)
-      const syntheticFullId = `${configBaseId}_init_${pageId}_${slotId}`;
-      return {
-        action: 'Update' as 'Add' | 'Update' | 'Remove',
-        fullId: syntheticFullId,
-        pageId: pageId,
-        slotId: slotId,
-        configBaseId: configBaseId,
-        count: count,
-      };
-    });
+    return matches
+      .filter((m) => m[1] && m[2] && m[3] && m[4])
+      .map((m) => {
+        const pageId = m[1]!;
+        const slotId = m[2]!;
+        const configBaseId = m[3]!;
+        const count = parseInt(m[4]!);
+        // Create synthetic fullId for bag data (will be replaced when real ItemChange@ appears)
+        const syntheticFullId = `${configBaseId}_init_${pageId}_${slotId}`;
+        return {
+          action: 'Update' as 'Add' | 'Update' | 'Remove',
+          fullId: syntheticFullId,
+          pageId: pageId,
+          slotId: slotId,
+          configBaseId: configBaseId,
+          count: count,
+        };
+      });
   }
 
   /**
@@ -264,7 +289,7 @@ export class LogParser {
    */
   detectSubregionEntry(text: string): string | null {
     const match = PATTERN_SUBREGION_ENTER.exec(text);
-    if (match) {
+    if (match && match[1] && match[2]) {
       const areaId = match[1];
       const areaLevel = parseInt(match[2], 10);
       return getSubregionDisplayName(areaId, areaLevel);

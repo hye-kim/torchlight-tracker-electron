@@ -4,10 +4,10 @@
  */
 
 import { EventEmitter } from 'events';
-import { FileManager, ItemData } from './FileManager';
-import { ConfigManager } from './ConfigManager';
-import { calculatePriceWithTax } from './constants';
-import { Logger } from './Logger';
+import { FileManager, ItemData } from '../data/FileManager';
+import { ConfigManager } from '../core/ConfigManager';
+import { calculatePriceWithTax } from '../core/constants';
+import { Logger } from '../core/Logger';
 
 const logger = Logger.getInstance();
 
@@ -54,6 +54,25 @@ export interface MapLog {
   duration: number;
   drops: MapItemData[];
   costs: MapItemData[];
+}
+
+export interface StatisticsTrackerEvents {
+  reset: () => void;
+  enterMap: (mapCount: number) => void;
+  exitMap: (duration: number) => void;
+  mapCompleted: (mapLog: MapLog) => void;
+  itemsProcessed: (items: ProcessedItem[]) => void;
+}
+
+export declare interface StatisticsTracker {
+  on<K extends keyof StatisticsTrackerEvents>(
+    event: K,
+    listener: StatisticsTrackerEvents[K]
+  ): this;
+  emit<K extends keyof StatisticsTrackerEvents>(
+    event: K,
+    ...args: Parameters<StatisticsTrackerEvents[K]>
+  ): boolean;
 }
 
 export class StatisticsTracker extends EventEmitter {
@@ -232,8 +251,9 @@ export class StatisticsTracker extends EventEmitter {
     // Recalculate current map income
     this.income = 0.0;
     for (const [itemId, quantity] of this.dropList) {
-      if (fullTable[itemId]) {
-        const basePrice = fullTable[itemId].price || 0.0;
+      const item = fullTable[itemId];
+      if (item) {
+        const basePrice = item.price || 0.0;
         const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         this.income += price * quantity;
       }
@@ -242,8 +262,9 @@ export class StatisticsTracker extends EventEmitter {
     // Recalculate total income
     this.incomeAll = 0.0;
     for (const [itemId, quantity] of this.dropListAll) {
-      if (fullTable[itemId]) {
-        const basePrice = fullTable[itemId].price || 0.0;
+      const item = fullTable[itemId];
+      if (item) {
+        const basePrice = item.price || 0.0;
         const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         this.incomeAll += price * quantity;
       }
@@ -252,8 +273,9 @@ export class StatisticsTracker extends EventEmitter {
     // Recalculate current map costs
     this.currentMapCost = 0.0;
     for (const [itemId, quantity] of this.costList) {
-      if (fullTable[itemId]) {
-        const basePrice = fullTable[itemId].price || 0.0;
+      const item = fullTable[itemId];
+      if (item) {
+        const basePrice = item.price || 0.0;
         const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         this.currentMapCost += price * quantity;
       }
@@ -262,8 +284,9 @@ export class StatisticsTracker extends EventEmitter {
     // Recalculate total costs
     this.totalCost = 0.0;
     for (const [itemId, quantity] of this.costListAll) {
-      if (fullTable[itemId]) {
-        const basePrice = fullTable[itemId].price || 0.0;
+      const item = fullTable[itemId];
+      if (item) {
+        const basePrice = item.price || 0.0;
         const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         this.totalCost += price * quantity;
       }
@@ -273,8 +296,9 @@ export class StatisticsTracker extends EventEmitter {
     for (const mapLog of this.mapLogs) {
       let revenue = 0.0;
       for (const drop of mapLog.drops) {
-        if (fullTable[drop.itemId]) {
-          const basePrice = fullTable[drop.itemId].price || 0.0;
+        const item = fullTable[drop.itemId];
+        if (item) {
+          const basePrice = item.price || 0.0;
           const price = calculatePriceWithTax(basePrice, drop.itemId, taxEnabled);
           revenue += price * drop.quantity;
         }
@@ -282,8 +306,9 @@ export class StatisticsTracker extends EventEmitter {
 
       let cost = 0.0;
       for (const costItem of mapLog.costs) {
-        if (fullTable[costItem.itemId]) {
-          const basePrice = fullTable[costItem.itemId].price || 0.0;
+        const item = fullTable[costItem.itemId];
+        if (item) {
+          const basePrice = item.price || 0.0;
           const price = calculatePriceWithTax(basePrice, costItem.itemId, taxEnabled);
           cost += price * costItem.quantity;
         }
@@ -307,8 +332,8 @@ export class StatisticsTracker extends EventEmitter {
   ): ProcessedItem | null {
     // Get item name - ensure it's always a string
     let itemName: string;
-    if (fullTable[itemId]) {
-      const itemData = fullTable[itemId];
+    const itemData = fullTable[itemId];
+    if (itemData) {
       // Try multiple name fields and ensure we get a string
       let rawName = itemData.name || itemData.name_en || null;
 
@@ -325,7 +350,8 @@ export class StatisticsTracker extends EventEmitter {
         logger.warn(`Unknown item ID: ${itemId}`);
         this.pendingItems.set(itemId, amount);
       } else {
-        this.pendingItems.set(itemId, this.pendingItems.get(itemId)! + amount);
+        const current = this.pendingItems.get(itemId);
+        this.pendingItems.set(itemId, (current || 0) + amount);
       }
       return null;
     }
@@ -349,8 +375,8 @@ export class StatisticsTracker extends EventEmitter {
 
     // Calculate price
     let price = 0.0;
-    if (fullTable[itemId]) {
-      const basePrice = fullTable[itemId].price || 0.0;
+    if (itemData) {
+      const basePrice = itemData.price || 0.0;
       // Apply tax if enabled using centralized calculation
       const taxEnabled = this.configManager.getTaxMode() === 1;
       price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
@@ -388,13 +414,6 @@ export class StatisticsTracker extends EventEmitter {
    * Log item change to drop log file.
    */
   private logItemChange(itemName: string, amount: number, price: number): void {
-    let message: string;
-    if (amount > 0) {
-      message = `Drop: ${itemName} x${amount} (${price.toFixed(3)}/each)`;
-    } else {
-      message = `Consumed: ${itemName} x${Math.abs(amount)} (${price.toFixed(3)}/each)`;
-    }
-
     this.fileManager.logDrop(itemName, amount, price);
   }
 

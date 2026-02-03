@@ -137,7 +137,7 @@ export class ConfigManager {
     return this.config.overlayMode ?? false;
   }
 
-  setOverlayMode(overlayMode: boolean): void {
+  setOverlayMode(_overlayMode: boolean): void {
     // Do not save overlay mode - it should not be persisted
     // This method is kept for compatibility but does nothing
   }
@@ -146,7 +146,7 @@ export class ConfigManager {
     return this.config.clickThrough ?? false;
   }
 
-  setClickThrough(clickThrough: boolean): void {
+  setClickThrough(_clickThrough: boolean): void {
     // Do not save click through - it should not be persisted
     // This method is kept for compatibility but does nothing
   }
