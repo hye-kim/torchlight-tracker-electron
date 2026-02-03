@@ -214,6 +214,7 @@ export class InventoryTracker {
    */
   private processItemChangesWithFullId(changes: BagModification[]): Array<[string, number]> {
     const realChanges = new Map<string, number>();
+    const affectedPages = new Set<string>();
 
     logger.debug(`Processing ${changes.length} ItemChange events with fullId tracking (${this.itemInstances.size} instances tracked)`);
 
@@ -222,6 +223,9 @@ export class InventoryTracker {
         logger.warn(`ItemChange event missing fullId: ${JSON.stringify(change)}`);
         continue; // Skip if no fullId
       }
+
+      // Track which pages are affected by this batch
+      affectedPages.add(change.pageId);
 
       const previousInstance = this.itemInstances.get(change.fullId);
 
@@ -295,9 +299,8 @@ export class InventoryTracker {
             count: change.count,
           });
         } else {
-          // First time seeing this fullId - might be replacing a synthetic one
+          // First time seeing this fullId - might be replacing a synthetic one or from sorting
           const slotKey = `${change.pageId}:${change.slotId}:${change.configBaseId}`;
-          const previousCount = this.bagState.get(slotKey) || 0;
 
           // Check if there's a synthetic fullId for this slot (from InitBagData)
           const syntheticFullId = `${change.configBaseId}_init_${change.pageId}_${change.slotId}`;
@@ -316,13 +319,9 @@ export class InventoryTracker {
               logger.debug(`Item count changed: ${change.fullId} (${change.configBaseId}) ${syntheticInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`);
             }
           } else {
-            // No synthetic fullId - calculate delta from bagState
-            const delta = change.count - previousCount;
-            if (delta !== 0) {
-              const netChange = realChanges.get(change.configBaseId) || 0;
-              realChanges.set(change.configBaseId, netChange + delta);
-              logger.debug(`Item tracked (first fullId): ${change.fullId} (${change.configBaseId}) ${previousCount} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`);
-            }
+            // New fullId without synthetic - likely from sorting or lost tracking
+            // Don't calculate delta because we don't know where this came from
+            logger.debug(`Tracking new fullId without previous instance: ${change.fullId} (${change.configBaseId}) x${change.count} in slot ${change.slotId}`);
           }
 
           // Track this item instance going forward with real fullId
@@ -337,17 +336,37 @@ export class InventoryTracker {
       }
     }
 
-    // Update bagState for compatibility with existing code
-    for (const change of changes) {
-      if (change.fullId) {
-        const slotKey = `${change.pageId}:${change.slotId}:${change.configBaseId}`;
-        if (change.action === 'Remove') {
-          this.bagState.delete(slotKey);
-        } else {
-          this.bagState.set(slotKey, change.count);
+    // Reconcile bagState with itemInstances to ensure consistency
+    // Only clear and rebuild the pages that were affected in this batch
+    // This preserves data from other pages that weren't sorted
+    const keysToDelete: string[] = [];
+    for (const [key] of this.bagState) {
+      if (!key.startsWith('init:')) {
+        // Check if this slot belongs to an affected page
+        const pageId = key.split(':')[0];
+        if (affectedPages.has(pageId)) {
+          keysToDelete.push(key);
         }
       }
     }
+    for (const key of keysToDelete) {
+      this.bagState.delete(key);
+    }
+
+    // Rebuild bagState from itemInstances for affected pages only
+    for (const [fullId, instance] of this.itemInstances) {
+      // Skip synthetic init entries
+      if (fullId.includes('_init_')) {
+        continue;
+      }
+      // Only rebuild slots for affected pages
+      if (affectedPages.has(instance.pageId)) {
+        const slotKey = `${instance.pageId}:${instance.slotId}:${instance.baseId}`;
+        this.bagState.set(slotKey, instance.count);
+      }
+    }
+
+    logger.debug(`Reconciled bagState for pages [${Array.from(affectedPages).join(', ')}]: ${keysToDelete.length} old slots cleared`);
 
     // Convert to array and filter out zero changes
     const result: Array<[string, number]> = [];
