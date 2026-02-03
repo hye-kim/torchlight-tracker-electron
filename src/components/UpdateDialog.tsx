@@ -97,7 +97,8 @@ function UpdateDialog({ updateInfo, onClose }: UpdateDialogProps) {
 
             {!isDownloading && !isDownloaded && (
               <p className="update-description">
-                A new version is available. Click "Download Update" to download and install it.
+                A new version is available. Click &quot;Download Update&quot; to download and
+                install it.
               </p>
             )}
 
@@ -110,10 +111,7 @@ function UpdateDialog({ updateInfo, onClose }: UpdateDialogProps) {
                   </span>
                 </div>
                 <div className="progress-bar">
-                  <div
-                    className="progress-bar-fill"
-                    style={{ width: `${progress.percent}%` }}
-                  />
+                  <div className="progress-bar-fill" style={{ width: `${progress.percent}%` }} />
                 </div>
                 <div className="progress-percentage">{progress.percent.toFixed(1)}%</div>
               </div>
@@ -125,8 +123,8 @@ function UpdateDialog({ updateInfo, onClose }: UpdateDialogProps) {
                 <div className="ready-message">
                   <p className="ready-title">Update Ready!</p>
                   <p className="ready-description">
-                    The update has been downloaded. Click "Restart to Install" to complete the
-                    installation.
+                    The update has been downloaded. Click &quot;Restart to Install&quot; to complete
+                    the installation.
                   </p>
                 </div>
               </div>

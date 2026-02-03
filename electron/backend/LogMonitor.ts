@@ -259,7 +259,9 @@ export class LogMonitor extends EventEmitter {
 
     // Process any remaining price buffer before shutdown
     if (this.priceBuffer.length > 0) {
-      logger.info(`Processing ${this.priceBuffer.length} remaining price buffer lines before shutdown`);
+      logger.info(
+        `Processing ${this.priceBuffer.length} remaining price buffer lines before shutdown`
+      );
       try {
         const text = this.priceBuffer.join('\n');
         this.processPriceUpdates(text);
@@ -316,7 +318,9 @@ export class LogMonitor extends EventEmitter {
       const currentStats = this.statisticsTracker.getCurrentMapStats();
       const totalStats = this.statisticsTracker.getTotalStats();
       const fullTable = this.fileManager.loadFullTable();
-      const itemMapping = this.fileManager.loadJson<Record<string, { id: string; img?: string; name_en?: string; type_en?: string }>>(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
+      const itemMapping = this.fileManager.loadJson<
+        Record<string, { id: string; img?: string; name_en?: string; type_en?: string }>
+      >(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
 
       // Helper to get item image URL from comprehensive mapping
       const getItemImageUrl = (itemId: string): string | undefined => {
@@ -491,7 +495,9 @@ export class LogMonitor extends EventEmitter {
           this.bagMgrBuffer = []; // Clear buffer after successful init
         } else {
           // Initialization failed despite having enough entries - log warning
-          logger.warn(`Initialization failed despite buffering ${this.bagMgrBuffer.length} BagMgr entries`);
+          logger.warn(
+            `Initialization failed despite buffering ${this.bagMgrBuffer.length} BagMgr entries`
+          );
           // Keep buffer for next attempt
         }
       }
@@ -582,7 +588,6 @@ export class LogMonitor extends EventEmitter {
       }
     }
   }
-
 
   /**
    * Update the log file path and restart monitoring if running.

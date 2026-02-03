@@ -22,6 +22,7 @@ npm run dev
 ```
 
 This will:
+
 - Start the Vite dev server for hot reloading
 - Launch Electron with the app
 - Open DevTools for debugging
@@ -40,6 +41,7 @@ The installer will be created in the `release/` directory.
 ### Required Data Files
 
 The following files should be in the `electron/` directory:
+
 - ✅ `en_id_table.json` - English item translations
 - ✅ `comprehensive_item_mapping.json` - Complete item database
 
@@ -67,6 +69,7 @@ These files are already copied from the parent directory.
 ### Tracking Drops
 
 Once initialized:
+
 - Drops are automatically detected as you play
 - Items are categorized by type
 - Prices are updated when you search the market in-game
@@ -88,6 +91,7 @@ Once initialized:
 ### Hot Reloading
 
 When running `npm run dev`:
+
 - UI changes auto-reload (Vite HMR)
 - Backend changes require restart
 
@@ -135,6 +139,7 @@ electron/
 ### "Game Not Found" Warning
 
 **Solution**:
+
 - Make sure Torchlight: Infinite is running
 - Check that the game window title is "Torchlight: Infinite"
 - Restart the tracker after starting the game
@@ -142,6 +147,7 @@ electron/
 ### "Initialization Failed"
 
 **Solution**:
+
 - Open your inventory in-game
 - Make sure you have at least 20 items
 - Try clicking "Initialize Tracker" again
@@ -149,6 +155,7 @@ electron/
 ### No Prices Showing
 
 **Solution**:
+
 - Prices update when you search items in the market
 - Open the in-game market and search for an item
 - The tracker will capture and store the price
@@ -156,6 +163,7 @@ electron/
 ### Drops Not Detected
 
 **Solution**:
+
 - Make sure you've initialized the tracker
 - Check that you're actually in a map/dungeon
 - Look for "Entered map" messages in the log
@@ -170,19 +178,20 @@ Windows: `C:\Users\[YourName]\AppData\Roaming\torchlight-tracker-electron\config
 
 ```json
 {
-  "opacity": 1.0,           // 0.1 to 1.0
-  "tax": 0,                 // 0 = off, 1 = on
-  "user": "",               // Your user ID
-  "window_x": 100,          // Window position X
-  "window_y": 100,          // Window position Y
-  "window_width": 800,      // Window width
-  "window_height": 600      // Window height
+  "opacity": 1.0, // 0.1 to 1.0
+  "tax": 0, // 0 = off, 1 = on
+  "user": "", // Your user ID
+  "window_x": 100, // Window position X
+  "window_y": 100, // Window position Y
+  "window_width": 800, // Window width
+  "window_height": 600 // Window height
 }
 ```
 
 ### Data Files Location
 
 All data files are stored in the app's user data directory:
+
 - Windows: `C:\Users\[YourName]\AppData\Roaming\torchlight-tracker-electron\`
 
 ## Performance Tips
@@ -201,11 +210,13 @@ npm run build:electron
 ```
 
 The installer will be in `release/` with filename like:
+
 - Windows: `Torchlight Tracker Setup [version].exe`
 
 ## Support
 
 If you encounter issues:
+
 1. Check the `tracker.log` file in the app data directory
 2. Export debug log using the "Export Debug Log" button
 3. Report issues with the log file attached
@@ -213,6 +224,7 @@ If you encounter issues:
 ## Contributing
 
 To contribute:
+
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
@@ -222,6 +234,7 @@ To contribute:
 ## Next Steps
 
 After setup:
+
 1. ✅ Run `npm install`
 2. ✅ Start development server with `npm run dev`
 3. ✅ Launch Torchlight: Infinite

@@ -1,19 +1,29 @@
 import { FileManager, ItemData } from './FileManager';
 import { Logger } from './Logger';
-import { PATTERN_SUBREGION_ENTER, getSubregionDisplayName, EXCLUDED_ITEM_ID, PRICE_SAMPLE_SIZE } from './constants';
+import {
+  PATTERN_SUBREGION_ENTER,
+  getSubregionDisplayName,
+  EXCLUDED_ITEM_ID,
+  PRICE_SAMPLE_SIZE,
+} from './constants';
 
 const logger = Logger.getInstance();
 
 // Constants
 const PATTERN_PRICE_ID = /XchgSearchPrice----SynId = (\d+).*?\+refer \[(\d+)\]/gs;
-const PATTERN_ITEM_CHANGE = /\[.*?\]GameLog: Display: \[Game\] ItemChange@ (Add|Update|Remove) Id=(\d+_[^ ]+) BagNum=(\d+) in PageId=(\d+) SlotId=(\d+)/g;
+const PATTERN_ITEM_CHANGE =
+  /\[.*?\]GameLog: Display: \[Game\] ItemChange@ (Add|Update|Remove) Id=(\d+_[^ ]+) BagNum=(\d+) in PageId=(\d+) SlotId=(\d+)/g;
 const PATTERN_RESET_ITEMS_START = /ItemChange@ ProtoName=ResetItemsLayout start/;
 const PATTERN_RESET_ITEMS_END = /ItemChange@ ProtoName=ResetItemsLayout end/;
 const PATTERN_ITEM_CHANGE_RESET = /ItemChange@ Reset PageId=(\d+)/g;
-const PATTERN_BAG_INIT_DATA = /BagMgr@:InitBagData PageId = (\d+) SlotId = (\d+) ConfigBaseId = (\d+) Num = (\d+)/g;
-const PATTERN_MAP_ENTER = /PageApplyBase@ _UpdateGameEnd: LastSceneName = World'\/Game\/Art\/Maps\/01SD\/XZ_YuJinZhiXiBiNanSuo200\/XZ_YuJinZhiXiBiNanSuo200.XZ_YuJinZhiXiBiNanSuo200' NextSceneName = World'\/Game\/Art\/Maps/;
-const PATTERN_MAP_EXIT = /NextSceneName = World'\/Game\/Art\/Maps\/01SD\/XZ_YuJinZhiXiBiNanSuo200\/XZ_YuJinZhiXiBiNanSuo200.XZ_YuJinZhiXiBiNanSuo200'/;
-const PATTERN_DIXIAZHEN_ENTER = /NextSceneName = World'\/Game\/Art\/Season\/S13\/Maps\/DiXiaZhenSuo\/DiXiaZhenSuo\.DiXiaZhenSuo'/;
+const PATTERN_BAG_INIT_DATA =
+  /BagMgr@:InitBagData PageId = (\d+) SlotId = (\d+) ConfigBaseId = (\d+) Num = (\d+)/g;
+const PATTERN_MAP_ENTER =
+  /PageApplyBase@ _UpdateGameEnd: LastSceneName = World'\/Game\/Art\/Maps\/01SD\/XZ_YuJinZhiXiBiNanSuo200\/XZ_YuJinZhiXiBiNanSuo200.XZ_YuJinZhiXiBiNanSuo200' NextSceneName = World'\/Game\/Art\/Maps/;
+const PATTERN_MAP_EXIT =
+  /NextSceneName = World'\/Game\/Art\/Maps\/01SD\/XZ_YuJinZhiXiBiNanSuo200\/XZ_YuJinZhiXiBiNanSuo200.XZ_YuJinZhiXiBiNanSuo200'/;
+const PATTERN_DIXIAZHEN_ENTER =
+  /NextSceneName = World'\/Game\/Art\/Season\/S13\/Maps\/DiXiaZhenSuo\/DiXiaZhenSuo\.DiXiaZhenSuo'/;
 const PATTERN_VALUE = /\+\d+\s+\[([\d.]+)\]/g;
 
 const LOG_NOISE_PATTERNS = [
@@ -116,7 +126,9 @@ export class LogParser {
 
       // Use first N values as samples
       const numValues = Math.min(values.length, PRICE_SAMPLE_SIZE);
-      const roundedValues = values.slice(0, numValues).map((v) => Math.round(parseFloat(v) * 100) / 100);
+      const roundedValues = values
+        .slice(0, numValues)
+        .map((v) => Math.round(parseFloat(v) * 100) / 100);
 
       // Try to find mode (most common price)
       const counter = new Map<number, number>();

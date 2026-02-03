@@ -26,6 +26,7 @@ npm install
 ```
 
 This will install:
+
 - Electron framework
 - React and dependencies
 - Build tools (electron-builder, vite, etc.)
@@ -38,6 +39,7 @@ This will install:
 3. If you don't have an icon, the build will use Electron's default
 
 **Quick icon creation:**
+
 ```bash
 # If you have an existing icon from the Python version
 # Copy it to the electron directory
@@ -49,6 +51,7 @@ cp ../path/to/your/icon.ico build-resources/icon.ico
 ### Option A: Installer (Recommended)
 
 Creates a Windows installer (.exe) that:
+
 - Installs to Program Files
 - Creates desktop shortcut
 - Adds to Start Menu
@@ -59,12 +62,14 @@ npm run build:win
 ```
 
 **Output:**
+
 - File: `release/Torchlight Tracker-2.0.0-Setup.exe`
 - Size: ~150-200 MB (includes Chromium + Node.js)
 
 ### Option B: Portable Executable
 
 Creates a standalone .exe that:
+
 - Runs without installation
 - Can be placed anywhere
 - Perfect for USB drives
@@ -74,6 +79,7 @@ npm run build:win-portable
 ```
 
 **Output:**
+
 - File: `release/Torchlight Tracker-2.0.0-Portable.exe`
 - Size: ~150-200 MB
 
@@ -102,10 +108,12 @@ npm run build:win-portable
 ### What to Share:
 
 **Option 1 - Installer (Easiest for users):**
+
 - Share `Torchlight Tracker-2.0.0-Setup.exe`
 - Users just run it and follow the installer
 
 **Option 2 - Portable (No installation):**
+
 - Share `Torchlight Tracker-2.0.0-Portable.exe`
 - Users can run it from anywhere
 
@@ -124,6 +132,7 @@ git push origin v2.0.0
 ### Issue: "electron-builder not found"
 
 **Solution:**
+
 ```bash
 npm install --save-dev electron-builder
 ```
@@ -131,6 +140,7 @@ npm install --save-dev electron-builder
 ### Issue: "Python required" error
 
 **Solution:**
+
 ```bash
 # Install windows-build-tools
 npm install --global windows-build-tools
@@ -141,6 +151,7 @@ Or install Python 3.x from python.org
 ### Issue: Build fails with "icon not found"
 
 **Solution:**
+
 ```bash
 # Create a placeholder icon or skip icon
 # Edit electron-builder.json and remove icon lines temporarily
@@ -149,6 +160,7 @@ Or install Python 3.x from python.org
 ### Issue: Antivirus blocks the .exe
 
 **Solution:**
+
 - This is normal for unsigned executables
 - Users need to allow it in their antivirus
 - To avoid: Sign the executable (requires code signing certificate ~$100-400/year)
@@ -156,6 +168,7 @@ Or install Python 3.x from python.org
 ### Issue: Large file size (~150-200 MB)
 
 **Explanation:**
+
 - This is normal for Electron apps
 - Includes Chromium browser + Node.js runtime
 - Cannot be significantly reduced
@@ -170,6 +183,7 @@ To avoid antivirus warnings and build trust:
    - Cost: $100-400/year
 
 2. **Configure in electron-builder.json:**
+
 ```json
 {
   "win": {
@@ -180,18 +194,19 @@ To avoid antivirus warnings and build trust:
 ```
 
 3. **Build with signing:**
+
 ```bash
 npm run build:win
 ```
 
 ## Build Scripts Reference
 
-| Command | Description | Output |
-|---------|-------------|--------|
-| `npm run build` | Build React + Electron | dist-react/, dist-electron/ |
-| `npm run build:win` | Create Windows installer | .exe installer |
-| `npm run build:win-portable` | Create portable .exe | Standalone .exe |
-| `npm run dist` | Build for all platforms | All configured targets |
+| Command                      | Description              | Output                      |
+| ---------------------------- | ------------------------ | --------------------------- |
+| `npm run build`              | Build React + Electron   | dist-react/, dist-electron/ |
+| `npm run build:win`          | Create Windows installer | .exe installer              |
+| `npm run build:win-portable` | Create portable .exe     | Standalone .exe             |
+| `npm run dist`               | Build for all platforms  | All configured targets      |
 
 ## File Structure After Build
 
@@ -209,21 +224,24 @@ electron/
 ## Optimization Tips
 
 ### Reduce Build Size:
+
 ```json
 // In electron-builder.json
 {
-  "compression": "maximum",  // Already set
-  "asar": true              // Already set
+  "compression": "maximum", // Already set
+  "asar": true // Already set
 }
 ```
 
 ### Faster Builds:
+
 ```bash
 # Skip compression for testing
 npm run build && electron-builder --win --config.compression=store
 ```
 
 ### Clean Build:
+
 ```bash
 # Remove old builds
 rm -rf dist-react dist-electron release
@@ -307,6 +325,7 @@ FIRST RUN
 ## Success!
 
 Once built, users can simply:
+
 1. Download the .exe file
 2. Run it
 3. Start tracking!

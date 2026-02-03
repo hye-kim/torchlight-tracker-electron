@@ -25,6 +25,7 @@
 ## 1. NEW FEATURES
 
 ### 1.1 Advanced Analytics & Visualization
+
 - **Charts/Graphs**: Add visual charts for:
   - Income over time (line graph showing FE/hour trends across sessions)
   - Drop distribution pie charts (by item type/rarity)
@@ -39,6 +40,7 @@
 - **Predictive Analytics**: Estimate time to reach X flame elementium based on current rate
 
 ### 1.2 Data Export & Sharing
+
 - **Multiple Export Formats**:
   - CSV export (simpler alternative to Excel)
   - JSON export (for third-party tools/analysis)
@@ -48,6 +50,7 @@
 - **Screenshot Integration**: Auto-capture screenshots of valuable drops
 
 ### 1.3 Notifications & Alerts
+
 - **Desktop Notifications**:
   - High-value drop alerts (configurable threshold)
   - Session milestone achievements
@@ -56,11 +59,13 @@
 - **Discord Webhook Integration**: Post session summaries to Discord
 
 ### 1.4 Multi-Game/Multi-Character Support
+
 - **Character Profiles**: Track different characters separately with profile switching
 - **Season Tracking**: Separate data by game season/league
 - **Account Aggregation**: View combined stats across all characters
 
 ### 1.5 Enhanced Inventory Management
+
 - **Inventory Value Breakdown**: Show total inventory value by category
 - **Price Change Alerts**: Notify when owned items significantly change in price
 - **Stash Tab Organization**: Visual representation of inventory layout
@@ -68,12 +73,14 @@
 - **Wishlist/Shopping List**: Track items you want to buy with price alerts
 
 ### 1.6 Map Planning & Optimization
+
 - **Map Recommendations**: Suggest most profitable map types based on history
 - **Pre-Map Checklist**: Remind to use specific consumables before entering
 - **Map Rotation Planner**: Plan and track map rotation strategies
 - **Break Timer**: Remind to take breaks after X hours of farming
 
 ### 1.7 Social Features
+
 - **Leaderboards**: Compare your stats with friends (opt-in)
 - **Party Tracking**: Track group farming sessions with loot split calculations
 - **Friend Sync**: See friends' current farming status
@@ -83,9 +90,11 @@
 ## 2. ARCHITECTURE REFACTORING
 
 ### 2.1 State Management Overhaul
+
 **Problem**: App.tsx has 16+ useState hooks (571 lines total) making it difficult to maintain
 
 **Solutions**:
+
 - **Implement Context API**: Create separate contexts for:
   - `ConfigContext` - app configuration
   - `StatsContext` - statistics data
@@ -100,6 +109,7 @@
   - Better performance with selective re-renders
 
 **Implementation Tasks**:
+
 1. Choose state management solution (Context API, Zustand, or Jotai)
 2. Create context providers/stores for each domain
 3. Refactor App.tsx to use contexts instead of useState
@@ -108,14 +118,17 @@
 6. Test all functionality still works
 
 **Scope**:
+
 - Files affected: App.tsx + all 16 components
 - Lines to refactor: ~500-700 lines across files
 - New files: 5-6 context files (if using Context API)
 
 ### 2.2 Component Decomposition
+
 **Problem**: App.tsx is a 571-line monolith
 
 **Solutions**:
+
 - **Extract Layout Components**:
   ```
   App.tsx (orchestration only)
@@ -135,6 +148,7 @@
   - Clearer separation of concerns
 
 **Implementation Tasks**:
+
 1. Extract page components from App.tsx
 2. Create custom hooks for data fetching/management
 3. Create shared hooks for common patterns
@@ -142,14 +156,17 @@
 5. Test all functionality
 
 **Scope**:
+
 - App.tsx: ~571 lines → ~100-150 lines
 - New files: 3 page components + 6 custom hooks
 - Lines to write: ~400-500 new lines
 
 ### 2.3 Backend Module Reorganization
+
 **Current**: 16 flat modules in `backend/`
 
 **Proposed Structure**:
+
 ```
 backend/
 ├── core/
@@ -174,6 +191,7 @@ backend/
 ```
 
 **Implementation Tasks**:
+
 1. Create new directory structure
 2. Move files to appropriate directories (16 files)
 3. Update all import paths in backend files and main.ts
@@ -181,13 +199,16 @@ backend/
 5. Test application builds and runs
 
 **Scope**:
+
 - Files to move: 16 backend files
 - Import statements to update: ~50-100 across codebase
 
 ### 2.4 Dependency Injection
+
 **Problem**: Tight coupling between modules (hard to test)
 
 **Solution**:
+
 ```typescript
 // Instead of:
 class StatisticsTracker {
@@ -207,6 +228,7 @@ class StatisticsTracker {
 ```
 
 **Implementation Tasks**:
+
 1. Identify all tight couplings
 2. Refactor each class to accept dependencies via constructor
 3. Update main.ts to instantiate and wire dependencies
@@ -214,11 +236,13 @@ class StatisticsTracker {
 5. Update tests to use dependency injection
 
 **Scope**:
+
 - Classes to refactor: ~10 classes
 - New interfaces: ~5-8 interfaces
 - main.ts: Significant changes to initialization logic
 
 **Benefits**:
+
 - Easier unit testing (mock dependencies)
 - More flexible module composition
 - Clearer dependency graph
@@ -228,9 +252,11 @@ class StatisticsTracker {
 ## 3. CODE QUALITY IMPROVEMENTS
 
 ### 3.1 Testing Infrastructure
+
 **Critical Need**: Zero test coverage currently
 
 **Recommended Setup**:
+
 - **Unit Testing**: Vitest (fast, Vite-compatible)
   - Test LogParser regex patterns
   - Test price calculation logic
@@ -247,6 +273,7 @@ class StatisticsTracker {
 - **Coverage Target**: Minimum 70% coverage
 
 **High-Priority Test Cases**:
+
 ```typescript
 // LogParser.test.ts
 describe('LogParser', () => {
@@ -265,9 +292,11 @@ describe('InventoryTracker', () => {
 ```
 
 ### 3.2 Error Handling Enhancement
+
 **Current**: Errors mostly silently logged, users unaware
 
 **Improvements**:
+
 - **Error Boundary Component** (React):
   ```tsx
   <ErrorBoundary fallback={<ErrorDisplay />}>
@@ -284,9 +313,11 @@ describe('InventoryTracker', () => {
 - **Error Reporting**: Optional crash report submission (Sentry integration)
 
 ### 3.3 Input Validation
+
 **Current**: No validation on user inputs
 
 **Add Validation For**:
+
 - Tax input (0-100%, numeric only)
 - User field (max length, sanitization)
 - Font size (8-32px range enforcement)
@@ -295,6 +326,7 @@ describe('InventoryTracker', () => {
 - File path inputs
 
 **Implementation**:
+
 ```typescript
 // Form validation helper
 const validateTax = (value: number): string | null => {
@@ -305,9 +337,11 @@ const validateTax = (value: number): string | null => {
 ```
 
 ### 3.4 TypeScript Strict Mode Enforcement
+
 **Current**: Strict mode enabled but some areas could be stricter
 
 **Enhancements**:
+
 - Enable `noUncheckedIndexedAccess` (safer array/object access)
 - Add `@typescript-eslint` with recommended rules
 - Remove any remaining `any` types
@@ -315,6 +349,7 @@ const validateTax = (value: number): string | null => {
 - Use `const` assertions where appropriate
 
 **Implementation Tasks**:
+
 1. Enable `noUncheckedIndexedAccess` in tsconfig.json
 2. Install ESLint TypeScript plugin
 3. Configure recommended TypeScript rules
@@ -324,12 +359,15 @@ const validateTax = (value: number): string | null => {
 7. Add `const` assertions where beneficial
 
 **Scope**:
+
 - TypeScript errors to fix: Unknown until enabled (likely 50-200)
 - JSDoc to add: ~30-50 functions
 - Files affected: Most TypeScript files
 
 ### 3.5 Code Documentation
+
 **Add**:
+
 - **README sections**:
   - Architecture diagram
   - Contributing guide
@@ -345,16 +383,20 @@ const validateTax = (value: number): string | null => {
 ## 4. PERFORMANCE OPTIMIZATIONS
 
 ### 4.1 React Performance
+
 **Current Issues**:
+
 - No memoization on components
 - Potentially excessive re-renders
 - Large lists without virtualization
 
 **Optimizations**:
+
 - **Component Memoization**:
   ```tsx
-  export default React.memo(DropsCard, (prev, next) =>
-    prev.drops === next.drops && prev.costs === next.costs
+  export default React.memo(
+    DropsCard,
+    (prev, next) => prev.drops === next.drops && prev.costs === next.costs
   );
   ```
 - **Virtual Scrolling**: Use `react-virtual` or `react-window` for:
@@ -363,10 +405,7 @@ const validateTax = (value: number): string | null => {
   - Drops/costs lists
 - **Debounce Updates**: Debounce high-frequency IPC events
   ```typescript
-  const debouncedUpdate = useMemo(
-    () => debounce((data) => setStats(data), 100),
-    []
-  );
+  const debouncedUpdate = useMemo(() => debounce((data) => setStats(data), 100), []);
   ```
 - **Code Splitting**: Lazy load heavy components
   ```tsx
@@ -374,6 +413,7 @@ const validateTax = (value: number): string | null => {
   ```
 
 **Implementation Tasks**:
+
 1. Identify components that re-render unnecessarily
 2. Wrap with `React.memo()` + comparison function (~8-10 components)
 3. Install and implement virtual scrolling (3 components)
@@ -382,13 +422,16 @@ const validateTax = (value: number): string | null => {
 6. Test performance improvements
 
 **Scope**:
+
 - React.memo: ~8-10 components
 - Virtual scrolling: 3 components (significant refactor each)
 - Debouncing: ~3-5 IPC handlers
 - Code splitting: 2-3 lazy components
 
 ### 4.2 Backend Performance
+
 **Optimizations**:
+
 - **Log Parsing**:
   - Pre-compile regex patterns (already doing this)
   - Consider binary search for sorted data
@@ -403,6 +446,7 @@ const validateTax = (value: number): string | null => {
   - Use HTTP/2 for multiplexing
 
 **Implementation Tasks**:
+
 1. Add caching for duplicate log lines with LRU eviction
 2. Implement config write coalescing
 3. Implement API request batching
@@ -410,13 +454,16 @@ const validateTax = (value: number): string | null => {
 5. Test performance improvements
 
 **Scope**:
+
 - Log parsing cache: ~50 lines of code
 - Config write batching: ~100-150 lines (new module)
 - API batching: ~100 lines
 - Cache warmup: ~30 lines
 
 ### 4.3 Memory Management
+
 **Add**:
+
 - **Drop History Limits**:
   - Cap `dropList` to last 1000 items (currently unlimited)
   - Archive old data to disk
@@ -426,6 +473,7 @@ const validateTax = (value: number): string | null => {
 - **Memory Profiling**: Add heap snapshot capability for debugging leaks
 
 **Implementation Tasks**:
+
 1. Add max size to dropList (1000 items)
 2. Implement ring buffer or FIFO eviction
 3. Replace TTL-only cache with LRU cache
@@ -434,14 +482,17 @@ const validateTax = (value: number): string | null => {
 6. Test behavior when limits reached
 
 **Scope**:
+
 - Drop limits: ~50-100 lines
 - LRU cache: ~100 lines (or use library)
 - Session cleanup: ~50 lines
 
 ### 4.4 Startup Optimization
+
 **Current**: Sequential loading of all modules
 
 **Optimize**:
+
 - **Parallel Loading**: Load independent data in parallel
   ```typescript
   await Promise.all([
@@ -454,6 +505,7 @@ const validateTax = (value: number): string | null => {
 - **Splash Screen**: Show progress while loading
 
 **Implementation Tasks**:
+
 1. Identify all sequential `await` calls in initialization
 2. Group independent operations
 3. Use `Promise.all()` for parallel execution
@@ -462,6 +514,7 @@ const validateTax = (value: number): string | null => {
 6. Test startup still works correctly
 
 **Scope**:
+
 - Parallel loading: ~20-30 lines changed
 - Lazy loading: Depends on DI implementation
 - Splash screen: ~100-150 lines (new component + IPC)
@@ -471,6 +524,7 @@ const validateTax = (value: number): string | null => {
 ## 5. USER EXPERIENCE ENHANCEMENTS
 
 ### 5.1 UI/UX Polish
+
 - **Dark/Light Theme Toggle**: Add theme switcher
 - **Customizable Color Schemes**: Let users pick accent colors
 - **Animations**: Smooth transitions between views, drop animations
@@ -486,6 +540,7 @@ const validateTax = (value: number): string | null => {
 - **Loading States**: Skeleton screens instead of blank areas
 
 ### 5.2 Accessibility
+
 - **ARIA Labels**: Screen reader support
 - **Keyboard Navigation**: Full keyboard accessibility
 - **Focus Management**: Proper focus indicators
@@ -493,15 +548,18 @@ const validateTax = (value: number): string | null => {
 - **Font Scaling**: Support system font size preferences
 
 ### 5.3 Onboarding
+
 - **First-Run Tutorial**: Explain features step-by-step
 - **Feature Discovery**: Highlight new features after updates
 - **Quick Start Guide**: In-app getting started wizard
 - **Demo Mode**: Show example data before game detection
 
 ### 5.4 Overlay Improvements
+
 **Current**: Basic overlay with limited customization
 
 **Enhancements**:
+
 - **Custom Layouts**: Drag-and-drop widget positioning
 - **Widget System**: Modular widgets (stats, timer, drops preview)
 - **Multiple Overlays**: Separate windows for different data
@@ -511,9 +569,11 @@ const validateTax = (value: number): string | null => {
 - **Compact Mode**: Ultra-minimal mode showing only income/hour
 
 ### 5.5 Settings Organization
+
 **Current**: Single settings dialog
 
 **Improve**:
+
 - **Tabbed Settings**: Categories (General, Overlay, Export, Advanced)
 - **Search Settings**: Search box to find specific settings
 - **Reset to Defaults**: Per-section reset buttons
@@ -524,31 +584,39 @@ const validateTax = (value: number): string | null => {
 ## 6. PLATFORM & COMPATIBILITY
 
 ### 6.1 Cross-Platform Support
+
 **Current**: Windows-only (GameDetector uses WMIC/tasklist)
 
 **Add Support For**:
+
 - **macOS**: Use `ps` or `pgrep` for process detection
 - **Linux**: Use `/proc` filesystem for process enumeration
 - **Manual Log Path**: Let users manually specify log file location
 - **Game Path Auto-Detection**: Search common installation directories
 
 **Implementation**:
+
 ```typescript
 class GameDetector {
   async findGame(): Promise<GameInfo | null> {
     switch (process.platform) {
-      case 'win32': return this.findGameWindows();
-      case 'darwin': return this.findGameMacOS();
-      case 'linux': return this.findGameLinux();
+      case 'win32':
+        return this.findGameWindows();
+      case 'darwin':
+        return this.findGameMacOS();
+      case 'linux':
+        return this.findGameLinux();
     }
   }
 }
 ```
 
 ### 6.2 Update System Enhancement
+
 **Current**: Manual download, signature verification disabled
 
 **Improvements**:
+
 - **Code Signing**: Invest in code signing certificate
 - **Auto-Update**: Enable automatic background updates
 - **Update Channels**: Stable/Beta/Nightly builds
@@ -561,9 +629,11 @@ class GameDetector {
 ## 7. DATA & PERSISTENCE
 
 ### 7.1 Database Migration
+
 **Current**: JSON files for everything
 
 **Consider**:
+
 - **SQLite**: For session history and drops (better querying)
   - Enables complex queries (e.g., "show all maps where profit > 1000 FE")
   - Better performance for large datasets
@@ -571,6 +641,7 @@ class GameDetector {
 - **Keep JSON for**: Config, price tables (simple, human-readable)
 
 **Implementation Tasks**:
+
 1. Design tables for sessions, maps, drops, costs
 2. Install `better-sqlite3` or `sql.js`
 3. Create database initialization module
@@ -585,25 +656,30 @@ class GameDetector {
 12. Test all CRUD operations
 
 **Scope**:
+
 - New files: Database module, DAOs, migration script (~500-800 lines)
 - Files to refactor: SessionManager, StatisticsTracker, FileManager (~300-400 lines changed)
 - Migration script: ~200-300 lines
 - SQL schema: ~100-150 lines
 
 **Benefits**:
+
 - Faster historical queries
 - Indexing for performance
 - Easier data backup/restore
 - Support for advanced filters
 
 ### 7.2 Data Migration System
+
 **Add**:
+
 - **Schema Versioning**: Track data format version
 - **Auto-Migration**: Upgrade old data on app update
 - **Backup Before Migration**: Prevent data loss
 - **Migration Rollback**: Undo failed migrations
 
 **Implementation Tasks**:
+
 1. Add schema version to config
 2. Create migration runner
 3. Implement migration scripts (one per version)
@@ -614,6 +690,7 @@ class GameDetector {
 8. Test migration from each old version
 
 **Scope**:
+
 - Migration framework: ~300-400 lines
 - Per-version migrations: ~100-200 lines each
 - Backup system: ~100 lines
@@ -623,6 +700,7 @@ class GameDetector {
 ## 8. DEVELOPER EXPERIENCE
 
 ### 8.1 Development Tooling
+
 - **ESLint + Prettier**: Enforce consistent code style
 - **Husky**: Pre-commit hooks for linting/testing
 - **Commitlint**: Enforce conventional commit messages
@@ -635,6 +713,7 @@ class GameDetector {
 **ESLint + Prettier Implementation Tasks**:
 
 **ESLint Setup**:
+
 1. Install dependencies:
    ```bash
    npm install -D eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
@@ -646,6 +725,7 @@ class GameDetector {
 5. Add `.eslintignore` file
 
 **Prettier Setup**:
+
 1. Install dependencies:
    ```bash
    npm install -D prettier eslint-config-prettier eslint-plugin-prettier
@@ -657,6 +737,7 @@ class GameDetector {
 6. Add `.prettierignore` file
 
 **Husky Setup**:
+
 1. Install Husky and lint-staged
 2. Initialize Husky
 3. Configure lint-staged in package.json
@@ -664,12 +745,14 @@ class GameDetector {
 5. Test hook fires on commit
 
 **Scope**:
+
 - Config files: 4-5 new files
 - ESLint errors to fix: Unknown (likely 50-300)
 - Code formatting changes: All files (automatic)
 - npm scripts: ~6 new scripts
 
 ### 8.2 Debugging Improvements
+
 - **Better Logging**:
   - Log levels (DEBUG, INFO, WARN, ERROR)
   - Structured logging (JSON format)
@@ -684,6 +767,7 @@ class GameDetector {
   - Memory usage dashboard
 
 ### 8.3 Documentation
+
 - **Component Storybook**: Visual component documentation
 - **API Documentation**: Auto-generate from TypeScript types
 - **Architecture Diagrams**: Visual system overview (use Mermaid)
@@ -695,6 +779,7 @@ class GameDetector {
 ## 9. SECURITY & RELIABILITY
 
 ### 9.1 Security Hardening
+
 - **Content Security Policy**: Restrict resource loading
 - **Input Sanitization**: Prevent XSS in user inputs
 - **Safe External Links**: Validate URLs before opening
@@ -702,6 +787,7 @@ class GameDetector {
 - **Regular Dependency Audits**: `npm audit` in CI
 
 ### 9.2 Error Recovery
+
 - **Graceful Degradation**: App should work even if:
   - Game not found (manual mode)
   - API unavailable (cached prices)
@@ -710,6 +796,7 @@ class GameDetector {
 - **Safe Mode**: Boot with minimal features if last session crashed
 
 ### 9.3 Data Integrity
+
 - **Checksum Validation**: Verify loaded JSON files
 - **Backup System**: Auto-backup before destructive operations
 - **Transaction Safety**: Atomic writes for critical data
@@ -720,6 +807,7 @@ class GameDetector {
 ## 10. ANALYTICS & FEEDBACK
 
 ### 10.1 Usage Analytics (Privacy-Respecting)
+
 - **Optional Telemetry**: Opt-in anonymous usage stats
   - Most-used features
   - Average session length
@@ -729,6 +817,7 @@ class GameDetector {
 - **Transparency**: Show exactly what's being tracked
 
 ### 10.2 In-App Feedback
+
 - **Feedback Button**: Easy bug reporting
 - **Feature Voting**: Let users vote on feature requests
 - **Issue Templates**: Pre-filled GitHub issue templates
@@ -740,56 +829,64 @@ class GameDetector {
 
 ### Breakdown Summary
 
-| Area | Sub-tasks | Files Affected | New Code (est.) | Refactored Code (est.) | Risk Level |
-|------|-----------|----------------|-----------------|------------------------|------------|
-| **2.1 State Management** | 6 tasks | ~20 files | ~500 lines | ~700 lines | Medium |
-| **2.2 Component Decomposition** | 5 tasks | ~17 files | ~500 lines | ~400 lines | Medium |
-| **2.3 Module Reorganization** | 5 tasks | ~20 files | 0 lines | ~100 imports | Low |
-| **2.4 Dependency Injection** | 5 tasks | ~15 files | ~300 lines | ~400 lines | Medium-High |
-| **3.4 TypeScript Strict** | 7 tasks | Most files | ~100 lines | 50-200 fixes | Low-Medium |
-| **4.1 React Performance** | 4 groups | ~12 files | ~300 lines | ~400 lines | Medium |
-| **4.2 Backend Performance** | 3 groups | ~5 files | ~300 lines | ~100 lines | Medium |
-| **4.3 Memory Management** | 3 tasks | ~5 files | ~250 lines | ~50 lines | Low-Medium |
-| **4.4 Startup Optimization** | 3 tasks | ~5 files | ~250 lines | ~100 lines | Low-Medium |
-| **7.1 Database Migration** | 5 tasks | ~10 files | ~1000 lines | ~500 lines | **High** |
-| **7.2 Migration System** | 4 tasks | ~5 files | ~600 lines | ~100 lines | Medium-High |
-| **8.1 ESLint + Prettier** | 3 groups | All files | ~50 lines | 50-300 fixes | Low-Medium |
+| Area                            | Sub-tasks | Files Affected | New Code (est.) | Refactored Code (est.) | Risk Level  |
+| ------------------------------- | --------- | -------------- | --------------- | ---------------------- | ----------- |
+| **2.1 State Management**        | 6 tasks   | ~20 files      | ~500 lines      | ~700 lines             | Medium      |
+| **2.2 Component Decomposition** | 5 tasks   | ~17 files      | ~500 lines      | ~400 lines             | Medium      |
+| **2.3 Module Reorganization**   | 5 tasks   | ~20 files      | 0 lines         | ~100 imports           | Low         |
+| **2.4 Dependency Injection**    | 5 tasks   | ~15 files      | ~300 lines      | ~400 lines             | Medium-High |
+| **3.4 TypeScript Strict**       | 7 tasks   | Most files     | ~100 lines      | 50-200 fixes           | Low-Medium  |
+| **4.1 React Performance**       | 4 groups  | ~12 files      | ~300 lines      | ~400 lines             | Medium      |
+| **4.2 Backend Performance**     | 3 groups  | ~5 files       | ~300 lines      | ~100 lines             | Medium      |
+| **4.3 Memory Management**       | 3 tasks   | ~5 files       | ~250 lines      | ~50 lines              | Low-Medium  |
+| **4.4 Startup Optimization**    | 3 tasks   | ~5 files       | ~250 lines      | ~100 lines             | Low-Medium  |
+| **7.1 Database Migration**      | 5 tasks   | ~10 files      | ~1000 lines     | ~500 lines             | **High**    |
+| **7.2 Migration System**        | 4 tasks   | ~5 files       | ~600 lines      | ~100 lines             | Medium-High |
+| **8.1 ESLint + Prettier**       | 3 groups  | All files      | ~50 lines       | 50-300 fixes           | Low-Medium  |
 
 ### Recommended Sequencing
 
 **Week 1-2:**
+
 - ESLint + Prettier (establishes code standards)
 - TypeScript Strict Mode (catches bugs early)
 - Module Reorganization (low risk, improves navigation)
 
 **Week 3-4:**
+
 - State Management Refactor (foundation for everything else)
 - Component Decomposition (builds on state refactor)
 
 **Week 5-6:**
+
 - React Performance optimizations (now that components are organized)
 - Backend Performance optimizations (independent work)
 
 **Week 7-8:**
+
 - Memory Management (straightforward optimizations)
 - Startup Optimization (quick wins)
 
 **Week 9-12:**
+
 - Data Migration System (framework first)
 - Database Migration (biggest change, do last when everything else is stable)
 
 **Optional/Later:**
+
 - Dependency Injection (only if planning extensive testing)
 
 ### What Can Be Parallelized
 
 **Can parallelize:**
+
 - ESLint/Prettier + TypeScript Strict (both affect code style)
 - Module Reorganization (doesn't conflict with logic changes)
 - Backend Performance + Memory Management (different files)
 - React Performance (if working in separate components)
 
 **Cannot parallelize:**
+
 - State Management must come before Component Decomposition
 - Migration System must come before Database Migration
 - Dependency Injection should come after Testing Infrastructure
@@ -807,6 +904,7 @@ class GameDetector {
 ## PRIORITIZATION FRAMEWORK
 
 ### High Priority (Do First)
+
 1. ✅ **Testing Infrastructure** - Foundation for quality
 2. ✅ **State Management Refactor** - App.tsx is becoming unmaintainable
 3. ✅ **Error Handling & UI Feedback** - Users are currently blind to errors
@@ -814,6 +912,7 @@ class GameDetector {
 5. ✅ **Performance: Virtual Scrolling** - Will become an issue as data grows
 
 ### Medium Priority (Do Soon)
+
 1. 📊 **Charts/Visualization** - High user value
 2. 🔔 **Notifications** - Greatly improves UX
 3. 🗂️ **Database Migration** - Better scalability
@@ -821,6 +920,7 @@ class GameDetector {
 5. 🎨 **UI Polish** - Keyboard shortcuts, animations, themes
 
 ### Low Priority (Nice to Have)
+
 1. 🌐 **Cross-Platform Support** - If expanding user base
 2. ☁️ **Cloud Sync** - Convenience feature
 3. 🤝 **Social Features** - Niche use case
@@ -829,18 +929,18 @@ class GameDetector {
 
 ### Impact vs. Effort Matrix
 
-| Feature | Impact | Effort | ROI |
-|---------|--------|--------|-----|
-| Testing Infrastructure | 🔥🔥🔥 | 🔨🔨🔨 | ⭐⭐⭐ |
-| State Management Refactor | 🔥🔥🔥 | 🔨🔨🔨 | ⭐⭐⭐ |
-| Error UI Feedback | 🔥🔥🔥 | 🔨 | ⭐⭐⭐⭐ |
-| Charts/Graphs | 🔥🔥🔥 | 🔨🔨 | ⭐⭐⭐⭐ |
-| Desktop Notifications | 🔥🔥 | 🔨 | ⭐⭐⭐⭐ |
-| Keyboard Shortcuts | 🔥🔥 | 🔨 | ⭐⭐⭐⭐ |
-| Virtual Scrolling | 🔥🔥 | 🔨🔨 | ⭐⭐⭐ |
-| Database Migration | 🔥🔥 | 🔨🔨🔨🔨 | ⭐⭐ |
-| Cross-Platform | 🔥 | 🔨🔨🔨 | ⭐⭐ |
-| Cloud Sync | 🔥 | 🔨🔨🔨🔨 | ⭐ |
+| Feature                   | Impact | Effort   | ROI      |
+| ------------------------- | ------ | -------- | -------- |
+| Testing Infrastructure    | 🔥🔥🔥 | 🔨🔨🔨   | ⭐⭐⭐   |
+| State Management Refactor | 🔥🔥🔥 | 🔨🔨🔨   | ⭐⭐⭐   |
+| Error UI Feedback         | 🔥🔥🔥 | 🔨       | ⭐⭐⭐⭐ |
+| Charts/Graphs             | 🔥🔥🔥 | 🔨🔨     | ⭐⭐⭐⭐ |
+| Desktop Notifications     | 🔥🔥   | 🔨       | ⭐⭐⭐⭐ |
+| Keyboard Shortcuts        | 🔥🔥   | 🔨       | ⭐⭐⭐⭐ |
+| Virtual Scrolling         | 🔥🔥   | 🔨🔨     | ⭐⭐⭐   |
+| Database Migration        | 🔥🔥   | 🔨🔨🔨🔨 | ⭐⭐     |
+| Cross-Platform            | 🔥     | 🔨🔨🔨   | ⭐⭐     |
+| Cloud Sync                | 🔥     | 🔨🔨🔨🔨 | ⭐       |
 
 ### Quick Wins (Implement This Week)
 
@@ -878,4 +978,4 @@ class GameDetector {
 
 ---
 
-*Last Updated: 2026-02-03*
+_Last Updated: 2026-02-03_

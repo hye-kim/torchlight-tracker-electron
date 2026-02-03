@@ -184,7 +184,9 @@ export class StatisticsTracker extends EventEmitter {
       this.mapLogs.push(mapLog);
 
       this.isInMap = false;
-      logger.info(`Exited map (duration: ${duration.toFixed(1)}s, profit: ${mapLog.profit.toFixed(2)} FE)`);
+      logger.info(
+        `Exited map (duration: ${duration.toFixed(1)}s, profit: ${mapLog.profit.toFixed(2)} FE)`
+      );
       this.emit('exitMap', duration);
       this.emit('mapCompleted', mapLog);
     }

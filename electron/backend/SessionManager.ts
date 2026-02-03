@@ -87,11 +87,7 @@ export class SessionManager {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
-      fs.writeFileSync(
-        this.sessionsPath,
-        JSON.stringify(this.sessionsData, null, 2),
-        'utf-8'
-      );
+      fs.writeFileSync(this.sessionsPath, JSON.stringify(this.sessionsData, null, 2), 'utf-8');
       logger.info('Sessions saved to disk');
     } catch (error) {
       logger.error('Error saving sessions:', error);
@@ -110,9 +106,7 @@ export class SessionManager {
 
     const hours = Math.floor(session.duration / 3600);
     const minutes = Math.floor((session.duration % 3600) / 60);
-    const durationPart = hours > 0
-      ? `${hours}h ${minutes}m`
-      : `${minutes}m`;
+    const durationPart = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
 
     return `${datePart} - ${timePart} - ${durationPart}`;
   }
@@ -206,7 +200,9 @@ export class SessionManager {
 
     this.sessionsData.currentSessionId = null;
 
-    logger.info(`Ended session: ${currentSession.sessionId} (duration: ${currentSession.duration}s)`);
+    logger.info(
+      `Ended session: ${currentSession.sessionId} (duration: ${currentSession.duration}s)`
+    );
   }
 
   /**
@@ -218,7 +214,7 @@ export class SessionManager {
     }
 
     const session = this.sessionsData.sessions.find(
-      s => s.sessionId === this.sessionsData.currentSessionId
+      (s) => s.sessionId === this.sessionsData.currentSessionId
     );
 
     return session || null;
@@ -235,9 +231,7 @@ export class SessionManager {
    * Get session by ID
    */
   getSessionById(sessionId: string): Session | null {
-    const session = this.sessionsData.sessions.find(
-      s => s.sessionId === sessionId
-    );
+    const session = this.sessionsData.sessions.find((s) => s.sessionId === sessionId);
     return session || null;
   }
 
@@ -254,7 +248,7 @@ export class SessionManager {
     }
 
     this.sessionsData.sessions = this.sessionsData.sessions.filter(
-      s => s.sessionId !== sessionId
+      (s) => s.sessionId !== sessionId
     );
 
     logger.info(`Deleted session: ${sessionId}`);
@@ -305,7 +299,7 @@ export class SessionManager {
     const retentionMs = SESSION_RETENTION_DAYS * 24 * 60 * 60 * 1000;
     const cutoffTime = Date.now() - retentionMs;
 
-    const sessionsToKeep = this.sessionsData.sessions.filter(session => {
+    const sessionsToKeep = this.sessionsData.sessions.filter((session) => {
       // Always keep active session
       if (session.isActive) {
         return true;

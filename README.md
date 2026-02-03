@@ -43,6 +43,7 @@ npm run dev
 ```
 
 This will:
+
 1. Start the Vite dev server (React UI)
 2. Launch Electron in development mode
 3. Enable hot module replacement for UI changes
@@ -102,6 +103,7 @@ electron/
 ### Main Process (Node.js)
 
 The Electron main process handles:
+
 - Game detection and log file monitoring
 - Log parsing and price extraction
 - Inventory state tracking
@@ -112,6 +114,7 @@ The Electron main process handles:
 ### Renderer Process (React)
 
 The React app handles:
+
 - Displaying statistics and drops
 - User interactions (buttons, filters, settings)
 - Real-time updates via IPC
@@ -140,6 +143,7 @@ Automatically detects the Torchlight: Infinite game process and locates the log 
 ### Log Monitoring
 
 Monitors the game log file in real-time using Node.js file system APIs with:
+
 - Noise filtering for performance
 - Message batching to reduce overhead
 - Log rotation handling
@@ -147,12 +151,14 @@ Monitors the game log file in real-time using Node.js file system APIs with:
 ### Inventory Tracking
 
 Tracks inventory state with two initialization methods:
+
 1. **Modern**: Uses `InitBagData` log entries (requires 20+ items)
 2. **Legacy**: Falls back to bag modification scanning (requires 10+ items)
 
 ### Price Calculation
 
 Extracts prices from market search logs using:
+
 - Mode (most common price) with 30% threshold
 - Median fallback for reliability
 - 30-sample window for accuracy
@@ -160,6 +166,7 @@ Extracts prices from market search logs using:
 ### Statistics
 
 Tracks:
+
 - **Current Map**: Duration, FE income, income/minute
 - **Total Session**: All maps combined
 - **Per-Item**: Individual drop tracking with quantities and values
@@ -229,6 +236,7 @@ npm run build:electron
 ## Dependencies
 
 Key packages:
+
 - `electron`: ^28.1.3
 - `react`: ^18.2.0
 - `typescript`: ^5.3.3

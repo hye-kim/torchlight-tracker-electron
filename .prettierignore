@@ -1,0 +1,25 @@
+# Build outputs
+dist/
+dist-electron/
+build/
+
+# Dependencies
+node_modules/
+
+# Config files
+electron-builder.json
+
+# Logs
+*.log
+
+# Test coverage
+coverage/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock

@@ -80,7 +80,10 @@ export class ExcelExporter {
         pattern: 'solid',
         fgColor: { argb: 'FFEF4444' }, // Red background
       };
-      worksheet.getCell(`A${costsStartRow}`).alignment = { vertical: 'middle', horizontal: 'center' };
+      worksheet.getCell(`A${costsStartRow}`).alignment = {
+        vertical: 'middle',
+        horizontal: 'center',
+      };
 
       // Merge cells for costs header
       worksheet.mergeCells(`A${costsStartRow}:E${costsStartRow}`);

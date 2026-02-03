@@ -4,7 +4,13 @@ import { app } from 'electron';
 import axios from 'axios';
 import { Logger } from './Logger';
 import { APIClient } from './APIClient';
-import { API_UPDATE_THROTTLE, DEFAULT_API_URL, FULL_TABLE_FILE, COMPREHENSIVE_ITEM_DATABASE_FILE, DROP_LOG_FILE } from './constants';
+import {
+  API_UPDATE_THROTTLE,
+  DEFAULT_API_URL,
+  FULL_TABLE_FILE,
+  COMPREHENSIVE_ITEM_DATABASE_FILE,
+  DROP_LOG_FILE,
+} from './constants';
 
 const logger = Logger.getInstance();
 
@@ -37,9 +43,7 @@ export class FileManager {
 
   constructor() {
     this.userDataPath = app.getPath('userData');
-    this.resourcePath = app.isPackaged
-      ? process.resourcesPath
-      : path.join(process.cwd(), '..');
+    this.resourcePath = app.isPackaged ? process.resourcesPath : path.join(process.cwd(), '..');
 
     this.apiUrl = DEFAULT_API_URL;
     this.apiClient = new APIClient(this.apiUrl, 60, 3);
@@ -152,7 +156,9 @@ export class FileManager {
     }
 
     logger.info('Initializing full_table.json from comprehensive_item_mapping.json');
-    const itemMapping = this.loadJson<Record<string, { id: string; name_en?: string; type_en?: string }>>(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
+    const itemMapping = this.loadJson<
+      Record<string, { id: string; name_en?: string; type_en?: string }>
+    >(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
 
     const fullTable: Record<string, ItemData> = {};
     for (const [id, data] of Object.entries(itemMapping)) {
@@ -295,7 +301,9 @@ export class FileManager {
       }
 
       // Load comprehensive mapping for item names/types
-      const itemMapping = this.loadJson<Record<string, { id: string; name_en?: string; type_en?: string }>>(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
+      const itemMapping = this.loadJson<
+        Record<string, { id: string; name_en?: string; type_en?: string }>
+      >(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
 
       // Build complete table from API data
       const fullTable: Record<string, ItemData> = {};
@@ -337,5 +345,4 @@ export class FileManager {
       return 0;
     }
   }
-
 }
