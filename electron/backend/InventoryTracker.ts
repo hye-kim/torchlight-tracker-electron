@@ -362,6 +362,14 @@ export class InventoryTracker {
         if (change.action === 'Remove') {
           this.bagState.delete(slotKey);
         } else {
+          // Before setting the new slot, delete all other slots with the same item
+          // This prevents double counting when items move to new slots
+          for (const [key] of this.bagState) {
+            if (key !== slotKey && !key.startsWith('init:') && key.endsWith(`:${change.configBaseId}`)) {
+              logger.debug(`Cleaning up duplicate slot entry: ${key} (keeping ${slotKey})`);
+              this.bagState.delete(key);
+            }
+          }
           this.bagState.set(slotKey, change.count);
         }
       }
