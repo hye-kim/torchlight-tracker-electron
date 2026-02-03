@@ -214,6 +214,7 @@ export class InventoryTracker {
    */
   private processItemChangesWithFullId(changes: BagModification[]): Array<[string, number]> {
     const realChanges = new Map<string, number>();
+    const slotsToDelete = new Set<string>();
 
     logger.debug(`Processing ${changes.length} ItemChange events with fullId tracking (${this.itemInstances.size} instances tracked)`);
 
@@ -254,6 +255,12 @@ export class InventoryTracker {
             realChanges.set(change.configBaseId, netChange + delta);
             logger.debug(`Item count changed (Add as Update): ${change.fullId} (${change.configBaseId}) ${previousInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`);
           }
+          // Mark old slot for deletion if it changed
+          const slotChanged = previousInstance.slotId !== change.slotId || previousInstance.pageId !== change.pageId;
+          if (slotChanged) {
+            const oldSlotKey = `${previousInstance.pageId}:${previousInstance.slotId}:${previousInstance.baseId}`;
+            slotsToDelete.add(oldSlotKey);
+          }
         } else {
           // Normal Add - new item
           const netChange = realChanges.get(change.configBaseId) || 0;
@@ -284,6 +291,12 @@ export class InventoryTracker {
             const netChange = realChanges.get(change.configBaseId) || 0;
             realChanges.set(change.configBaseId, netChange + delta);
             logger.debug(`Item quantity changed: ${change.fullId} (${change.configBaseId}) ${previousInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`);
+          }
+
+          // If slot changed, mark old slot for deletion
+          if (slotChanged) {
+            const oldSlotKey = `${previousInstance.pageId}:${previousInstance.slotId}:${previousInstance.baseId}`;
+            slotsToDelete.add(oldSlotKey);
           }
 
           // Update instance state
@@ -335,6 +348,11 @@ export class InventoryTracker {
           });
         }
       }
+    }
+
+    // Delete old slot entries first to prevent double counting
+    for (const slotKey of slotsToDelete) {
+      this.bagState.delete(slotKey);
     }
 
     // Update bagState for compatibility with existing code
