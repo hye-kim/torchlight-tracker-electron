@@ -11,7 +11,7 @@ import { Logger } from './backend/Logger';
 import { ExcelExporter } from './backend/ExcelExporter';
 import { UpdateManager } from './backend/UpdateManager';
 import { SessionManager } from './backend/SessionManager';
-import { CONFIG_FILE } from './backend/constants';
+import { CONFIG_FILE, COMPREHENSIVE_ITEM_DATABASE_FILE } from './backend/constants';
 
 const logger = Logger.getInstance();
 const isDev = process.env.NODE_ENV === 'development';
@@ -584,6 +584,12 @@ ipcMain.handle('skip-update-version', (_, version: string) => {
 ipcMain.handle('get-sessions', () => {
   const sessions = sessionManager.getAllSessions();
   const fullTable = fileManager.loadFullTable();
+  const itemMapping = fileManager.loadJson<Record<string, { id: string; img?: string; name_en?: string; type_en?: string }>>(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
+
+  // Helper to get item image URL from comprehensive mapping
+  const getItemImageUrl = (itemId: string): string | undefined => {
+    return itemMapping[itemId]?.img;
+  };
 
   // Enrich drops and costs in each mapLog with item data
   return sessions.map(session => ({
@@ -599,7 +605,7 @@ ipcMain.handle('get-sessions', () => {
           price: itemData?.price || 0,
           type: itemData?.type || 'Unknown',
           timestamp: mapLog.startTime,
-          imageUrl: itemData?.imageUrl,
+          imageUrl: getItemImageUrl(drop.itemId),
         };
       }) || [],
       costs: mapLog.costs?.map(cost => {
@@ -611,7 +617,7 @@ ipcMain.handle('get-sessions', () => {
           price: itemData?.price || 0,
           type: itemData?.type || 'Unknown',
           timestamp: mapLog.startTime,
-          imageUrl: itemData?.imageUrl,
+          imageUrl: getItemImageUrl(cost.itemId),
         };
       }) || [],
     })),
