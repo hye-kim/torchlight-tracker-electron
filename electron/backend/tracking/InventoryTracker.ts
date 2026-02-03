@@ -15,8 +15,6 @@ interface ItemInstance {
 export class InventoryTracker {
   private bagState: Map<string, number> = new Map();
   private bagInitialized: boolean = false;
-  // @ts-expect-error - Reserved for future use
-  private _initializationComplete: boolean = false;
   private awaitingInitialization: boolean = false;
   private initializationInProgress: boolean = false;
   private firstScan: boolean = true;
@@ -29,13 +27,6 @@ export class InventoryTracker {
   // Phase 3: FullId-based tracking
   private itemInstances: Map<string, ItemInstance> = new Map();
 
-  // Phase 4: Batch processing (currently unused but reserved for future optimization)
-  // @ts-expect-error - Reserved for future use
-  private _changeBuffer: BagModification[] = [];
-  // @ts-expect-error - Reserved for future use
-  private _lastProcessTime: number = 0;
-  // private readonly BATCH_WINDOW_MS = 1000; // 1 second batch window (reserved)
-
   constructor(private logParser: LogParser) {}
 
   isAwaitingInitialization(): boolean {
@@ -45,15 +36,12 @@ export class InventoryTracker {
   reset(): void {
     this.bagState.clear();
     this.bagInitialized = false;
-    this._initializationComplete = false;
     this.awaitingInitialization = false;
     this.initializationInProgress = false;
     this.firstScan = true;
     this.isInSortOperation = false;
     this.sortStartTime = 0;
     this.itemInstances.clear();
-    this._changeBuffer = [];
-    this._lastProcessTime = 0;
     logger.info('Inventory tracker reset');
   }
 
@@ -112,7 +100,6 @@ export class InventoryTracker {
     }
 
     this.bagInitialized = true;
-    this._initializationComplete = true;
     this.awaitingInitialization = false;
     this.initializationInProgress = false;
 
