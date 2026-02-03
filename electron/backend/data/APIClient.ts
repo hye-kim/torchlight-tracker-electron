@@ -88,7 +88,7 @@ export class APIClient {
     await this.checkRateLimit();
 
     const url = `${this.baseUrl}${endpoint}`;
-    let lastError: any = null; // eslint-disable-line @typescript-eslint/no-unused-vars
+    let lastError: any = null;
 
     for (let attempt = 0; attempt < this.maxRetries; attempt++) {
       try {
@@ -141,6 +141,10 @@ export class APIClient {
       }
     }
 
+    // All retries exhausted
+    if (lastError) {
+      logger.error(`All ${this.maxRetries} retry attempts failed for ${method} ${url}:`, lastError);
+    }
     return null;
   }
 
