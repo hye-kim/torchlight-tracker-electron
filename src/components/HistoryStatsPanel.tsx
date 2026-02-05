@@ -39,7 +39,8 @@ const HistoryStatsPanel: React.FC<HistoryStatsPanelProps> = ({
   };
 
   const profitRateValue = profitMode === 'perMinute' ? stats.profitPerMinute : stats.profitPerHour;
-  const mapProfitRateValue = profitMode === 'perMinute' ? stats.mapProfitPerMinute : stats.mapProfitPerHour;
+  const mapProfitRateValue =
+    profitMode === 'perMinute' ? stats.mapProfitPerMinute : stats.mapProfitPerHour;
   const profitRateLabel = profitMode === 'perMinute' ? 'Profit / Min' : 'Profit / Hour';
 
   return (
