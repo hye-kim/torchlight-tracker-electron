@@ -45,6 +45,18 @@ const HistoryStatsPanel: React.FC<HistoryStatsPanelProps> = ({
   return (
     <div className="history-stats-panel">
       <div className="history-stat-card">
+        <div className="history-stat-label">Total Profit</div>
+        <div className={`history-stat-value ${stats.totalProfit >= 0 ? 'positive' : 'negative'}`}>
+          {formatProfit(stats.totalProfit)}
+        </div>
+      </div>
+
+      <div className="history-stat-card">
+        <div className="history-stat-label">Maps Completed</div>
+        <div className="history-stat-value">{stats.mapsCompleted}</div>
+      </div>
+
+      <div className="history-stat-card">
         <div className="history-stat-label">Map Duration</div>
         <div className="history-stat-value">{formatDuration(stats.mapDuration)}</div>
         <div className="history-stat-label">Total Duration</div>
