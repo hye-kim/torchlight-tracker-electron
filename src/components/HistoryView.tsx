@@ -71,19 +71,6 @@ const HistoryView: React.FC = () => {
     loadSessions();
   }, []);
 
-  // Reset selected map when sessions change or become unselected
-  useEffect(() => {
-    if (selectedMapNumber !== null && selectedMapSessionId !== null) {
-      const mapExists = combinedMapLogs.some(
-        (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
-      );
-      if (!mapExists) {
-        setSelectedMapNumber(null);
-        setSelectedMapSessionId(null);
-      }
-    }
-  }, [combinedMapLogs, selectedMapNumber, selectedMapSessionId]);
-
   // Calculate aggregated stats from selected sessions
   const aggregatedStats = React.useMemo(() => {
     const selectedSessions = sessions.filter((s) => selectedSessionIds.includes(s.sessionId));
@@ -219,6 +206,19 @@ const HistoryView: React.FC = () => {
   const totalCost = React.useMemo(() => {
     return costs.reduce((sum, cost) => sum + cost.price * cost.quantity, 0);
   }, [costs]);
+
+  // Reset selected map when sessions change or become unselected
+  useEffect(() => {
+    if (selectedMapNumber !== null && selectedMapSessionId !== null) {
+      const mapExists = combinedMapLogs.some(
+        (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
+      );
+      if (!mapExists) {
+        setSelectedMapNumber(null);
+        setSelectedMapSessionId(null);
+      }
+    }
+  }, [combinedMapLogs, selectedMapNumber, selectedMapSessionId]);
 
   const handleDeleteSessions = async (sessionIds: string[]) => {
     await window.electronAPI.deleteSessions(sessionIds);
