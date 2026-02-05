@@ -617,6 +617,7 @@ ipcMain.handle('get-sessions', () => {
   };
 
   // Enrich drops and costs in each mapLog with item data
+  // Use stored historical prices instead of current prices
   return sessions.map((session) => ({
     ...session,
     mapLogs: session.mapLogs.map((mapLog) => ({
@@ -628,7 +629,7 @@ ipcMain.handle('get-sessions', () => {
             itemId: drop.itemId,
             name: itemData?.name || `Item ${drop.itemId}`,
             quantity: drop.quantity,
-            price: itemData?.price || 0,
+            price: drop.price, // Use stored historical price
             type: itemData?.type || 'Unknown',
             timestamp: mapLog.startTime,
             imageUrl: getItemImageUrl(drop.itemId),
@@ -641,7 +642,7 @@ ipcMain.handle('get-sessions', () => {
             itemId: cost.itemId,
             name: itemData?.name || `Item ${cost.itemId}`,
             quantity: cost.quantity,
-            price: itemData?.price || 0,
+            price: cost.price, // Use stored historical price
             type: itemData?.type || 'Unknown',
             timestamp: mapLog.startTime,
             imageUrl: getItemImageUrl(cost.itemId),
