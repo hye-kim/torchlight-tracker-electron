@@ -21,7 +21,7 @@ export interface ItemData {
   name_en?: string;
   type?: string;
   type_en?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface ComprehensiveItemEntry {
@@ -62,7 +62,7 @@ export class FileManager {
     return path.join(this.userDataPath, filename);
   }
 
-  async ensureFileExists(filename: string, defaultContent: any): Promise<void> {
+  ensureFileExists(filename: string, defaultContent: unknown): void {
     const writablePath = this.getWritablePath(filename);
     const resourcePath = this.getResourcePath(filename);
 
@@ -76,18 +76,18 @@ export class FileManager {
     }
   }
 
-  loadJson<T = any>(filename: string, defaultValue: T = {} as T): T {
+  loadJson<T = unknown>(filename: string, defaultValue: T = {} as T): T {
     try {
       const filePath = this.getResourcePath(filename);
       const data = fs.readFileSync(filePath, 'utf-8');
-      return JSON.parse(data);
+      return JSON.parse(data) as T;
     } catch (error) {
       logger.warn(`Could not load ${filename}:`, error);
       return defaultValue;
     }
   }
 
-  saveJson(filename: string, data: any): boolean {
+  saveJson(filename: string, data: unknown): boolean {
     try {
       const writablePath = this.getWritablePath(filename);
       const dir = path.dirname(writablePath);
@@ -110,12 +110,10 @@ export class FileManager {
     const data = this.loadJson<Record<string, ItemData>>(FULL_TABLE_FILE, {});
 
     // Merge with comprehensive item database to get proper names
-    if (!this.itemDatabase) {
-      this.itemDatabase = this.loadJson<Record<string, ComprehensiveItemEntry>>(
-        COMPREHENSIVE_ITEM_DATABASE_FILE,
-        {}
-      );
-    }
+    this.itemDatabase ??= this.loadJson<Record<string, ComprehensiveItemEntry>>(
+      COMPREHENSIVE_ITEM_DATABASE_FILE,
+      {}
+    );
 
     // Enrich full table with item names and types from comprehensive database
     for (const [itemId, item] of Object.entries(data)) {
@@ -147,7 +145,7 @@ export class FileManager {
     return success;
   }
 
-  async initializeFullTableFromEnTable(): Promise<void> {
+  initializeFullTableFromEnTable(): void {
     const fullTablePath = this.getWritablePath(FULL_TABLE_FILE);
 
     if (fs.existsSync(fullTablePath)) {
@@ -163,7 +161,7 @@ export class FileManager {
     const fullTable: Record<string, ItemData> = {};
     for (const [id, data] of Object.entries(itemMapping)) {
       fullTable[id] = {
-        name: data.name_en || `Item ${id}`,
+        name: data.name_en ?? `Item ${id}`,
         type: data.type_en,
         price: 0,
         last_update: 0,
@@ -184,7 +182,7 @@ export class FileManager {
 
     const currentItem = fullTable[itemId];
     const currentTime = Math.floor(Date.now() / 1000);
-    const lastApiSync = currentItem.last_api_sync || 0;
+    const lastApiSync = currentItem.last_api_sync ?? 0;
     const timeSinceApiSync = currentTime - lastApiSync;
 
     // Always update locally with fresh game data
@@ -221,17 +219,20 @@ export class FileManager {
 
   getItemInfo(itemId: string): ItemData | null {
     // First check comprehensive item database
-    const compDb = this.loadJson<Record<string, any>>(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
+    const compDb = this.loadJson<Record<string, ComprehensiveItemEntry>>(
+      COMPREHENSIVE_ITEM_DATABASE_FILE,
+      {}
+    );
     if (compDb[itemId]) {
-      return compDb[itemId];
+      return compDb[itemId] as ItemData;
     }
 
     // Fall back to full table
     const fullTable = this.loadFullTable(true);
-    return fullTable[itemId] || null;
+    return fullTable[itemId] ?? null;
   }
 
-  async exportDebugLog(filePath: string): Promise<void> {
+  exportDebugLog(filePath: string): void {
     const logPath = path.join(this.userDataPath, 'tracker.log');
     if (fs.existsSync(logPath)) {
       fs.copyFileSync(logPath, filePath);
@@ -244,7 +245,7 @@ export class FileManager {
     const dropLogPath = this.getWritablePath(DROP_LOG_FILE);
     const timestamp = new Date().toISOString();
     const itemInfo = this.getItemInfo(itemId);
-    const itemName = itemInfo?.name || itemId;
+    const itemName = itemInfo?.name ?? itemId;
     const logEntry = `[${timestamp}] ${itemName} (ID: ${itemId}) x${quantity} @ ${price}\n`;
 
     try {
@@ -261,11 +262,11 @@ export class FileManager {
   async fetchPriceFromAPI(itemId: string): Promise<number | null> {
     try {
       const apiItem = await this.apiClient.getItem(itemId);
-      if (apiItem && apiItem.price !== undefined) {
+      if (apiItem?.price !== undefined) {
         const fullTable = this.loadFullTable(true);
         if (fullTable[itemId]) {
-          const apiLastUpdate = apiItem.last_update || Math.floor(Date.now() / 1000);
-          const localLastUpdate = fullTable[itemId].last_update || 0;
+          const apiLastUpdate = apiItem.last_update ?? Math.floor(Date.now() / 1000);
+          const localLastUpdate = fullTable[itemId].last_update ?? 0;
 
           // Only update price if API data is fresher than local
           if (apiLastUpdate > localLastUpdate) {
@@ -311,12 +312,12 @@ export class FileManager {
 
       for (const [itemId, apiItem] of Object.entries(apiItems)) {
         const mappingData = itemMapping[itemId];
-        const apiLastUpdate = apiItem.last_update || Math.floor(Date.now() / 1000);
+        const apiLastUpdate = apiItem.last_update ?? Math.floor(Date.now() / 1000);
 
         fullTable[itemId] = {
-          name: mappingData?.name_en || apiItem.name_en || apiItem.name || `Item ${itemId}`,
-          type: mappingData?.type_en || apiItem.type_en || apiItem.type,
-          price: apiItem.price || 0,
+          name: mappingData?.name_en ?? apiItem.name_en ?? apiItem.name ?? `Item ${itemId}`,
+          type: mappingData?.type_en ?? apiItem.type_en ?? apiItem.type,
+          price: apiItem.price ?? 0,
           last_update: apiLastUpdate,
           last_api_sync: apiLastUpdate,
         };
@@ -327,7 +328,7 @@ export class FileManager {
       for (const [itemId, data] of Object.entries(itemMapping)) {
         if (!fullTable[itemId]) {
           fullTable[itemId] = {
-            name: data.name_en || `Item ${itemId}`,
+            name: data.name_en ?? `Item ${itemId}`,
             type: data.type_en,
             price: 0,
             last_update: 0,

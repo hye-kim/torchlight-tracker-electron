@@ -48,7 +48,7 @@ export class ConfigManager {
     try {
       if (fs.existsSync(this.configPath)) {
         const data = fs.readFileSync(this.configPath, 'utf-8');
-        return JSON.parse(data);
+        return JSON.parse(data) as Config;
       }
     } catch (error) {
       console.error('Error loading config:', error);
@@ -87,7 +87,11 @@ export class ConfigManager {
         fs.mkdirSync(dir, { recursive: true });
       }
       // Filter out overlayMode and clickThrough before saving
-      const { overlayMode, clickThrough, ...configToSave } = this.config;
+      const {
+        overlayMode: _overlayMode,
+        clickThrough: _clickThrough,
+        ...configToSave
+      } = this.config;
       fs.writeFileSync(this.configPath, JSON.stringify(configToSave, null, 2), 'utf-8');
     } catch (error) {
       console.error('Error saving config:', error);
@@ -106,7 +110,11 @@ export class ConfigManager {
 
   updateConfig(updates: Partial<Config>): void {
     // Filter out overlayMode and clickThrough - these should never be persisted
-    const { overlayMode, clickThrough, ...persistableUpdates } = updates;
+    const {
+      overlayMode: _overlayMode,
+      clickThrough: _clickThrough,
+      ...persistableUpdates
+    } = updates;
     this.config = { ...this.config, ...persistableUpdates };
     this.saveConfig();
   }
@@ -130,7 +138,7 @@ export class ConfigManager {
   }
 
   getApiUrl(): string {
-    return this.config.api_url || DEFAULT_API_URL;
+    return this.config.api_url ?? DEFAULT_API_URL;
   }
 
   getOverlayMode(): boolean {
@@ -182,7 +190,7 @@ export class ConfigManager {
   }
 
   getUpdateConfig(): UpdateConfig {
-    return this.config.updates || { autoCheck: true };
+    return this.config.updates ?? { autoCheck: true };
   }
 
   setUpdateConfig(updateConfig: Partial<UpdateConfig>): void {

@@ -71,3 +71,45 @@ export interface CurrentMapData {
 }
 
 export type NavView = 'overview' | 'inventory' | 'history';
+
+export interface UpdateInfo {
+  version: string;
+  releaseDate: string;
+  releaseNotes?: string;
+}
+
+export interface UpdateConfig {
+  autoDownload: boolean;
+  autoInstall: boolean;
+  checkOnStartup: boolean;
+  checkInterval: number;
+}
+
+export interface UpdateStatus {
+  checking: boolean;
+  available: boolean;
+  downloading: boolean;
+  downloaded: boolean;
+  info?: UpdateInfo;
+  error?: string;
+}
+
+export interface DownloadProgress {
+  percent: number;
+  bytesPerSecond: number;
+  total: number;
+  transferred: number;
+}
+
+export interface BagState {
+  items: MapItemData[];
+}
+
+export interface Session {
+  id: string;
+  startTime: number;
+  endTime?: number;
+  mapCount: number;
+  totalIncome: number;
+  totalDuration: number;
+}

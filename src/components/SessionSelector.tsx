@@ -15,7 +15,7 @@ interface Session {
     profitPerMinute: number;
     profitPerHour: number;
   };
-  mapLogs: any[];
+  mapLogs: unknown[];
   isActive: boolean;
   lastModified: number;
 }
@@ -35,7 +35,7 @@ const SessionSelector: React.FC<SessionSelectorProps> = ({
 }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const handleToggleSession = (sessionId: string) => {
+  const handleToggleSession = (sessionId: string): void => {
     if (selectedSessionIds.includes(sessionId)) {
       onSelectionChange(selectedSessionIds.filter((id) => id !== sessionId));
     } else {
@@ -43,15 +43,15 @@ const SessionSelector: React.FC<SessionSelectorProps> = ({
     }
   };
 
-  const handleSelectAll = () => {
+  const handleSelectAll = (): void => {
     onSelectionChange(sessions.map((s) => s.sessionId));
   };
 
-  const handleClearAll = () => {
+  const handleClearAll = (): void => {
     onSelectionChange([]);
   };
 
-  const handleDelete = () => {
+  const handleDelete = (): void => {
     // Filter out active sessions from deletion
     const sessionsToDelete = selectedSessionIds.filter((id) => {
       const session = sessions.find((s) => s.sessionId === id);

@@ -79,7 +79,7 @@ export class InventoryTracker {
       const slotKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
       this.bagState.set(slotKey, entry.count);
 
-      const current = itemTotals.get(entry.configBaseId) || 0;
+      const current = itemTotals.get(entry.configBaseId) ?? 0;
       itemTotals.set(entry.configBaseId, current + entry.count);
 
       // Store instance with synthetic fullId (will be replaced when real ItemChange@ appears)
@@ -134,7 +134,7 @@ export class InventoryTracker {
         const slotKey = `${entry.pageId}:${entry.slotId}:${entry.configBaseId}`;
         this.bagState.set(slotKey, entry.count);
 
-        const current = itemTotals.get(entry.configBaseId) || 0;
+        const current = itemTotals.get(entry.configBaseId) ?? 0;
         itemTotals.set(entry.configBaseId, current + entry.count);
       }
 
@@ -228,7 +228,7 @@ export class InventoryTracker {
       if (change.action === 'Remove') {
         // Item removed completely
         if (previousInstance) {
-          const netChange = realChanges.get(previousInstance.baseId) || 0;
+          const netChange = realChanges.get(previousInstance.baseId) ?? 0;
           realChanges.set(previousInstance.baseId, netChange - previousInstance.count);
           this.itemInstances.delete(change.fullId);
           logger.debug(
@@ -237,9 +237,9 @@ export class InventoryTracker {
         } else {
           // No previousInstance - use bagState as fallback
           const slotKey = `${change.pageId}:${change.slotId}:${change.configBaseId}`;
-          const previousCount = this.bagState.get(slotKey) || 0;
+          const previousCount = this.bagState.get(slotKey) ?? 0;
           if (previousCount > 0) {
-            const netChange = realChanges.get(change.configBaseId) || 0;
+            const netChange = realChanges.get(change.configBaseId) ?? 0;
             realChanges.set(change.configBaseId, netChange - previousCount);
             logger.debug(
               `Item removed (no instance): ${change.fullId} (${change.configBaseId}) x${previousCount} from bagState`
@@ -254,7 +254,7 @@ export class InventoryTracker {
           logger.warn(`Add event for existing fullId: ${change.fullId} - treating as Update`);
           const delta = change.count - previousInstance.count;
           if (delta !== 0) {
-            const netChange = realChanges.get(change.configBaseId) || 0;
+            const netChange = realChanges.get(change.configBaseId) ?? 0;
             realChanges.set(change.configBaseId, netChange + delta);
             logger.debug(
               `Item count changed (Add as Update): ${change.fullId} (${change.configBaseId}) ${previousInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`
@@ -262,7 +262,7 @@ export class InventoryTracker {
           }
         } else {
           // Normal Add - new item
-          const netChange = realChanges.get(change.configBaseId) || 0;
+          const netChange = realChanges.get(change.configBaseId) ?? 0;
           realChanges.set(change.configBaseId, netChange + change.count);
           logger.debug(`Item added: ${change.fullId} (${change.configBaseId}) x${change.count}`);
         }
@@ -290,7 +290,7 @@ export class InventoryTracker {
           } else if (countChanged) {
             // Quantity changed (with or without movement)
             const delta = change.count - previousInstance.count;
-            const netChange = realChanges.get(change.configBaseId) || 0;
+            const netChange = realChanges.get(change.configBaseId) ?? 0;
             realChanges.set(change.configBaseId, netChange + delta);
             logger.debug(
               `Item quantity changed: ${change.fullId} (${change.configBaseId}) ${previousInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`
@@ -321,7 +321,7 @@ export class InventoryTracker {
             // Compare with synthetic instance count
             const delta = change.count - syntheticInstance.count;
             if (delta !== 0) {
-              const netChange = realChanges.get(change.configBaseId) || 0;
+              const netChange = realChanges.get(change.configBaseId) ?? 0;
               realChanges.set(change.configBaseId, netChange + delta);
               logger.debug(
                 `Item count changed: ${change.fullId} (${change.configBaseId}) ${syntheticInstance.count} → ${change.count} (${delta > 0 ? '+' : ''}${delta})`
@@ -408,7 +408,7 @@ export class InventoryTracker {
         const parts = key.split(':');
         if (parts.length === 3 && parts[2]) {
           const itemId = parts[2];
-          itemTotals.set(itemId, (itemTotals.get(itemId) || 0) + value);
+          itemTotals.set(itemId, (itemTotals.get(itemId) ?? 0) + value);
         }
       }
     }
@@ -445,7 +445,7 @@ export class InventoryTracker {
         itemId = key;
       }
 
-      grouped[itemId] = (grouped[itemId] || 0) + amount;
+      grouped[itemId] = (grouped[itemId] ?? 0) + amount;
     }
 
     return grouped;

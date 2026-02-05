@@ -17,7 +17,7 @@ interface SettingsDialogProps {
   onClose: () => void;
 }
 
-function SettingsDialog({ config, onSave, onClose }: SettingsDialogProps) {
+function SettingsDialog({ config, onSave, onClose }: SettingsDialogProps): JSX.Element {
   const [tax, setTax] = useState(config.tax);
   const [user, setUser] = useState(config.user);
   const [updateConfig, setUpdateConfig] = useState<UpdateConfig>({ autoCheck: true });
@@ -27,17 +27,17 @@ function SettingsDialog({ config, onSave, onClose }: SettingsDialogProps) {
 
   useEffect(() => {
     // Load update config and app version
-    window.electronAPI.getUpdateConfig().then(setUpdateConfig);
-    window.electronAPI.getAppVersion().then(setAppVersion);
+    void window.electronAPI.getUpdateConfig().then(setUpdateConfig);
+    void window.electronAPI.getAppVersion().then(setAppVersion);
   }, []);
 
-  const handleSave = () => {
+  const handleSave = (): void => {
     onSave({ tax, user });
     // Save update config separately
-    window.electronAPI.setUpdateConfig(updateConfig);
+    void window.electronAPI.setUpdateConfig(updateConfig);
   };
 
-  const handleCheckForUpdates = async () => {
+  const handleCheckForUpdates = async (): Promise<void> => {
     setIsCheckingUpdate(true);
     setLastCheckMessage('Checking for updates...');
     try {
@@ -51,7 +51,7 @@ function SettingsDialog({ config, onSave, onClose }: SettingsDialogProps) {
       } else {
         setLastCheckMessage('Failed to check for updates');
       }
-    } catch (error) {
+    } catch {
       setLastCheckMessage('Error checking for updates');
     } finally {
       setIsCheckingUpdate(false);
@@ -134,7 +134,7 @@ function SettingsDialog({ config, onSave, onClose }: SettingsDialogProps) {
           <div className="form-group">
             <button
               className="btn-check-updates"
-              onClick={handleCheckForUpdates}
+              onClick={() => void handleCheckForUpdates()}
               disabled={isCheckingUpdate}
             >
               {isCheckingUpdate ? 'Checking...' : 'Check for Updates Now'}

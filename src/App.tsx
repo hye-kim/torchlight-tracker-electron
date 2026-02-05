@@ -19,7 +19,7 @@ import { useElectronData } from './hooks';
 import { Config } from './types';
 import './App.css';
 
-function App() {
+function App(): JSX.Element {
   // Initialize data loading and IPC listeners
   useElectronData();
 
@@ -47,19 +47,19 @@ function App() {
   } = useUpdateStore();
 
   // Window control handlers
-  const handleWindowMinimize = () => window.electronAPI.windowMinimize();
-  const handleWindowMaximize = () => window.electronAPI.windowMaximize();
-  const handleWindowClose = () => window.electronAPI.windowClose();
+  const handleWindowMinimize = (): void => void window.electronAPI.windowMinimize();
+  const handleWindowMaximize = (): void => void window.electronAPI.windowMaximize();
+  const handleWindowClose = (): void => void window.electronAPI.windowClose();
 
   // Action handlers
-  const handleExportExcel = async () => {
+  const handleExportExcel = async (): Promise<void> => {
     const result = await window.electronAPI.exportExcel();
     if (result.success) {
       alert(`Excel exported successfully to: ${result.filePath}`);
     }
   };
 
-  const handleResetStats = async () => {
+  const handleResetStats = async (): Promise<void> => {
     if (confirm('Are you sure you want to reset all statistics?')) {
       await window.electronAPI.resetStats();
       resetStats();
@@ -68,39 +68,39 @@ function App() {
     }
   };
 
-  const handleSaveSettings = async (updates: Partial<Config>) => {
+  const handleSaveSettings = async (updates: Partial<Config>): Promise<void> => {
     const newConfig = await window.electronAPI.updateConfig(updates);
     setConfig(newConfig);
     setShowSettings(false);
   };
 
-  const handleSaveOverlaySettings = async (updates: Partial<Config>) => {
+  const handleSaveOverlaySettings = async (updates: Partial<Config>): Promise<void> => {
     const newConfig = await window.electronAPI.updateConfig(updates);
     setConfig(newConfig);
   };
 
-  const handleToggleOverlayMode = async () => {
+  const handleToggleOverlayMode = async (): Promise<void> => {
     const newOverlayMode = !config.overlayMode;
     updateConfig({ overlayMode: newOverlayMode });
     await window.electronAPI.toggleOverlayMode(newOverlayMode);
   };
 
-  const handleToggleClickThrough = async () => {
+  const handleToggleClickThrough = async (): Promise<void> => {
     const newClickThrough = !config.clickThrough;
     updateConfig({ clickThrough: newClickThrough });
     await window.electronAPI.toggleClickThrough(newClickThrough);
   };
 
-  const handleDownloadUpdate = () => {
+  const handleDownloadUpdate = (): void => {
     setShowUpdateNotification(false);
     setShowUpdateDialog(true);
   };
 
-  const handleDismissUpdate = () => {
+  const handleDismissUpdate = (): void => {
     setShowUpdateNotification(false);
   };
 
-  const handleSkipUpdate = async () => {
+  const handleSkipUpdate = async (): Promise<void> => {
     if (updateInfo) {
       await window.electronAPI.skipUpdateVersion(updateInfo.version);
       setShowUpdateNotification(false);
@@ -118,8 +118,8 @@ function App() {
       {overlayMode ? (
         <OverlayModePage
           onOpenSettings={() => setShowOverlaySettings(true)}
-          onToggleOverlay={handleToggleOverlayMode}
-          onToggleClickThrough={handleToggleClickThrough}
+          onToggleOverlay={() => void handleToggleOverlayMode()}
+          onToggleClickThrough={() => void handleToggleClickThrough()}
         />
       ) : (
         <>
@@ -188,9 +188,9 @@ function App() {
             {activeView === 'overview' ? (
               <OverviewPage
                 onOpenSettings={() => setShowSettings(true)}
-                onToggleOverlay={handleToggleOverlayMode}
-                onExportExcel={handleExportExcel}
-                onResetStats={handleResetStats}
+                onToggleOverlay={() => void handleToggleOverlayMode()}
+                onExportExcel={() => void handleExportExcel()}
+                onResetStats={() => void handleResetStats()}
               />
             ) : activeView === 'inventory' ? (
               <InventoryPage />
@@ -206,7 +206,7 @@ function App() {
       {showSettings && (
         <SettingsDialog
           config={config}
-          onSave={handleSaveSettings}
+          onSave={(updates) => void handleSaveSettings(updates)}
           onClose={() => setShowSettings(false)}
         />
       )}
@@ -214,7 +214,7 @@ function App() {
       {showOverlaySettings && (
         <OverlaySettings
           config={config}
-          onSave={handleSaveOverlaySettings}
+          onSave={(updates) => void handleSaveOverlaySettings(updates)}
           onClose={() => setShowOverlaySettings(false)}
         />
       )}
@@ -226,7 +226,7 @@ function App() {
           updateInfo={updateInfo}
           onDownload={handleDownloadUpdate}
           onDismiss={handleDismissUpdate}
-          onSkip={handleSkipUpdate}
+          onSkip={() => void handleSkipUpdate()}
         />
       )}
 

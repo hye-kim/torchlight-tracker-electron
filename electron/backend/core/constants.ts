@@ -95,7 +95,7 @@ export function formatDuration(seconds: number): string {
  * Get the formatted display name for a subregion.
  */
 export function getSubregionDisplayName(areaId: string, areaLevel: number): string {
-  const subregionName = SUBREGION_NAMES[areaId] || `Unknown Area (${areaId})`;
-  const levelPrefix = AREA_LEVEL_NAMES[areaLevel] || String(areaLevel);
+  const subregionName = SUBREGION_NAMES[areaId] ?? `Unknown Area (${areaId})`;
+  const levelPrefix = AREA_LEVEL_NAMES[areaLevel] ?? String(areaLevel);
   return `${levelPrefix} ${subregionName}`;
 }

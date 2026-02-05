@@ -55,7 +55,7 @@ const HistoryView: React.FC = () => {
   const [selectedMapSessionId, setSelectedMapSessionId] = useState<string | null>(null);
   const [profitMode, setProfitMode] = useState<'perMinute' | 'perHour'>('perMinute');
 
-  const loadSessions = async () => {
+  const loadSessions = async (): Promise<void> => {
     const allSessions = await window.electronAPI.getSessions();
     setSessions(allSessions);
 
@@ -68,7 +68,8 @@ const HistoryView: React.FC = () => {
 
   // Load sessions on mount
   useEffect(() => {
-    loadSessions();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadSessions();
   }, []);
 
   // Calculate aggregated stats from selected sessions
@@ -114,8 +115,10 @@ const HistoryView: React.FC = () => {
       mapDuration: avgMapDuration,
       profitPerMinute: totalDuration > 0 ? totalProfit / (totalDuration / 60) : 0,
       profitPerHour: totalDuration > 0 ? totalProfit / (totalDuration / 3600) : 0,
-      mapProfitPerMinute: avgMapDuration > 0 ? (totalProfit / mapsCompleted) / (avgMapDuration / 60) : 0,
-      mapProfitPerHour: avgMapDuration > 0 ? (totalProfit / mapsCompleted) / (avgMapDuration / 3600) : 0,
+      mapProfitPerMinute:
+        avgMapDuration > 0 ? totalProfit / mapsCompleted / (avgMapDuration / 60) : 0,
+      mapProfitPerHour:
+        avgMapDuration > 0 ? totalProfit / mapsCompleted / (avgMapDuration / 3600) : 0,
     };
   }, [sessions, selectedSessionIds]);
 
@@ -145,7 +148,7 @@ const HistoryView: React.FC = () => {
       const selectedMap = combinedMapLogs.find(
         (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
       );
-      if (selectedMap && selectedMap.drops) {
+      if (selectedMap?.drops) {
         // Data is already enriched by backend
         return selectedMap.drops;
       }
@@ -178,7 +181,7 @@ const HistoryView: React.FC = () => {
       const selectedMap = combinedMapLogs.find(
         (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
       );
-      if (selectedMap && selectedMap.costs) {
+      if (selectedMap?.costs) {
         // Data is already enriched by backend
         return selectedMap.costs;
       }
@@ -220,16 +223,18 @@ const HistoryView: React.FC = () => {
         (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
       );
       if (!mapExists) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedMapNumber(null);
         setSelectedMapSessionId(null);
       }
     }
   }, [combinedMapLogs, selectedMapNumber, selectedMapSessionId]);
 
-  const handleDeleteSessions = async (sessionIds: string[]) => {
-    await window.electronAPI.deleteSessions(sessionIds);
-    loadSessions();
-    setSelectedSessionIds([]);
+  const handleDeleteSessions = (sessionIds: string[]): void => {
+    void window.electronAPI.deleteSessions(sessionIds).then(() => {
+      void loadSessions();
+      setSelectedSessionIds([]);
+    });
   };
 
   return (
@@ -262,7 +267,7 @@ const HistoryView: React.FC = () => {
               selectedSessionId={selectedMapSessionId}
               onSelectMap={(mapNumber, sessionId) => {
                 setSelectedMapNumber(mapNumber);
-                setSelectedMapSessionId(sessionId || null);
+                setSelectedMapSessionId(sessionId ?? null);
               }}
             />
           </div>
@@ -277,7 +282,8 @@ const HistoryView: React.FC = () => {
                 selectedMapNumber !== null && selectedMapSessionId !== null
                   ? (() => {
                       const selectedMap = combinedMapLogs.find(
-                        (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
+                        (m) =>
+                          m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
                       );
                       return selectedMap
                         ? `${selectedMap.mapName ?? `Map #${selectedMap.mapNumber}`} (${selectedMap.sessionTitle ?? 'Session'})`

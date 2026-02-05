@@ -11,17 +11,17 @@ import {
 /**
  * Custom hook to load initial data from Electron API and listen for updates
  */
-export const useElectronData = () => {
+export const useElectronData = (): void => {
   const { setConfig, updateConfig } = useConfigStore();
-  const { setStats, setDrops, setCosts, setMapLogs } = useStatsStore();
-  const { setCurrentMap, setIsInMap } = useMapStore();
+  const { setStats, setDrops, setCosts: _setCosts, setMapLogs } = useStatsStore();
+  const { setCurrentMap: _setCurrentMap, setIsInMap: _setIsInMap } = useMapStore();
   const { setBagInventory } = useInventoryStore();
-  const { setIsInitialized } = useInitStore();
+  const { setIsInitialized: _setIsInitialized } = useInitStore();
   const { setUpdateInfo, setShowUpdateNotification } = useUpdateStore();
 
   useEffect(() => {
     // Load initial data
-    const loadInitialData = async () => {
+    const loadInitialData = async (): Promise<void> => {
       const [config, stats, drops, mapLogs, bagState] = await Promise.all([
         window.electronAPI.getConfig(),
         window.electronAPI.getStats(),
@@ -37,18 +37,14 @@ export const useElectronData = () => {
       if (bagState) setBagInventory(bagState);
     };
 
-    loadInitialData();
+    void loadInitialData();
 
     // Listen for display updates
-    window.electronAPI.onUpdateDisplay((data: any) => {
+    window.electronAPI.onUpdateDisplay((data) => {
       if (data.stats) setStats(data.stats);
       if (data.drops) setDrops(data.drops);
-      if (data.costs) setCosts(data.costs);
       if (data.mapLogs) setMapLogs(data.mapLogs);
-      if (data.bagInventory) setBagInventory(data.bagInventory);
-      if (data.isInMap !== undefined) setIsInMap(data.isInMap);
-      if (data.currentMap) setCurrentMap(data.currentMap);
-      if (data.isInitialized !== undefined) setIsInitialized(data.isInitialized);
+      if (data.bagState) setBagInventory(data.bagState);
     });
 
     // Listen for overlay mode changes
@@ -57,7 +53,7 @@ export const useElectronData = () => {
     });
 
     // Listen for update events
-    window.electronAPI.onUpdateAvailable((info: any) => {
+    window.electronAPI.onUpdateAvailable((info) => {
       setUpdateInfo(info);
       setShowUpdateNotification(true);
     });
@@ -66,19 +62,15 @@ export const useElectronData = () => {
       // Update not available - no action needed
     });
 
-    window.electronAPI.onUpdateError((error: any) => {
+    window.electronAPI.onUpdateError((error) => {
       console.error('Update error:', error);
     });
   }, [
     setConfig,
     setStats,
     setDrops,
-    setCosts,
     setMapLogs,
     setBagInventory,
-    setIsInMap,
-    setCurrentMap,
-    setIsInitialized,
     updateConfig,
     setUpdateInfo,
     setShowUpdateNotification,

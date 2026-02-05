@@ -103,7 +103,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({ drops }) => {
     const groups = new Map<string, InventoryItem[]>();
 
     sortedItems.forEach((item) => {
-      const group = groups.get(item.type) || [];
+      const group = groups.get(item.type) ?? [];
       group.push(item);
       groups.set(item.type, group);
     });
@@ -124,7 +124,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({ drops }) => {
     return Array.from(typeSet).sort();
   }, [inventoryItems]);
 
-  const toggleGroup = (type: string) => {
+  const toggleGroup = (type: string): void => {
     const newCollapsed = new Set(collapsedGroups);
     if (newCollapsed.has(type)) {
       newCollapsed.delete(type);

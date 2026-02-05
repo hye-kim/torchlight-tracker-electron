@@ -21,7 +21,7 @@ interface ItemData {
   type_en?: string;
   price?: number;
   last_update?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export class APIClient {
@@ -76,8 +76,8 @@ export class APIClient {
   private async makeRequest<T>(
     method: string,
     endpoint: string,
-    data?: any,
-    params?: any
+    data?: Record<string, unknown>,
+    params?: Record<string, unknown>
   ): Promise<T | null> {
     // Prevent DELETE requests
     if (method.toUpperCase() === 'DELETE') {
@@ -88,7 +88,7 @@ export class APIClient {
     await this.checkRateLimit();
 
     const url = `${this.baseUrl}${endpoint}`;
-    let lastError: any = null;
+    let lastError: unknown = null;
 
     for (let attempt = 0; attempt < this.maxRetries; attempt++) {
       try {
@@ -109,9 +109,12 @@ export class APIClient {
         }
 
         return response.data;
-      } catch (error: any) {
+      } catch (error: unknown) {
         lastError = error;
-        const statusCode = error.response?.status;
+        const statusCode =
+          error && typeof error === 'object' && 'response' in error
+            ? (error.response as { status?: number })?.status
+            : undefined;
 
         // Don't retry on client errors (4xx) except timeout-related ones
         if (
@@ -125,12 +128,16 @@ export class APIClient {
           return null;
         }
 
-        logger.warn(`Request error on attempt ${attempt + 1}/${this.maxRetries}: ${error.message}`);
+        const errorMessage =
+          error && typeof error === 'object' && 'message' in error
+            ? String(error.message)
+            : 'Unknown error';
+        logger.warn(`Request error on attempt ${attempt + 1}/${this.maxRetries}: ${errorMessage}`);
 
         // If this was the last attempt, log final error
         if (attempt === this.maxRetries - 1) {
           logger.error(
-            `Failed to ${method} ${url} after ${this.maxRetries} attempts. Last error: ${error.message}`
+            `Failed to ${method} ${url} after ${this.maxRetries} attempts. Last error: ${errorMessage}`
           );
           return null;
         }
@@ -150,13 +157,17 @@ export class APIClient {
 
   async healthCheck(): Promise<boolean> {
     try {
-      const response = await this.makeRequest<any>('GET', '/');
+      const response = await this.makeRequest<Record<string, unknown>>('GET', '/');
       if (response) {
         logger.info('API health check successful');
         return true;
       }
-    } catch (error: any) {
-      logger.error(`API health check failed: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === 'object' && 'message' in error
+          ? String(error.message)
+          : 'Unknown error';
+      logger.error(`API health check failed: ${errorMessage}`);
     }
     return false;
   }
@@ -203,7 +214,8 @@ export class APIClient {
   async getItem(itemId: string): Promise<ItemData | null> {
     // Check cache first
     if (this.isCacheValid() && this.cache.has(itemId)) {
-      return { ...this.cache.get(itemId)! };
+      const cachedItem = this.cache.get(itemId);
+      return cachedItem ? { ...cachedItem } : null;
     }
 
     const data = await this.makeRequest<ItemData>('GET', `/items/${itemId}`);
@@ -242,8 +254,8 @@ export class APIClient {
     return await this.makeRequest<string[]>('GET', '/types');
   }
 
-  async getStats(): Promise<any | null> {
-    return await this.makeRequest<any>('GET', '/stats');
+  async getStats(): Promise<Record<string, unknown> | null> {
+    return await this.makeRequest<Record<string, unknown>>('GET', '/stats');
   }
 
   invalidateCache(): void {

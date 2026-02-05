@@ -51,9 +51,7 @@ const OverviewPage: React.FC<OverviewPageProps> = ({
           isInMap={isInMap}
           currentMap={currentMap}
           mapCount={stats?.total.mapCount ?? 0}
-          selectedMapNumber={
-            selectedMapData ? selectedMapData.mapNumber : null
-          }
+          selectedMapNumber={selectedMapData ? selectedMapData.mapNumber : null}
           onSelectMap={setSelectedMapNumber}
         />
       </div>

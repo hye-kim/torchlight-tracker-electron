@@ -28,6 +28,7 @@ export interface LogMonitorEvents {
   error: (error: Error) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export declare interface LogMonitor {
   on<K extends keyof LogMonitorEvents>(event: K, listener: LogMonitorEvents[K]): this;
   emit<K extends keyof LogMonitorEvents>(
@@ -36,6 +37,7 @@ export declare interface LogMonitor {
   ): boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging, no-redeclare
 export class LogMonitor extends EventEmitter {
   private logFilePath: string | null;
   private logParser: LogParser;
@@ -96,7 +98,7 @@ export class LogMonitor extends EventEmitter {
       logger.info('Log file opened successfully');
       return true;
     } catch (error) {
-      logger.error(`Could not open log file: ${error}`);
+      logger.error(`Could not open log file: ${String(error)}`);
       this.logFileHandle = null;
       return false;
     }
@@ -111,7 +113,7 @@ export class LogMonitor extends EventEmitter {
         fs.closeSync(this.logFileHandle);
         logger.info('Log file closed');
       } catch (error) {
-        logger.error(`Error closing log file: ${error}`);
+        logger.error(`Error closing log file: ${String(error)}`);
       } finally {
         this.logFileHandle = null;
         this.logFilePosition = 0;
@@ -171,7 +173,7 @@ export class LogMonitor extends EventEmitter {
           // Busy wait
         }
       } catch (error) {
-        logger.error(`Error checking log file during rotation: ${error}`);
+        logger.error(`Error checking log file during rotation: ${String(error)}`);
       }
     }
 
@@ -214,7 +216,7 @@ export class LogMonitor extends EventEmitter {
 
       return buffer.toString('utf-8');
     } catch (error) {
-      logger.error(`Error reading log file: ${error}`);
+      logger.error(`Error reading log file: ${String(error)}`);
       // Try to reopen the file with rotation handling
       this.closeLogFile();
       this.handleFileRotation();
@@ -272,9 +274,9 @@ export class LogMonitor extends EventEmitter {
       );
       try {
         const text = this.priceBuffer.join('\n');
-        this.processPriceUpdates(text);
+        void this.processPriceUpdates(text);
       } catch (error) {
-        logger.error(`Error processing remaining price buffer: ${error}`);
+        logger.error(`Error processing remaining price buffer: ${String(error)}`);
       }
     }
 
@@ -317,7 +319,7 @@ export class LogMonitor extends EventEmitter {
       if (this.priceBuffer.length > 0 && now - this.lastPriceCheck >= this.PRICE_BUFFER_INTERVAL) {
         this.lastPriceCheck = now;
         const bufferedText = this.priceBuffer.join('\n');
-        this.processPriceUpdates(bufferedText);
+        void this.processPriceUpdates(bufferedText);
         this.priceBuffer = [];
         this.insidePriceResponse = false; // Reset capture state after processing
       }
@@ -340,7 +342,7 @@ export class LogMonitor extends EventEmitter {
       const dropsArray = Object.entries(totalStats.drops).map(([itemId, quantity]) => {
         const itemData = fullTable[itemId];
         const mappingData = itemMapping[itemId];
-        let itemName = itemData?.name || mappingData?.name_en || `Item ${itemId}`;
+        let itemName = itemData?.name ?? mappingData?.name_en ?? `Item ${itemId}`;
         // Ensure name is a string
         if (typeof itemName !== 'string') {
           itemName = `Item ${itemId}`;
@@ -349,8 +351,8 @@ export class LogMonitor extends EventEmitter {
           itemId,
           name: itemName,
           quantity,
-          price: itemData?.price || 0,
-          type: mappingData?.type_en || itemData?.type || 'Unknown',
+          price: itemData?.price ?? 0,
+          type: mappingData?.type_en ?? itemData?.type ?? 'Unknown',
           timestamp: Date.now(),
           imageUrl: getItemImageUrl(itemId),
         };
@@ -361,7 +363,7 @@ export class LogMonitor extends EventEmitter {
       const costsArray = currentCosts.map(({ itemId, quantity }) => {
         const itemData = fullTable[itemId];
         const mappingData = itemMapping[itemId];
-        let itemName = itemData?.name || mappingData?.name_en || `Item ${itemId}`;
+        let itemName = itemData?.name ?? mappingData?.name_en ?? `Item ${itemId}`;
         // Ensure name is a string
         if (typeof itemName !== 'string') {
           itemName = `Item ${itemId}`;
@@ -370,8 +372,8 @@ export class LogMonitor extends EventEmitter {
           itemId,
           name: itemName,
           quantity,
-          price: itemData?.price || 0,
-          type: mappingData?.type_en || itemData?.type || 'Unknown',
+          price: itemData?.price ?? 0,
+          type: mappingData?.type_en ?? itemData?.type ?? 'Unknown',
           timestamp: Date.now(),
           imageUrl: getItemImageUrl(itemId),
         };
@@ -388,10 +390,10 @@ export class LogMonitor extends EventEmitter {
         const itemData = fullTable[itemId];
         return {
           itemId,
-          name: itemData?.name || `Item ${itemId}`,
+          name: itemData?.name ?? `Item ${itemId}`,
           quantity,
-          price: itemData?.price || 0,
-          type: itemData?.type || 'Unknown',
+          price: itemData?.price ?? 0,
+          type: itemData?.type ?? 'Unknown',
           timestamp: Date.now(),
           imageUrl: getItemImageUrl(itemId),
         };
@@ -420,7 +422,7 @@ export class LogMonitor extends EventEmitter {
         bagInventory: bagArray,
       });
     } catch (error) {
-      logger.error(`Error in log monitor poll: ${error}`);
+      logger.error(`Error in log monitor poll: ${String(error)}`);
       this.emit('error', error as Error);
     }
   }
@@ -541,7 +543,7 @@ export class LogMonitor extends EventEmitter {
 
     if (mapChange.entering) {
       // Use subregion from mapChange if provided (e.g., DiXiaZhenSuo), otherwise use pending or detected subregion
-      const mapSubregion = mapChange.subregion || this.pendingSubregion || subregion;
+      const mapSubregion = mapChange.subregion ?? this.pendingSubregion ?? subregion;
       this.statisticsTracker.enterMap(mapSubregion);
       this.pendingSubregion = null;
       this.inventoryTracker.resetMapBaseline();

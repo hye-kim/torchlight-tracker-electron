@@ -1,4 +1,12 @@
-import { app, BrowserWindow, ipcMain, dialog, session, IpcMainInvokeEvent, IpcMainEvent } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  dialog,
+  session,
+  IpcMainInvokeEvent,
+  IpcMainEvent,
+} from 'electron';
 import path from 'path';
 import { ConfigManager, Config } from './backend/core/ConfigManager';
 import { FileManager } from './backend/data/FileManager';
@@ -30,13 +38,13 @@ const gameDetector = new GameDetector();
 const excelExporter = new ExcelExporter(fileManager);
 const updateManager = new UpdateManager(logger);
 
-function createWindow() {
+function createWindow(): void {
   const config = configManager.getConfig();
   // Always start in non-overlay mode with click through disabled
   const overlayMode = false;
 
-  const width = overlayMode ? config.overlay_width || 400 : config.window_width || 1300;
-  const height = overlayMode ? config.overlay_height || 1000 : config.window_height || 900;
+  const width = overlayMode ? (config.overlay_width ?? 400) : (config.window_width ?? 1300);
+  const height = overlayMode ? (config.overlay_height ?? 1000) : (config.window_height ?? 900);
 
   mainWindow = new BrowserWindow({
     width,
@@ -60,10 +68,10 @@ function createWindow() {
   // No need to apply click-through settings
 
   if (isDev) {
-    mainWindow.loadURL('http://localhost:5174');
+    void mainWindow.loadURL('http://localhost:5174');
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist-react/index.html'));
+    void mainWindow.loadFile(path.join(__dirname, '../dist-react/index.html'));
   }
 
   mainWindow.on('close', () => {
@@ -86,13 +94,16 @@ function createWindow() {
   });
 }
 
-app.whenReady().then(async () => {
+void app.whenReady().then(() => {
   logger.info('=== Torchlight Infinite Price Tracker Starting (Electron) ===');
 
   // Set up web request interceptor to fix 403 errors from CDN
   session.defaultSession.webRequest.onBeforeSendHeaders(
     { urls: ['https://cdn.tlidb.com/*'] },
-    (details: Electron.OnBeforeSendHeadersListenerDetails, callback: (beforeSendResponse: Electron.BeforeSendResponse) => void) => {
+    (
+      details: Electron.OnBeforeSendHeadersListenerDetails,
+      callback: (beforeSendResponse: Electron.BeforeSendResponse) => void
+    ) => {
       details.requestHeaders['User-Agent'] =
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
       details.requestHeaders['Referer'] = 'https://www.tlidb.com/';
@@ -101,11 +112,11 @@ app.whenReady().then(async () => {
   );
 
   // Initialize data files
-  await fileManager.ensureFileExists(CONFIG_FILE, {
+  fileManager.ensureFileExists(CONFIG_FILE, {
     tax: 1,
     user: '',
   });
-  await fileManager.initializeFullTableFromEnTable();
+  fileManager.initializeFullTableFromEnTable();
 
   // Initialize session manager (cleanup old sessions, but don't start a new one yet)
   sessionManager.cleanupOldSessions();
@@ -141,7 +152,7 @@ app.whenReady().then(async () => {
   }, 3600 * 1000); // 1 hour in milliseconds
 
   // Detect game
-  const { gameFound, logFilePath } = await gameDetector.detectGame();
+  const { gameFound, logFilePath } = gameDetector.detectGame();
 
   createWindow();
 
@@ -152,29 +163,32 @@ app.whenReady().then(async () => {
 
   // Check for updates on startup (after 5 second delay)
   if (mainWindow && !isDev) {
-    setTimeout(async () => {
-      const shouldCheck = configManager.getAutoCheckUpdates();
-      if (shouldCheck) {
-        logger.info('Checking for updates on startup...');
-        try {
-          const updateInfo = await updateManager.checkForUpdates();
-          const skipVersion = configManager.getSkipVersion();
+    setTimeout(() => {
+      void (async () => {
+        const shouldCheck = configManager.getAutoCheckUpdates();
+        if (shouldCheck) {
+          logger.info('Checking for updates on startup...');
+          try {
+            const updateInfo = await updateManager.checkForUpdates();
+            const skipVersion = configManager.getSkipVersion();
 
-          // Don't notify if this version was explicitly skipped
-          if (updateInfo && skipVersion !== updateInfo.version) {
-            configManager.setLastCheckTime(Date.now());
+            // Don't notify if this version was explicitly skipped
+            if (updateInfo && skipVersion !== updateInfo.version) {
+              configManager.setLastCheckTime(Date.now());
+            }
+          } catch (error) {
+            logger.error('Startup update check failed:', error);
           }
-        } catch (error) {
-          logger.error('Startup update check failed:', error);
         }
-      }
+      })();
     }, 5000); // 5 second delay
   }
 
   // Show warning if game not found
   if (!gameFound && mainWindow) {
+    const window = mainWindow;
     setTimeout(() => {
-      dialog.showMessageBox(mainWindow!, {
+      void dialog.showMessageBox(window, {
         type: 'warning',
         title: 'Game Not Found',
         message:
@@ -286,10 +300,10 @@ ipcMain.handle('get-drops', () => {
     const itemData = fullTable[itemId];
     return {
       itemId,
-      name: itemData?.name || `Item ${itemId}`,
+      name: itemData?.name ?? `Item ${itemId}`,
       quantity,
-      price: itemData?.price || 0,
-      type: itemData?.type || 'Unknown',
+      price: itemData?.price ?? 0,
+      type: itemData?.type ?? 'Unknown',
       timestamp: Date.now(),
     };
   });
@@ -310,10 +324,10 @@ ipcMain.handle('get-bag-state', () => {
     const itemData = fullTable[itemId];
     return {
       itemId,
-      name: itemData?.name || `Item ${itemId}`,
+      name: itemData?.name ?? `Item ${itemId}`,
       quantity,
-      price: itemData?.price || 0,
-      type: itemData?.type || 'Unknown',
+      price: itemData?.price ?? 0,
+      type: itemData?.type ?? 'Unknown',
       imageUrl: itemData?.imageUrl,
     };
   });
@@ -321,7 +335,7 @@ ipcMain.handle('get-bag-state', () => {
   return bagArray;
 });
 
-ipcMain.handle('initialize-tracker', async () => {
+ipcMain.handle('initialize-tracker', () => {
   // End current session if one exists, then start a new session
   const currentSession = sessionManager.getCurrentSession();
   if (currentSession) {
@@ -335,7 +349,10 @@ ipcMain.handle('initialize-tracker', async () => {
 });
 
 ipcMain.handle('export-excel', async () => {
-  const { filePath } = await dialog.showSaveDialog(mainWindow!, {
+  if (!mainWindow) {
+    return { success: false, error: 'No main window' };
+  }
+  const { filePath } = await dialog.showSaveDialog(mainWindow, {
     defaultPath: 'torchlight_drops.xlsx',
     filters: [{ name: 'Excel Files', extensions: ['xlsx'] }],
   });
@@ -352,10 +369,10 @@ ipcMain.handle('export-excel', async () => {
         const itemData = fullTable[itemId];
         return {
           itemId,
-          name: itemData?.name || `Item ${itemId}`,
+          name: itemData?.name ?? `Item ${itemId}`,
           quantity,
-          price: itemData?.price || 0,
-          type: itemData?.type || 'Unknown',
+          price: itemData?.price ?? 0,
+          type: itemData?.type ?? 'Unknown',
           timestamp: Date.now(),
         };
       });
@@ -365,10 +382,10 @@ ipcMain.handle('export-excel', async () => {
         const itemData = fullTable[itemId];
         return {
           itemId,
-          name: itemData?.name || `Item ${itemId}`,
+          name: itemData?.name ?? `Item ${itemId}`,
           quantity,
-          price: itemData?.price || 0,
-          type: itemData?.type || 'Unknown',
+          price: itemData?.price ?? 0,
+          type: itemData?.type ?? 'Unknown',
           timestamp: Date.now(),
         };
       });
@@ -400,13 +417,16 @@ ipcMain.handle('reset-stats', () => {
 });
 
 ipcMain.handle('export-debug-log', async () => {
-  const { filePath } = await dialog.showSaveDialog(mainWindow!, {
+  if (!mainWindow) {
+    return { success: false, error: 'No main window' };
+  }
+  const { filePath } = await dialog.showSaveDialog(mainWindow, {
     defaultPath: 'debug_log.txt',
     filters: [{ name: 'Text Files', extensions: ['txt'] }],
   });
 
   if (filePath) {
-    await fileManager.exportDebugLog(filePath);
+    fileManager.exportDebugLog(filePath);
     return { success: true, filePath };
   }
   return { success: false };
@@ -483,23 +503,29 @@ ipcMain.handle('set-ignore-mouse-events', (_event: IpcMainInvokeEvent, ignore: b
 });
 
 // Handle set-ignore-mouse-events from ipcRenderer.send (used by preload for interactive elements)
-ipcMain.on('set-ignore-mouse-events', (_event: IpcMainEvent, ignore: boolean, options?: any) => {
-  if (mainWindow) {
-    mainWindow.setIgnoreMouseEvents(ignore, options || { forward: true });
+ipcMain.on(
+  'set-ignore-mouse-events',
+  (_event: IpcMainEvent, ignore: boolean, options?: { forward: boolean }) => {
+    if (mainWindow) {
+      mainWindow.setIgnoreMouseEvents(ignore, options ?? { forward: true });
+    }
   }
-});
+);
 
 ipcMain.handle('set-font-size', (_event: IpcMainInvokeEvent, fontSize: number) => {
   configManager.setFontSize(fontSize);
   return { success: true };
 });
 
-ipcMain.handle('set-display-items', (_event: IpcMainInvokeEvent, displayItems: Config['displayItems']) => {
-  if (displayItems) {
-    configManager.setDisplayItems(displayItems);
+ipcMain.handle(
+  'set-display-items',
+  (_event: IpcMainInvokeEvent, displayItems: Config['displayItems']) => {
+    if (displayItems) {
+      configManager.setDisplayItems(displayItems);
+    }
+    return { success: true };
   }
-  return { success: true };
-});
+);
 
 // Window controls
 ipcMain.handle('window-minimize', () => {
@@ -532,11 +558,7 @@ ipcMain.handle('window-resize', (_event: IpcMainInvokeEvent, width: number, heig
     const currentSize = mainWindow.getSize();
     const currentWidth = currentSize[0];
     const currentHeight = currentSize[1];
-    mainWindow.setSize(
-      width || (currentWidth ?? 400),
-      height || (currentHeight ?? 600),
-      true
-    );
+    mainWindow.setSize(width ?? currentWidth ?? 400, height ?? currentHeight ?? 600, true);
   }
   return { success: true };
 });
@@ -627,27 +649,27 @@ ipcMain.handle('get-sessions', () => {
           const itemData = fullTable[drop.itemId];
           return {
             itemId: drop.itemId,
-            name: itemData?.name || `Item ${drop.itemId}`,
+            name: itemData?.name ?? `Item ${drop.itemId}`,
             quantity: drop.quantity,
             price: drop.price, // Use stored historical price
-            type: itemData?.type || 'Unknown',
+            type: itemData?.type ?? 'Unknown',
             timestamp: mapLog.startTime,
             imageUrl: getItemImageUrl(drop.itemId),
           };
-        }) || [],
+        }) ?? [],
       costs:
         mapLog.costs?.map((cost) => {
           const itemData = fullTable[cost.itemId];
           return {
             itemId: cost.itemId,
-            name: itemData?.name || `Item ${cost.itemId}`,
+            name: itemData?.name ?? `Item ${cost.itemId}`,
             quantity: cost.quantity,
             price: cost.price, // Use stored historical price
-            type: itemData?.type || 'Unknown',
+            type: itemData?.type ?? 'Unknown',
             timestamp: mapLog.startTime,
             imageUrl: getItemImageUrl(cost.itemId),
           };
-        }) || [],
+        }) ?? [],
     })),
   }));
 });

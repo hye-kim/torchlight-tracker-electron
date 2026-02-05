@@ -65,17 +65,16 @@ export interface StatisticsTrackerEvents {
   itemsProcessed: (items: ProcessedItem[]) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export declare interface StatisticsTracker {
-  on<K extends keyof StatisticsTrackerEvents>(
-    event: K,
-    listener: StatisticsTrackerEvents[K]
-  ): this;
+  on<K extends keyof StatisticsTrackerEvents>(event: K, listener: StatisticsTrackerEvents[K]): this;
   emit<K extends keyof StatisticsTrackerEvents>(
     event: K,
     ...args: Parameters<StatisticsTrackerEvents[K]>
   ): boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging, no-redeclare
 export class StatisticsTracker extends EventEmitter {
   private isInMap: boolean = false;
   private mapStartTime: number = Date.now();
@@ -186,7 +185,7 @@ export class StatisticsTracker extends EventEmitter {
       const mapDrops: MapItemData[] = [];
       for (const [itemId, quantity] of this.dropList) {
         const item = fullTable[itemId];
-        const basePrice = item?.price || 0.0;
+        const basePrice = item?.price ?? 0.0;
         const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         mapDrops.push({ itemId, quantity, price });
       }
@@ -194,7 +193,7 @@ export class StatisticsTracker extends EventEmitter {
       const mapCosts: MapItemData[] = [];
       for (const [itemId, quantity] of this.costList) {
         const item = fullTable[itemId];
-        const basePrice = item?.price || 0.0;
+        const basePrice = item?.price ?? 0.0;
         const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         mapCosts.push({ itemId, quantity, price });
       }
@@ -233,7 +232,7 @@ export class StatisticsTracker extends EventEmitter {
     const consolidated = new Map<string, number>();
     for (const [itemId, amount] of changes) {
       const id = String(itemId);
-      consolidated.set(id, (consolidated.get(id) || 0) + amount);
+      consolidated.set(id, (consolidated.get(id) ?? 0) + amount);
     }
 
     // Process each consolidated change
@@ -264,7 +263,7 @@ export class StatisticsTracker extends EventEmitter {
     for (const [itemId, quantity] of this.dropList) {
       const item = fullTable[itemId];
       if (item) {
-        const basePrice = item.price || 0.0;
+        const basePrice = item.price ?? 0.0;
         const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         this.income += price * quantity;
       }
@@ -275,7 +274,7 @@ export class StatisticsTracker extends EventEmitter {
     for (const [itemId, quantity] of this.dropListAll) {
       const item = fullTable[itemId];
       if (item) {
-        const basePrice = item.price || 0.0;
+        const basePrice = item.price ?? 0.0;
         const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         this.incomeAll += price * quantity;
       }
@@ -286,7 +285,7 @@ export class StatisticsTracker extends EventEmitter {
     for (const [itemId, quantity] of this.costList) {
       const item = fullTable[itemId];
       if (item) {
-        const basePrice = item.price || 0.0;
+        const basePrice = item.price ?? 0.0;
         const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         this.currentMapCost += price * quantity;
       }
@@ -297,7 +296,7 @@ export class StatisticsTracker extends EventEmitter {
     for (const [itemId, quantity] of this.costListAll) {
       const item = fullTable[itemId];
       if (item) {
-        const basePrice = item.price || 0.0;
+        const basePrice = item.price ?? 0.0;
         const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         this.totalCost += price * quantity;
       }
@@ -309,7 +308,7 @@ export class StatisticsTracker extends EventEmitter {
       for (const drop of mapLog.drops) {
         const item = fullTable[drop.itemId];
         if (item) {
-          const basePrice = item.price || 0.0;
+          const basePrice = item.price ?? 0.0;
           const price = calculatePriceWithTax(basePrice, drop.itemId, taxEnabled);
           revenue += price * drop.quantity;
         }
@@ -319,7 +318,7 @@ export class StatisticsTracker extends EventEmitter {
       for (const costItem of mapLog.costs) {
         const item = fullTable[costItem.itemId];
         if (item) {
-          const basePrice = item.price || 0.0;
+          const basePrice = item.price ?? 0.0;
           const price = calculatePriceWithTax(basePrice, costItem.itemId, taxEnabled);
           cost += price * costItem.quantity;
         }
@@ -346,15 +345,19 @@ export class StatisticsTracker extends EventEmitter {
     const itemData = fullTable[itemId];
     if (itemData) {
       // Try multiple name fields and ensure we get a string
-      let rawName = itemData.name || itemData.name_en || null;
+      let rawName = itemData.name ?? itemData.name_en ?? null;
 
       // If rawName is an object (shouldn't happen), try to extract string value
       if (rawName && typeof rawName === 'object') {
         logger.warn(`Item ${itemId} has object as name, attempting to extract string`);
-        rawName = (rawName as any).name_en || (rawName as any).name || null;
+        const nameObj = rawName as { name_en?: unknown; name?: unknown };
+        rawName =
+          (typeof nameObj.name_en === 'string' ? nameObj.name_en : null) ??
+          (typeof nameObj.name === 'string' ? nameObj.name : null) ??
+          null;
       }
 
-      itemName = (typeof rawName === 'string' ? rawName : null) || `Unknown item (ID: ${itemId})`;
+      itemName = (typeof rawName === 'string' ? rawName : null) ?? `Unknown item (ID: ${itemId})`;
     } else {
       itemName = `Unknown item (ID: ${itemId})`;
       if (!this.pendingItems.has(itemId)) {
@@ -362,7 +365,7 @@ export class StatisticsTracker extends EventEmitter {
         this.pendingItems.set(itemId, amount);
       } else {
         const current = this.pendingItems.get(itemId);
-        this.pendingItems.set(itemId, (current || 0) + amount);
+        this.pendingItems.set(itemId, (current ?? 0) + amount);
       }
       return null;
     }
@@ -376,18 +379,18 @@ export class StatisticsTracker extends EventEmitter {
     // Update drop lists or cost lists based on amount
     if (amount > 0) {
       // Positive = loot/drops
-      this.dropList.set(itemId, (this.dropList.get(itemId) || 0) + amount);
-      this.dropListAll.set(itemId, (this.dropListAll.get(itemId) || 0) + amount);
+      this.dropList.set(itemId, (this.dropList.get(itemId) ?? 0) + amount);
+      this.dropListAll.set(itemId, (this.dropListAll.get(itemId) ?? 0) + amount);
     } else {
       // Negative = costs (items consumed)
-      this.costList.set(itemId, (this.costList.get(itemId) || 0) + Math.abs(amount));
-      this.costListAll.set(itemId, (this.costListAll.get(itemId) || 0) + Math.abs(amount));
+      this.costList.set(itemId, (this.costList.get(itemId) ?? 0) + Math.abs(amount));
+      this.costListAll.set(itemId, (this.costListAll.get(itemId) ?? 0) + Math.abs(amount));
     }
 
     // Calculate price
     let price = 0.0;
     if (itemData) {
-      const basePrice = itemData.price || 0.0;
+      const basePrice = itemData.price ?? 0.0;
       // Apply tax if enabled using centralized calculation
       const taxEnabled = this.configManager.getTaxMode() === 1;
       price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
@@ -566,7 +569,7 @@ export class StatisticsTracker extends EventEmitter {
     const currentDrops: MapItemData[] = [];
     for (const [itemId, quantity] of this.dropList) {
       const item = fullTable[itemId];
-      const basePrice = item?.price || 0.0;
+      const basePrice = item?.price ?? 0.0;
       const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
       currentDrops.push({ itemId, quantity, price });
     }
@@ -574,7 +577,7 @@ export class StatisticsTracker extends EventEmitter {
     const currentCosts: MapItemData[] = [];
     for (const [itemId, quantity] of this.costList) {
       const item = fullTable[itemId];
-      const basePrice = item?.price || 0.0;
+      const basePrice = item?.price ?? 0.0;
       const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
       currentCosts.push({ itemId, quantity, price });
     }

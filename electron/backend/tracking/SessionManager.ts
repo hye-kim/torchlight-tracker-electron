@@ -217,7 +217,7 @@ export class SessionManager {
       (s) => s.sessionId === this.sessionsData.currentSessionId
     );
 
-    return session || null;
+    return session ?? null;
   }
 
   /**
@@ -232,7 +232,7 @@ export class SessionManager {
    */
   getSessionById(sessionId: string): Session | null {
     const session = this.sessionsData.sessions.find((s) => s.sessionId === sessionId);
-    return session || null;
+    return session ?? null;
   }
 
   /**
@@ -242,7 +242,7 @@ export class SessionManager {
     const session = this.getSessionById(sessionId);
 
     // Don't allow deleting active session
-    if (session && session.isActive) {
+    if (session?.isActive) {
       logger.warn('Cannot delete active session');
       return;
     }

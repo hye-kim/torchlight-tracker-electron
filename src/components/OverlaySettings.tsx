@@ -15,11 +15,11 @@ interface OverlaySettingsProps {
     fontSize?: number;
     displayItems?: DisplayItem[];
   };
-  onSave: (updates: any) => void;
+  onSave: (updates: { fontSize?: number; displayItems?: DisplayItem[] }) => void;
   onClose: () => void;
 }
 
-function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
+function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps): JSX.Element {
   const [fontSize, setFontSize] = useState(config.fontSize ?? 14);
   const [displayItems, setDisplayItems] = useState<DisplayItem[]>(
     config.displayItems ?? [
@@ -39,26 +39,26 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
   // Apply changes in real-time
   useEffect(() => {
     if (window.electronAPI) {
-      window.electronAPI.setFontSize(fontSize);
+      void window.electronAPI.setFontSize(fontSize);
       onSave({ fontSize });
     }
-  }, [fontSize]);
+  }, [fontSize, onSave]);
 
   useEffect(() => {
     if (window.electronAPI) {
-      window.electronAPI.setDisplayItems(displayItems);
+      void window.electronAPI.setDisplayItems(displayItems);
       onSave({ displayItems });
     }
-  }, [displayItems]);
+  }, [displayItems, onSave]);
 
   // Sort displayItems by order
   const sortedItems = [...displayItems].sort((a, b) => a.order - b.order);
 
-  const handleDragStart = (index: number) => {
+  const handleDragStart = (index: number): void => {
     setDraggedItem(index);
   };
 
-  const handleDragOver = (e: React.DragEvent, index: number) => {
+  const handleDragOver = (e: React.DragEvent, index: number): void => {
     e.preventDefault();
     if (draggedItem === null || draggedItem === index) return;
 
@@ -77,17 +77,17 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
     setDraggedItem(index);
   };
 
-  const handleDragEnd = () => {
+  const handleDragEnd = (): void => {
     setDraggedItem(null);
   };
 
-  const toggleItemEnabled = (id: string) => {
+  const toggleItemEnabled = (id: string): void => {
     setDisplayItems((items) =>
       items.map((item) => (item.id === id ? { ...item, enabled: !item.enabled } : item))
     );
   };
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     // Final save on close
     const updates = {
       fontSize,
@@ -98,13 +98,13 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps) {
   };
 
   // Handle mouse events for click-through mode
-  const handleMouseEnter = () => {
+  const handleMouseEnter = (): void => {
     if (window.electronAPI) {
-      window.electronAPI.setIgnoreMouseEvents(false);
+      void window.electronAPI.setIgnoreMouseEvents(false);
     }
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (): void => {
     // Don't enable click-through while dialog is open
     // This prevents the dialog from becoming unresponsive
   };

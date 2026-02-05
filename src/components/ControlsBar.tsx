@@ -2,11 +2,11 @@ import React from 'react';
 import './ControlsBar.css';
 
 interface ControlsBarProps {
-  onInitialize: () => void;
-  onExportExcel: () => void;
+  onInitialize: () => void | Promise<void>;
+  onExportExcel: () => void | Promise<void>;
   onOpenSettings: () => void;
-  onResetStats: () => void;
-  onToggleOverlay: () => void;
+  onResetStats: () => void | Promise<void>;
+  onToggleOverlay: () => void | Promise<void>;
   isInitialized: boolean;
   isWaitingForInit: boolean;
 }
@@ -24,7 +24,9 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
     <div className="controls-bar">
       <button
         className="control-btn primary"
-        onClick={onInitialize}
+        onClick={() => {
+          void onInitialize();
+        }}
         disabled={isWaitingForInit || isInitialized}
       >
         {isInitialized
@@ -34,15 +36,30 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
             : 'Initialize Tracker'}
       </button>
 
-      <button className="control-btn danger" onClick={onResetStats}>
+      <button
+        className="control-btn danger"
+        onClick={() => {
+          void onResetStats();
+        }}
+      >
         Reset Session
       </button>
 
-      <button className="control-btn secondary" onClick={onExportExcel}>
+      <button
+        className="control-btn secondary"
+        onClick={() => {
+          void onExportExcel();
+        }}
+      >
         Export Excel
       </button>
 
-      <button className="control-btn secondary" onClick={onToggleOverlay}>
+      <button
+        className="control-btn secondary"
+        onClick={() => {
+          void onToggleOverlay();
+        }}
+      >
         Enable Overlay Mode
       </button>
 

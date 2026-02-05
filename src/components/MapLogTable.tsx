@@ -160,8 +160,11 @@ function MapLogTable({
             ) : (
               displayLogs.map((log) => {
                 const isActive = log.isActive ?? false;
-                const isSelected = selectedMapNumber === log.mapNumber &&
-                  (selectedSessionId === log.sessionId || selectedSessionId === null || selectedSessionId === undefined);
+                const isSelected =
+                  selectedMapNumber === log.mapNumber &&
+                  (selectedSessionId === log.sessionId ||
+                    selectedSessionId === null ||
+                    selectedSessionId === undefined);
 
                 return (
                   <tr

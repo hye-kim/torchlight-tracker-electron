@@ -4,7 +4,7 @@ interface InitializationDialogProps {
   onClose: () => void;
 }
 
-function InitializationDialog({ onClose }: InitializationDialogProps) {
+function InitializationDialog({ onClose }: InitializationDialogProps): JSX.Element {
   return (
     <div className="dialog-overlay">
       <div className="init-dialog-content" onClick={(e) => e.stopPropagation()}>

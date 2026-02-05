@@ -42,7 +42,7 @@ export class UpdateManager {
     // Disable signature verification (app is not code-signed)
     // Code signing requires a purchased certificate, so we disable verification for now
     if (process.platform === 'win32') {
-      (autoUpdater as any).verifyUpdateCodeSignature = false;
+      (autoUpdater as { verifyUpdateCodeSignature?: boolean }).verifyUpdateCodeSignature = false;
     }
 
     // Set up event listeners
@@ -77,15 +77,18 @@ export class UpdateManager {
       this.sendStatusToRenderer('update-error', { message: error.message });
     });
 
-    autoUpdater.on('download-progress', (progressObj: { percent: number; transferred: number; total: number }) => {
-      this.status.progress = {
-        percent: progressObj.percent,
-        transferred: progressObj.transferred,
-        total: progressObj.total,
-      };
-      this.logger.info(`Download progress: ${progressObj.percent.toFixed(2)}%`);
-      this.sendStatusToRenderer('download-progress', progressObj);
-    });
+    autoUpdater.on(
+      'download-progress',
+      (progressObj: { percent: number; transferred: number; total: number }) => {
+        this.status.progress = {
+          percent: progressObj.percent,
+          transferred: progressObj.transferred,
+          total: progressObj.total,
+        };
+        this.logger.info(`Download progress: ${progressObj.percent.toFixed(2)}%`);
+        this.sendStatusToRenderer('download-progress', progressObj);
+      }
+    );
 
     autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
       this.logger.info('Update downloaded:', info.version);
@@ -100,7 +103,7 @@ export class UpdateManager {
     this.mainWindow = window;
   }
 
-  private sendStatusToRenderer(event: string, data?: any): void {
+  private sendStatusToRenderer(event: string, data?: unknown): void {
     if (this.mainWindow && !this.mainWindow.isDestroyed()) {
       this.mainWindow.webContents.send(event, data);
     }
@@ -112,11 +115,11 @@ export class UpdateManager {
 
       // Create a promise that resolves when we get the appropriate event
       const statusPromise = new Promise<boolean>((resolve) => {
-        const availableHandler = () => {
+        const availableHandler = (): void => {
           autoUpdater.off('update-not-available', notAvailableHandler);
           resolve(true);
         };
-        const notAvailableHandler = () => {
+        const notAvailableHandler = (): void => {
           autoUpdater.off('update-available', availableHandler);
           resolve(false);
         };
@@ -129,7 +132,7 @@ export class UpdateManager {
       const isUpdateAvailable = await statusPromise;
 
       // Only return updateInfo if an update is actually available
-      return isUpdateAvailable ? result?.updateInfo || null : null;
+      return isUpdateAvailable ? (result?.updateInfo ?? null) : null;
     } catch (error) {
       this.logger.error('Error checking for updates:', error);
       this.status.error = error instanceof Error ? error.message : 'Unknown error';
@@ -173,6 +176,7 @@ export class UpdateManager {
   }
 
   getCurrentVersion(): string {
-    return autoUpdater.currentVersion.version;
+    const currentVersion = autoUpdater.currentVersion as { version?: string } | undefined;
+    return String(currentVersion?.version ?? 'unknown');
   }
 }

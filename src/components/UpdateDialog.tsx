@@ -1,24 +1,13 @@
 import { useState, useEffect } from 'react';
+import type { UpdateInfo, DownloadProgress } from '../types';
 import './UpdateDialog.css';
-
-interface UpdateInfo {
-  version: string;
-  releaseDate?: string;
-  releaseName?: string;
-}
-
-interface DownloadProgress {
-  percent: number;
-  transferred: number;
-  total: number;
-}
 
 interface UpdateDialogProps {
   updateInfo: UpdateInfo;
   onClose: () => void;
 }
 
-function UpdateDialog({ updateInfo, onClose }: UpdateDialogProps) {
+function UpdateDialog({ updateInfo, onClose }: UpdateDialogProps): JSX.Element {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isDownloaded, setIsDownloaded] = useState(false);
   const [progress, setProgress] = useState<DownloadProgress | null>(null);
@@ -26,7 +15,7 @@ function UpdateDialog({ updateInfo, onClose }: UpdateDialogProps) {
   const [currentVersion, setCurrentVersion] = useState<string>('');
 
   useEffect(() => {
-    window.electronAPI.getAppVersion().then(setCurrentVersion);
+    void window.electronAPI.getAppVersion().then(setCurrentVersion);
 
     // Listen for download progress
     window.electronAPI.onDownloadProgress((progressInfo) => {
@@ -46,19 +35,23 @@ function UpdateDialog({ updateInfo, onClose }: UpdateDialogProps) {
     });
   }, []);
 
-  const handleDownload = async () => {
+  const handleDownload = async (): Promise<void> => {
     setIsDownloading(true);
     setError(null);
     try {
       await window.electronAPI.downloadUpdate();
-    } catch (err: any) {
-      setError(err.message || 'Failed to download update');
+    } catch (err: unknown) {
+      const errorMessage =
+        err && typeof err === 'object' && 'message' in err
+          ? String(err.message)
+          : 'Failed to download update';
+      setError(errorMessage);
       setIsDownloading(false);
     }
   };
 
-  const handleInstall = () => {
-    window.electronAPI.installUpdate();
+  const handleInstall = (): void => {
+    void window.electronAPI.installUpdate();
   };
 
   const formatBytes = (bytes: number): string => {
@@ -148,7 +141,12 @@ function UpdateDialog({ updateInfo, onClose }: UpdateDialogProps) {
               <button className="btn-secondary" onClick={onClose}>
                 Cancel
               </button>
-              <button className="btn-primary" onClick={handleDownload}>
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  void handleDownload();
+                }}
+              >
                 Download Update
               </button>
             </>
@@ -170,7 +168,12 @@ function UpdateDialog({ updateInfo, onClose }: UpdateDialogProps) {
               <button className="btn-secondary" onClick={onClose}>
                 Close
               </button>
-              <button className="btn-primary" onClick={handleDownload}>
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  void handleDownload();
+                }}
+              >
                 Retry
               </button>
             </>

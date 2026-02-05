@@ -26,6 +26,7 @@ export interface GameDetectorEvents {
   gameDetected: (info: { logFilePath: string; gameExePath: string }) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export declare interface GameDetector {
   on<K extends keyof GameDetectorEvents>(event: K, listener: GameDetectorEvents[K]): this;
   emit<K extends keyof GameDetectorEvents>(
@@ -34,6 +35,7 @@ export declare interface GameDetector {
   ): boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging, no-redeclare
 export class GameDetector extends EventEmitter {
   // @ts-expect-error - Reserved for future use
   private _gameFound: boolean = false;
@@ -67,7 +69,7 @@ export class GameDetector extends EventEmitter {
         if (!line.trim()) continue;
 
         const match = line.match(/"([^"]+)","(\d+)"/);
-        if (!match || !match[1] || !match[2]) continue;
+        if (!match?.[1] || !match[2]) continue;
 
         const exeName = match[1];
         const pid = parseInt(match[2], 10);
@@ -113,7 +115,7 @@ export class GameDetector extends EventEmitter {
               }
             }
           }
-        } catch (wmicError) {
+        } catch {
           // WMIC failed, continue
         }
 
@@ -338,7 +340,7 @@ export class GameDetector extends EventEmitter {
           .replace(/\n/g, ' ');
         logger.info(`Log file preview: ${previewClean.substring(0, 50)}...`);
       } catch (error) {
-        logger.error(`Cannot read log file: ${error}`);
+        logger.error(`Cannot read log file: ${String(error)}`);
         return { gameFound: false, logFilePath: null };
       }
 
@@ -352,7 +354,7 @@ export class GameDetector extends EventEmitter {
 
       return { gameFound: true, logFilePath: this.logFilePath };
     } catch (error) {
-      logger.error(`Error detecting game: ${error}`);
+      logger.error(`Error detecting game: ${String(error)}`);
       return { gameFound: false, logFilePath: null };
     }
   }
@@ -371,7 +373,7 @@ export class GameDetector extends EventEmitter {
     try {
       const processInfo = this.findGameProcess();
       return processInfo !== null;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

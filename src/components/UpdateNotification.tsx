@@ -19,11 +19,11 @@ function UpdateNotification({
   onDownload,
   onDismiss,
   onSkip,
-}: UpdateNotificationProps) {
+}: UpdateNotificationProps): JSX.Element | null {
   const [currentVersion, setCurrentVersion] = useState<string>('');
 
   useEffect(() => {
-    window.electronAPI.getAppVersion().then(setCurrentVersion);
+    void window.electronAPI.getAppVersion().then(setCurrentVersion);
   }, []);
 
   if (!updateInfo) return null;
