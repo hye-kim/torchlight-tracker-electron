@@ -1,6 +1,3 @@
-# Set default behavior to automatically normalize line endings
-* text=auto
-
 # Explicitly set line endings to LF for all text files
 *.ts text eol=lf
 *.tsx text eol=lf
