@@ -8,8 +8,11 @@ interface HistoryStatsPanelProps {
     totalCost: number;
     mapsCompleted: number;
     duration: number;
+    mapDuration: number;
     profitPerMinute: number;
     profitPerHour: number;
+    mapProfitPerMinute: number;
+    mapProfitPerHour: number;
   };
   profitMode: 'perMinute' | 'perHour';
   onProfitModeToggle: () => void;
@@ -36,30 +39,28 @@ const HistoryStatsPanel: React.FC<HistoryStatsPanelProps> = ({
   };
 
   const profitRateValue = profitMode === 'perMinute' ? stats.profitPerMinute : stats.profitPerHour;
+  const mapProfitRateValue = profitMode === 'perMinute' ? stats.mapProfitPerMinute : stats.mapProfitPerHour;
   const profitRateLabel = profitMode === 'perMinute' ? 'Profit / Min' : 'Profit / Hour';
 
   return (
     <div className="history-stats-panel">
       <div className="history-stat-card">
-        <div className="history-stat-label">Total Profit</div>
-        <div className={`history-stat-value ${stats.totalProfit >= 0 ? 'positive' : 'negative'}`}>
-          {formatProfit(stats.totalProfit)}
-        </div>
-      </div>
-
-      <div className="history-stat-card">
-        <div className="history-stat-label">Maps Completed</div>
-        <div className="history-stat-value">{stats.mapsCompleted}</div>
-      </div>
-
-      <div className="history-stat-card">
-        <div className="history-stat-label">Duration</div>
+        <div className="history-stat-label">Map Duration</div>
+        <div className="history-stat-value">{formatDuration(stats.mapDuration)}</div>
+        <div className="history-stat-label">Total Duration</div>
         <div className="history-stat-value">{formatDuration(stats.duration)}</div>
       </div>
 
       <div className="history-stat-card clickable" onClick={onProfitModeToggle}>
         <div className="history-stat-label">
-          {profitRateLabel}
+          Map {profitRateLabel}
+          <span className="toggle-indicator">⇄</span>
+        </div>
+        <div className={`history-stat-value ${mapProfitRateValue >= 0 ? 'positive' : 'negative'}`}>
+          {formatProfit(mapProfitRateValue)}
+        </div>
+        <div className="history-stat-label">
+          Total {profitRateLabel}
           <span className="toggle-indicator">⇄</span>
         </div>
         <div className={`history-stat-value ${profitRateValue >= 0 ? 'positive' : 'negative'}`}>

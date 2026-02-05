@@ -388,10 +388,14 @@ ipcMain.handle('reset-stats', () => {
   const currentSession = sessionManager.getCurrentSession();
   if (currentSession) {
     sessionManager.endCurrentSession();
-    sessionManager.saveSessions();
   }
 
   statisticsTracker.reset();
+
+  // Start a new session
+  sessionManager.startNewSession();
+  sessionManager.saveSessions();
+
   return { success: true };
 });
 
