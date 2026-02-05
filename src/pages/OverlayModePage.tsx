@@ -75,8 +75,8 @@ const OverlayModePage: React.FC<OverlayModePageProps> = ({
           <div key={item.id} className="overlay-stat-item">
             <span className="label">Map Duration:</span>
             <span className="value">
-              {Math.floor((stats?.currentMap.duration || 0) / 60)}m{' '}
-              {Math.floor((stats?.currentMap.duration || 0) % 60)}s
+              {Math.floor((stats?.currentMap.duration ?? 0) / 60)}m{' '}
+              {Math.floor((stats?.currentMap.duration ?? 0) % 60)}s
             </span>
           </div>
         );
@@ -85,8 +85,8 @@ const OverlayModePage: React.FC<OverlayModePageProps> = ({
           <div key={item.id} className="overlay-stat-item">
             <span className="label">Total Duration:</span>
             <span className="value">
-              {Math.floor((stats?.total.duration || 0) / 60)}m{' '}
-              {Math.floor((stats?.total.duration || 0) % 60)}s
+              {Math.floor((stats?.total.duration ?? 0) / 60)}m{' '}
+              {Math.floor((stats?.total.duration ?? 0) % 60)}s
             </span>
           </div>
         );
@@ -94,7 +94,7 @@ const OverlayModePage: React.FC<OverlayModePageProps> = ({
         return (
           <div key={item.id} className="overlay-stat-item">
             <span className="label">Map Count:</span>
-            <span className="value">{stats?.total.mapCount || 0}</span>
+            <span className="value">{stats?.total.mapCount ?? 0}</span>
           </div>
         );
       default:
