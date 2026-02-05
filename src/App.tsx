@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
-import NavigationSidebar, { NavView } from './components/NavigationSidebar';
+import { useEffect, useMemo } from 'react';
+import NavigationSidebar from './components/NavigationSidebar';
 import StatsBar from './components/StatsBar';
 import ControlsBar from './components/ControlsBar';
 import InventoryView from './components/InventoryView';
@@ -11,97 +11,46 @@ import InitializationDialog from './components/InitializationDialog';
 import MapLogTable from './components/MapLogTable';
 import UpdateNotification from './components/UpdateNotification';
 import UpdateDialog from './components/UpdateDialog';
+import {
+  useConfigStore,
+  useStatsStore,
+  useMapStore,
+  useUIStore,
+  useInventoryStore,
+  useInitStore,
+  useUpdateStore,
+} from './stores';
+import { Config, Drop } from './types';
 import './App.css';
 
-interface DisplayItem {
-  id: string;
-  label: string;
-  enabled: boolean;
-  order: number;
-}
-
-interface Config {
-  tax: number;
-  user: string;
-  overlayMode?: boolean;
-  clickThrough?: boolean;
-  fontSize?: number;
-  displayItems?: DisplayItem[];
-}
-
-interface Stats {
-  currentMap: {
-    mapCount: number;
-    duration: number;
-    feIncome: number;
-    incomePerMinute: number;
-  };
-  total: {
-    mapCount: number;
-    duration: number;
-    feIncome: number;
-    incomePerMinute: number;
-  };
-}
-
-interface Drop {
-  itemId: string;
-  name: string;
-  quantity: number;
-  price: number;
-  type: string;
-  timestamp: number;
-  imageUrl?: string;
-}
-
-interface MapItemData {
-  itemId: string;
-  quantity: number;
-}
-
-interface MapLog {
-  mapNumber: number;
-  mapName: string;
-  startTime: number;
-  revenue: number;
-  cost: number;
-  profit: number;
-  duration: number;
-  drops?: MapItemData[];
-  costs?: MapItemData[];
-}
-
-interface CurrentMapData {
-  mapNumber: number;
-  mapName: string;
-  startTime: number;
-  revenue: number;
-  cost: number;
-  profit: number;
-  duration: number;
-  drops?: MapItemData[];
-  costs?: MapItemData[];
-}
-
 function App() {
-  const [config, setConfig] = useState<Config>({ tax: 1, user: '' });
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [drops, setDrops] = useState<Drop[]>([]);
-  const [costs, setCosts] = useState<Drop[]>([]);
-  const [mapLogs, setMapLogs] = useState<MapLog[]>([]);
-  const [showSettings, setShowSettings] = useState(false);
-  const [showOverlaySettings, setShowOverlaySettings] = useState(false);
-  const [showInitDialog, setShowInitDialog] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [isWaitingForInit, setIsWaitingForInit] = useState(false);
-  const [isInMap, setIsInMap] = useState(false);
-  const [currentMap, setCurrentMap] = useState<CurrentMapData | null>(null);
-  const [selectedMapNumber, setSelectedMapNumber] = useState<number | null>(null);
-  const [activeView, setActiveView] = useState<NavView>('overview');
-  const [bagInventory, setBagInventory] = useState<Drop[]>([]);
-  const [updateInfo, setUpdateInfo] = useState<any>(null);
-  const [showUpdateNotification, setShowUpdateNotification] = useState(false);
-  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  // Zustand stores
+  const { config, setConfig, updateConfig } = useConfigStore();
+  const { stats, drops, costs, mapLogs, setStats, setDrops, setCosts, setMapLogs, resetStats } =
+    useStatsStore();
+  const { currentMap, isInMap, selectedMapNumber, setCurrentMap, setIsInMap, setSelectedMapNumber, resetMap } =
+    useMapStore();
+  const {
+    showSettings,
+    showOverlaySettings,
+    showInitDialog,
+    activeView,
+    setShowSettings,
+    setShowOverlaySettings,
+    setShowInitDialog,
+    setActiveView,
+  } = useUIStore();
+  const { bagInventory, setBagInventory, resetInventory } = useInventoryStore();
+  const { isInitialized, isWaitingForInit, setIsInitialized, setIsWaitingForInit } =
+    useInitStore();
+  const {
+    updateInfo,
+    showUpdateNotification,
+    showUpdateDialog,
+    setUpdateInfo,
+    setShowUpdateNotification,
+    setShowUpdateDialog,
+  } = useUpdateStore();
 
   useEffect(() => {
     // Load initial config
@@ -114,12 +63,12 @@ function App() {
     window.electronAPI.getDrops().then(setDrops);
 
     // Load map logs
-    window.electronAPI.getMapLogs?.().then((logs: MapLog[]) => {
+    window.electronAPI.getMapLogs?.().then((logs) => {
       if (logs) setMapLogs(logs);
     });
 
     // Load bag state
-    window.electronAPI.getBagState?.().then((bagState: Drop[]) => {
+    window.electronAPI.getBagState?.().then((bagState) => {
       if (bagState) setBagInventory(bagState);
     });
 
@@ -143,7 +92,7 @@ function App() {
 
     // Listen for overlay mode changes
     window.electronAPI.onOverlayModeChanged((overlayMode: boolean) => {
-      setConfig((prev) => ({ ...prev, overlayMode }));
+      updateConfig({ overlayMode });
     });
 
     // Listen for update events
@@ -159,14 +108,28 @@ function App() {
     window.electronAPI.onUpdateError((error: any) => {
       console.error('Update error:', error);
     });
-  }, []);
+  }, [
+    setConfig,
+    setStats,
+    setDrops,
+    setCosts,
+    setMapLogs,
+    setBagInventory,
+    setIsInMap,
+    setCurrentMap,
+    setIsInitialized,
+    setIsWaitingForInit,
+    updateConfig,
+    setUpdateInfo,
+    setShowUpdateNotification,
+  ]);
 
   // Auto-select current map when in map
   useEffect(() => {
     if (isInMap && currentMap) {
       setSelectedMapNumber(currentMap.mapNumber);
     }
-  }, [isInMap, currentMap]);
+  }, [isInMap, currentMap, setSelectedMapNumber]);
 
   const handleInitializeTracker = async () => {
     setShowInitDialog(true);
@@ -184,14 +147,9 @@ function App() {
   const handleResetStats = async () => {
     if (confirm('Are you sure you want to reset all statistics?')) {
       await window.electronAPI.resetStats();
-      setStats(null);
-      setDrops([]);
-      setCosts([]);
-      setMapLogs([]);
-      setBagInventory([]);
-      setCurrentMap(null);
-      setIsInMap(false);
-      setSelectedMapNumber(null);
+      resetStats();
+      resetMap();
+      resetInventory();
     }
   };
 
@@ -227,7 +185,7 @@ function App() {
     const newOverlayMode = !overlayMode;
 
     // Update local state only (do not persist to config)
-    setConfig((prev) => ({ ...prev, overlayMode: newOverlayMode }));
+    updateConfig({ overlayMode: newOverlayMode });
 
     // Apply overlay mode to window
     if (window.electronAPI) {
@@ -239,7 +197,7 @@ function App() {
     const newClickThrough = !config.clickThrough;
 
     // Update local state only (do not persist to config)
-    setConfig((prev) => ({ ...prev, clickThrough: newClickThrough }));
+    updateConfig({ clickThrough: newClickThrough });
 
     // Apply click-through to window
     if (window.electronAPI) {
