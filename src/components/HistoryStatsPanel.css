@@ -59,7 +59,7 @@
 }
 
 /* Responsive layout */
-@media (max-width: 1400px) {
+@media (max-width: 1200px) {
   .history-stats-panel {
     grid-template-columns: repeat(2, 1fr);
   }

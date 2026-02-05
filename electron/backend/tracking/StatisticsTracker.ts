@@ -42,6 +42,7 @@ export interface TotalStats {
 export interface MapItemData {
   itemId: string;
   quantity: number;
+  price: number;
 }
 
 export interface MapLog {
@@ -177,15 +178,25 @@ export class StatisticsTracker extends EventEmitter {
       const duration = (Date.now() - this.mapStartTime) / 1000;
       this.totalTime += duration;
 
-      // Capture current drops and costs for this map
+      // Get full table and tax settings to store historical prices
+      const fullTable = this.fileManager.loadFullTable();
+      const taxEnabled = this.configManager.getTaxMode() === 1;
+
+      // Capture current drops and costs for this map with historical prices
       const mapDrops: MapItemData[] = [];
       for (const [itemId, quantity] of this.dropList) {
-        mapDrops.push({ itemId, quantity });
+        const item = fullTable[itemId];
+        const basePrice = item?.price || 0.0;
+        const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
+        mapDrops.push({ itemId, quantity, price });
       }
 
       const mapCosts: MapItemData[] = [];
       for (const [itemId, quantity] of this.costList) {
-        mapCosts.push({ itemId, quantity });
+        const item = fullTable[itemId];
+        const basePrice = item?.price || 0.0;
+        const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
+        mapCosts.push({ itemId, quantity, price });
       }
 
       // Create map log entry with drops and costs
@@ -547,15 +558,25 @@ export class StatisticsTracker extends EventEmitter {
 
     const duration = (Date.now() - this.mapStartTime) / 1000;
 
-    // Get current drops and costs
+    // Get full table and tax settings to store current prices
+    const fullTable = this.fileManager.loadFullTable();
+    const taxEnabled = this.configManager.getTaxMode() === 1;
+
+    // Get current drops and costs with prices
     const currentDrops: MapItemData[] = [];
     for (const [itemId, quantity] of this.dropList) {
-      currentDrops.push({ itemId, quantity });
+      const item = fullTable[itemId];
+      const basePrice = item?.price || 0.0;
+      const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
+      currentDrops.push({ itemId, quantity, price });
     }
 
     const currentCosts: MapItemData[] = [];
     for (const [itemId, quantity] of this.costList) {
-      currentCosts.push({ itemId, quantity });
+      const item = fullTable[itemId];
+      const basePrice = item?.price || 0.0;
+      const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
+      currentCosts.push({ itemId, quantity, price });
     }
 
     return {

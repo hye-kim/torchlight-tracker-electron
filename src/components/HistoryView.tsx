@@ -19,7 +19,7 @@ interface Session {
     profitPerMinute: number;
     profitPerHour: number;
   };
-  mapLogs: any[];
+  mapLogs: MapLog[];
   isActive: boolean;
   lastModified: number;
 }
@@ -34,10 +34,25 @@ interface Drop {
   imageUrl?: string;
 }
 
+interface MapLog {
+  mapNumber: number;
+  mapName: string;
+  startTime: number;
+  revenue: number;
+  cost: number;
+  profit: number;
+  duration: number;
+  drops?: Drop[];
+  costs?: Drop[];
+  sessionId?: string;
+  sessionTitle?: string;
+}
+
 const HistoryView: React.FC = () => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [selectedSessionIds, setSelectedSessionIds] = useState<string[]>([]);
   const [selectedMapNumber, setSelectedMapNumber] = useState<number | null>(null);
+  const [selectedMapSessionId, setSelectedMapSessionId] = useState<string | null>(null);
   const [profitMode, setProfitMode] = useState<'perMinute' | 'perHour'>('perMinute');
 
   const loadSessions = async () => {
@@ -67,8 +82,11 @@ const HistoryView: React.FC = () => {
         totalCost: 0,
         mapsCompleted: 0,
         duration: 0,
+        mapDuration: 0,
         profitPerMinute: 0,
         profitPerHour: 0,
+        mapProfitPerMinute: 0,
+        mapProfitPerHour: 0,
       };
     }
 
@@ -78,14 +96,26 @@ const HistoryView: React.FC = () => {
     const mapsCompleted = selectedSessions.reduce((sum, s) => sum + s.stats.mapsCompleted, 0);
     const totalDuration = selectedSessions.reduce((sum, s) => sum + s.duration, 0);
 
+    // Calculate average map duration from actual map durations
+    let totalMapDuration = 0;
+    selectedSessions.forEach((session) => {
+      session.mapLogs.forEach((mapLog) => {
+        totalMapDuration += mapLog.duration;
+      });
+    });
+    const avgMapDuration = mapsCompleted > 0 ? totalMapDuration / mapsCompleted : 0;
+
     return {
       totalProfit,
       totalRevenue,
       totalCost,
       mapsCompleted,
       duration: totalDuration,
+      mapDuration: avgMapDuration,
       profitPerMinute: totalDuration > 0 ? totalProfit / (totalDuration / 60) : 0,
       profitPerHour: totalDuration > 0 ? totalProfit / (totalDuration / 3600) : 0,
+      mapProfitPerMinute: avgMapDuration > 0 ? (totalProfit / mapsCompleted) / (avgMapDuration / 60) : 0,
+      mapProfitPerHour: avgMapDuration > 0 ? (totalProfit / mapsCompleted) / (avgMapDuration / 3600) : 0,
     };
   }, [sessions, selectedSessionIds]);
 
@@ -93,7 +123,7 @@ const HistoryView: React.FC = () => {
   const combinedMapLogs = React.useMemo(() => {
     const selectedSessions = sessions.filter((s) => selectedSessionIds.includes(s.sessionId));
 
-    const allLogs: any[] = [];
+    const allLogs: MapLog[] = [];
     selectedSessions.forEach((session) => {
       session.mapLogs.forEach((mapLog) => {
         allLogs.push({
@@ -110,9 +140,11 @@ const HistoryView: React.FC = () => {
 
   // Get drops for selected map or all maps
   const drops: Drop[] = React.useMemo(() => {
-    if (selectedMapNumber !== null) {
-      // Find the specific map
-      const selectedMap = combinedMapLogs.find((m) => m.mapNumber === selectedMapNumber);
+    if (selectedMapNumber !== null && selectedMapSessionId !== null) {
+      // Find the specific map by both mapNumber and sessionId
+      const selectedMap = combinedMapLogs.find(
+        (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
+      );
       if (selectedMap && selectedMap.drops) {
         // Data is already enriched by backend
         return selectedMap.drops;
@@ -138,12 +170,14 @@ const HistoryView: React.FC = () => {
 
       return Array.from(aggregatedDrops.values());
     }
-  }, [combinedMapLogs, selectedMapNumber]);
+  }, [combinedMapLogs, selectedMapNumber, selectedMapSessionId]);
 
   // Get costs for selected map or all maps
   const costs: Drop[] = React.useMemo(() => {
-    if (selectedMapNumber !== null) {
-      const selectedMap = combinedMapLogs.find((m) => m.mapNumber === selectedMapNumber);
+    if (selectedMapNumber !== null && selectedMapSessionId !== null) {
+      const selectedMap = combinedMapLogs.find(
+        (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
+      );
       if (selectedMap && selectedMap.costs) {
         // Data is already enriched by backend
         return selectedMap.costs;
@@ -168,7 +202,7 @@ const HistoryView: React.FC = () => {
 
       return Array.from(aggregatedCosts.values());
     }
-  }, [combinedMapLogs, selectedMapNumber]);
+  }, [combinedMapLogs, selectedMapNumber, selectedMapSessionId]);
 
   // Calculate total picked up and total cost
   const totalPickedUp = React.useMemo(() => {
@@ -178,6 +212,19 @@ const HistoryView: React.FC = () => {
   const totalCost = React.useMemo(() => {
     return costs.reduce((sum, cost) => sum + cost.price * cost.quantity, 0);
   }, [costs]);
+
+  // Reset selected map when sessions change or become unselected
+  useEffect(() => {
+    if (selectedMapNumber !== null && selectedMapSessionId !== null) {
+      const mapExists = combinedMapLogs.some(
+        (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
+      );
+      if (!mapExists) {
+        setSelectedMapNumber(null);
+        setSelectedMapSessionId(null);
+      }
+    }
+  }, [combinedMapLogs, selectedMapNumber, selectedMapSessionId]);
 
   const handleDeleteSessions = async (sessionIds: string[]) => {
     await window.electronAPI.deleteSessions(sessionIds);
@@ -212,7 +259,11 @@ const HistoryView: React.FC = () => {
               currentMap={null}
               mapCount={combinedMapLogs.length}
               selectedMapNumber={selectedMapNumber}
-              onSelectMap={setSelectedMapNumber}
+              selectedSessionId={selectedMapSessionId}
+              onSelectMap={(mapNumber, sessionId) => {
+                setSelectedMapNumber(mapNumber);
+                setSelectedMapSessionId(sessionId || null);
+              }}
             />
           </div>
 
@@ -222,7 +273,18 @@ const HistoryView: React.FC = () => {
               costs={costs}
               totalPickedUp={totalPickedUp}
               totalCost={totalCost}
-              selectedMapName={selectedMapNumber !== null ? `Map #${selectedMapNumber}` : undefined}
+              selectedMapName={
+                selectedMapNumber !== null && selectedMapSessionId !== null
+                  ? (() => {
+                      const selectedMap = combinedMapLogs.find(
+                        (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
+                      );
+                      return selectedMap
+                        ? `${selectedMap.mapName ?? `Map #${selectedMap.mapNumber}`} (${selectedMap.sessionTitle ?? 'Session'})`
+                        : `Map #${selectedMapNumber}`;
+                    })()
+                  : undefined
+              }
             />
           </div>
         </div>

@@ -9,6 +9,7 @@ interface MapLog {
   cost: number;
   profit: number;
   duration: number;
+  sessionId?: string;
 }
 
 interface CurrentMapData {
@@ -28,7 +29,8 @@ interface MapLogTableProps {
   currentMap: CurrentMapData | null;
   mapCount: number;
   selectedMapNumber: number | null;
-  onSelectMap: (mapNumber: number | null) => void;
+  selectedSessionId?: string | null;
+  onSelectMap: (mapNumber: number | null, sessionId?: string | null) => void;
 }
 
 type SortColumn = 'mapNumber' | 'revenue' | 'cost' | 'profit' | 'duration';
@@ -41,12 +43,13 @@ function MapLogTable({
   currentMap,
   mapCount,
   selectedMapNumber,
+  selectedSessionId,
   onSelectMap,
-}: MapLogTableProps) {
+}: MapLogTableProps): JSX.Element {
   const [sortColumn, setSortColumn] = useState<SortColumn>('mapNumber');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
-  const handleSort = (column: SortColumn) => {
+  const handleSort = (column: SortColumn): void => {
     if (sortColumn === column) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
@@ -109,8 +112,8 @@ function MapLogTable({
         ]
       : sortedLogs;
 
-  const handleRowClick = (mapNumber: number) => {
-    onSelectMap(mapNumber);
+  const handleRowClick = (mapNumber: number, sessionId?: string): void => {
+    onSelectMap(mapNumber, sessionId);
   };
 
   return (
@@ -156,14 +159,15 @@ function MapLogTable({
               </tr>
             ) : (
               displayLogs.map((log) => {
-                const isActive = log.isActive || false;
-                const isSelected = selectedMapNumber === log.mapNumber;
+                const isActive = log.isActive ?? false;
+                const isSelected = selectedMapNumber === log.mapNumber &&
+                  (selectedSessionId === log.sessionId || selectedSessionId === null || selectedSessionId === undefined);
 
                 return (
                   <tr
-                    key={isActive ? 'current' : log.mapNumber}
+                    key={isActive ? 'current' : `${log.sessionId}-${log.mapNumber}`}
                     className={`${isActive ? 'active-row' : ''} ${isSelected ? 'selected-row' : ''}`}
-                    onClick={() => handleRowClick(log.mapNumber)}
+                    onClick={() => handleRowClick(log.mapNumber, log.sessionId)}
                   >
                     <td className="map-cell">
                       {isActive && <span className="active-indicator"></span>}
