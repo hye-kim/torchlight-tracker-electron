@@ -39,6 +39,9 @@ interface MapItemData {
   itemId: string;
   quantity: number;
   price: number;
+  name?: string;
+  type?: string;
+  imageUrl?: string;
 }
 
 interface MapLog {
@@ -159,7 +162,9 @@ const HistoryView: React.FC = () => {
     );
   }, [combinedMapLogs, selectedMapNumber, selectedMapSessionId]);
 
-  // Get drops for the selected map, enriched with item metadata
+  // Get drops for the selected map, enriched with item metadata.
+  // Prefer metadata from the session data (populated by getSessions backend handler),
+  // falling back to globalDrops only when session data lacks enrichment.
   const drops: Drop[] = React.useMemo(() => {
     if (!selectedMapData?.drops) return [];
 
@@ -167,17 +172,18 @@ const HistoryView: React.FC = () => {
       const existingDrop = globalDrops.find((d) => d.itemId === item.itemId);
       return {
         itemId: item.itemId,
-        name: existingDrop?.name ?? `Item ${item.itemId}`,
+        name: item.name ?? existingDrop?.name ?? `Item ${item.itemId}`,
         quantity: item.quantity,
         price: item.price,
-        type: existingDrop?.type ?? 'Unknown',
+        type: item.type ?? existingDrop?.type ?? 'Unknown',
         timestamp: selectedMapData.startTime,
-        imageUrl: existingDrop?.imageUrl,
+        imageUrl: item.imageUrl ?? existingDrop?.imageUrl,
       };
     });
   }, [selectedMapData, globalDrops]);
 
-  // Get costs for the selected map, enriched with item metadata
+  // Get costs for the selected map, enriched with item metadata.
+  // Prefer metadata from the session data, falling back to globalCosts/globalDrops.
   const costs: Drop[] = React.useMemo(() => {
     if (!selectedMapData?.costs) return [];
 
@@ -186,12 +192,12 @@ const HistoryView: React.FC = () => {
       const existingDrop = globalDrops.find((d) => d.itemId === item.itemId);
       return {
         itemId: item.itemId,
-        name: existingCost?.name ?? existingDrop?.name ?? `Item ${item.itemId}`,
+        name: item.name ?? existingCost?.name ?? existingDrop?.name ?? `Item ${item.itemId}`,
         quantity: item.quantity,
         price: item.price,
-        type: existingCost?.type ?? existingDrop?.type ?? 'Unknown',
+        type: item.type ?? existingCost?.type ?? existingDrop?.type ?? 'Unknown',
         timestamp: selectedMapData.startTime,
-        imageUrl: existingCost?.imageUrl ?? existingDrop?.imageUrl,
+        imageUrl: item.imageUrl ?? existingCost?.imageUrl ?? existingDrop?.imageUrl,
       };
     });
   }, [selectedMapData, globalDrops, globalCosts]);
