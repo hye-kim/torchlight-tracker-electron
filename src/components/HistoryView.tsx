@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './HistoryView.css';
 import SessionSelector from './SessionSelector';
 import HistoryStatsPanel from './HistoryStatsPanel';
@@ -229,12 +229,21 @@ const HistoryView: React.FC = () => {
       : `Map #${selectedMapNumber}`;
   }, [selectedMapNumber, selectedMapSessionId, combinedMapLogs]);
 
-  const handleDeleteSessions = (sessionIds: string[]): void => {
+  const handleDeleteSessions = useCallback((sessionIds: string[]): void => {
     void window.electronAPI.deleteSessions(sessionIds).then(() => {
       void loadSessions();
       setSelectedSessionIds([]);
     });
-  };
+  }, []);
+
+  const handleProfitModeToggle = useCallback(() => {
+    setProfitMode((prev) => (prev === 'perMinute' ? 'perHour' : 'perMinute'));
+  }, []);
+
+  const handleSelectMap = useCallback((mapNumber: number | null, sessionId?: string | null) => {
+    setSelectedMapNumber(mapNumber);
+    setSelectedMapSessionId(sessionId ?? null);
+  }, []);
 
   return (
     <div className="history-view">
@@ -249,9 +258,7 @@ const HistoryView: React.FC = () => {
         <HistoryStatsPanel
           stats={aggregatedStats}
           profitMode={profitMode}
-          onProfitModeToggle={() =>
-            setProfitMode(profitMode === 'perMinute' ? 'perHour' : 'perMinute')
-          }
+          onProfitModeToggle={handleProfitModeToggle}
         />
 
         <div className="history-tables">
@@ -264,10 +271,7 @@ const HistoryView: React.FC = () => {
               mapCount={combinedMapLogs.length}
               selectedMapNumber={selectedMapNumber}
               selectedSessionId={selectedMapSessionId}
-              onSelectMap={(mapNumber, sessionId) => {
-                setSelectedMapNumber(mapNumber);
-                setSelectedMapSessionId(sessionId ?? null);
-              }}
+              onSelectMap={handleSelectMap}
             />
           </div>
 

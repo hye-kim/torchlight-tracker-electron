@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import NavigationSidebar from './components/NavigationSidebar';
 import SettingsDialog from './components/SettingsDialog';
 import OverlaySettings from './components/OverlaySettings';
@@ -46,65 +47,110 @@ function App(): JSX.Element {
   } = useUpdateStore();
 
   // Window control handlers
-  const handleWindowMinimize = (): void => void window.electronAPI.windowMinimize();
-  const handleWindowMaximize = (): void => void window.electronAPI.windowMaximize();
-  const handleWindowClose = (): void => void window.electronAPI.windowClose();
+  const handleWindowMinimize = useCallback(
+    (): void => void window.electronAPI.windowMinimize(),
+    []
+  );
+  const handleWindowMaximize = useCallback(
+    (): void => void window.electronAPI.windowMaximize(),
+    []
+  );
+  const handleWindowClose = useCallback((): void => void window.electronAPI.windowClose(), []);
 
   // Action handlers
-  const handleExportExcel = async (): Promise<void> => {
+  const handleExportExcel = useCallback(async (): Promise<void> => {
     const result = await window.electronAPI.exportExcel();
     if (result.success) {
       alert(`Excel exported successfully to: ${result.filePath}`);
     }
-  };
+  }, []);
 
-  const handleResetStats = async (): Promise<void> => {
+  const handleResetStats = useCallback(async (): Promise<void> => {
     if (confirm('Are you sure you want to reset all statistics?')) {
       await window.electronAPI.resetStats();
       resetStats();
       resetMap();
       resetInventory();
     }
-  };
+  }, [resetStats, resetMap, resetInventory]);
 
-  const handleSaveSettings = async (updates: Partial<Config>): Promise<void> => {
-    const newConfig = await window.electronAPI.updateConfig(updates);
-    setConfig(newConfig);
-    setShowSettings(false);
-  };
+  const handleSaveSettings = useCallback(
+    async (updates: Partial<Config>): Promise<void> => {
+      const newConfig = await window.electronAPI.updateConfig(updates);
+      setConfig(newConfig);
+      setShowSettings(false);
+    },
+    [setConfig, setShowSettings]
+  );
 
-  const handleSaveOverlaySettings = async (updates: Partial<Config>): Promise<void> => {
-    const newConfig = await window.electronAPI.updateConfig(updates);
-    setConfig(newConfig);
-  };
+  const handleSaveOverlaySettings = useCallback(
+    async (updates: Partial<Config>): Promise<void> => {
+      const newConfig = await window.electronAPI.updateConfig(updates);
+      setConfig(newConfig);
+    },
+    [setConfig]
+  );
 
-  const handleToggleOverlayMode = async (): Promise<void> => {
-    const newOverlayMode = !config.overlayMode;
+  // Use getState() to read current config without adding it as a dependency,
+  // which would invalidate the callback on every config change
+  const handleToggleOverlayMode = useCallback(async (): Promise<void> => {
+    const current = useConfigStore.getState().config.overlayMode ?? false;
+    const newOverlayMode = !current;
     updateConfig({ overlayMode: newOverlayMode });
     await window.electronAPI.toggleOverlayMode(newOverlayMode);
-  };
+  }, [updateConfig]);
 
-  const handleToggleClickThrough = async (): Promise<void> => {
-    const newClickThrough = !config.clickThrough;
+  const handleToggleClickThrough = useCallback(async (): Promise<void> => {
+    const current = useConfigStore.getState().config.clickThrough ?? false;
+    const newClickThrough = !current;
     updateConfig({ clickThrough: newClickThrough });
     await window.electronAPI.toggleClickThrough(newClickThrough);
-  };
+  }, [updateConfig]);
 
-  const handleDownloadUpdate = (): void => {
+  const handleDownloadUpdate = useCallback((): void => {
     setShowUpdateNotification(false);
     setShowUpdateDialog(true);
-  };
+  }, [setShowUpdateNotification, setShowUpdateDialog]);
 
-  const handleDismissUpdate = (): void => {
+  const handleDismissUpdate = useCallback((): void => {
     setShowUpdateNotification(false);
-  };
+  }, [setShowUpdateNotification]);
 
-  const handleSkipUpdate = async (): Promise<void> => {
-    if (updateInfo) {
-      await window.electronAPI.skipUpdateVersion(updateInfo.version);
+  const handleSkipUpdate = useCallback(async (): Promise<void> => {
+    const info = useUpdateStore.getState().updateInfo;
+    if (info) {
+      await window.electronAPI.skipUpdateVersion(info.version);
       setShowUpdateNotification(false);
     }
-  };
+  }, [setShowUpdateNotification]);
+
+  // Stable callbacks for memo'd children
+  const handleOpenSettings = useCallback(() => setShowSettings(true), [setShowSettings]);
+  const handleOpenOverlaySettings = useCallback(
+    () => setShowOverlaySettings(true),
+    [setShowOverlaySettings]
+  );
+  const handleCloseSettings = useCallback(() => setShowSettings(false), [setShowSettings]);
+  const handleCloseOverlaySettings = useCallback(
+    () => setShowOverlaySettings(false),
+    [setShowOverlaySettings]
+  );
+  const handleCloseInitDialog = useCallback(() => setShowInitDialog(false), [setShowInitDialog]);
+  const handleCloseUpdateDialog = useCallback(
+    () => setShowUpdateDialog(false),
+    [setShowUpdateDialog]
+  );
+
+  // Void-returning wrappers for async handlers passed to props expecting () => void
+  const fireToggleOverlayMode = useCallback(
+    () => void handleToggleOverlayMode(),
+    [handleToggleOverlayMode]
+  );
+  const fireToggleClickThrough = useCallback(
+    () => void handleToggleClickThrough(),
+    [handleToggleClickThrough]
+  );
+  const fireSkipUpdate = useCallback(() => void handleSkipUpdate(), [handleSkipUpdate]);
 
   const overlayMode = config.overlayMode ?? false;
   const fontSize = config.fontSize ?? 14;
@@ -116,9 +162,9 @@ function App(): JSX.Element {
     >
       {overlayMode ? (
         <OverlayModePage
-          onOpenSettings={() => setShowOverlaySettings(true)}
-          onToggleOverlay={() => void handleToggleOverlayMode()}
-          onToggleClickThrough={() => void handleToggleClickThrough()}
+          onOpenSettings={handleOpenOverlaySettings}
+          onToggleOverlay={fireToggleOverlayMode}
+          onToggleClickThrough={fireToggleClickThrough}
         />
       ) : (
         <>
@@ -186,7 +232,7 @@ function App(): JSX.Element {
 
             {activeView === 'overview' ? (
               <OverviewPage
-                onOpenSettings={() => setShowSettings(true)}
+                onOpenSettings={handleOpenSettings}
                 onToggleOverlay={handleToggleOverlayMode}
                 onExportExcel={handleExportExcel}
                 onResetStats={handleResetStats}
@@ -206,7 +252,7 @@ function App(): JSX.Element {
         <SettingsDialog
           config={config}
           onSave={(updates) => void handleSaveSettings(updates)}
-          onClose={() => setShowSettings(false)}
+          onClose={handleCloseSettings}
         />
       )}
 
@@ -214,23 +260,23 @@ function App(): JSX.Element {
         <OverlaySettings
           config={config}
           onSave={(updates) => void handleSaveOverlaySettings(updates)}
-          onClose={() => setShowOverlaySettings(false)}
+          onClose={handleCloseOverlaySettings}
         />
       )}
 
-      {showInitDialog && <InitializationDialog onClose={() => setShowInitDialog(false)} />}
+      {showInitDialog && <InitializationDialog onClose={handleCloseInitDialog} />}
 
       {showUpdateNotification && updateInfo && (
         <UpdateNotification
           updateInfo={updateInfo}
           onDownload={handleDownloadUpdate}
           onDismiss={handleDismissUpdate}
-          onSkip={() => void handleSkipUpdate()}
+          onSkip={fireSkipUpdate}
         />
       )}
 
       {showUpdateDialog && updateInfo && (
-        <UpdateDialog updateInfo={updateInfo} onClose={() => setShowUpdateDialog(false)} />
+        <UpdateDialog updateInfo={updateInfo} onClose={handleCloseUpdateDialog} />
       )}
     </div>
   );

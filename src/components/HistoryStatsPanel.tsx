@@ -84,4 +84,4 @@ const HistoryStatsPanel: React.FC<HistoryStatsPanelProps> = ({
   );
 };
 
-export default HistoryStatsPanel;
+export default React.memo(HistoryStatsPanel);

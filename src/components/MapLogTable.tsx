@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 import './MapLogTable.css';
 
 interface MapLog {
@@ -200,4 +200,4 @@ function MapLogTable({
   );
 }
 
-export default MapLogTable;
+export default memo(MapLogTable);

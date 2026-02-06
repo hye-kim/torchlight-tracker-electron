@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 import './DropsCard.css';
 
 interface Drop {
@@ -356,4 +356,4 @@ function DropsCard({
   );
 }
 
-export default DropsCard;
+export default memo(DropsCard);

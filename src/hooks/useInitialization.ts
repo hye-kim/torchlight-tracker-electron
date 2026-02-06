@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useUIStore, useInitStore } from '../stores';
 
 /**
@@ -17,11 +17,11 @@ export const useInitialization = (): { handleInitializeTracker: () => Promise<vo
     });
   }, [setIsInitialized, setIsWaitingForInit]);
 
-  const handleInitializeTracker = async (): Promise<void> => {
+  const handleInitializeTracker = useCallback(async (): Promise<void> => {
     setShowInitDialog(true);
     setIsWaitingForInit(true);
     await window.electronAPI.initializeTracker();
-  };
+  }, [setShowInitDialog, setIsWaitingForInit]);
 
   return { handleInitializeTracker };
 };

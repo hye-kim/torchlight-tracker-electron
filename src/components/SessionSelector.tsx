@@ -213,4 +213,4 @@ const SessionSelector: React.FC<SessionSelectorProps> = ({
   );
 };
 
-export default SessionSelector;
+export default React.memo(SessionSelector);

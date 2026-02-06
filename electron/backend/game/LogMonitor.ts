@@ -61,6 +61,9 @@ export class LogMonitor extends EventEmitter {
   private readonly PRICE_BUFFER_INTERVAL = 1000; // Check price buffer every 1 second
   private insidePriceResponse: boolean = false; // Track if we're inside a price response block
 
+  // Hash of the last emitted display payload to skip redundant IPC emissions
+  private lastPayloadHash: string = '';
+
   // Buffer for initialization (collects BagMgr@:InitBagData entries)
   private bagMgrBuffer: string[] = [];
 
@@ -399,7 +402,7 @@ export class LogMonitor extends EventEmitter {
         };
       });
 
-      this.emit('updateDisplay', {
+      const payload = {
         stats: {
           currentMap: {
             mapCount: totalStats.mapCount,
@@ -420,7 +423,33 @@ export class LogMonitor extends EventEmitter {
         isInMap: isInMap,
         currentMap: currentMap,
         bagInventory: bagArray,
-      });
+      };
+
+      // Build a fingerprint from stable payload fields (excluding volatile timestamps)
+      // to avoid emitting identical data every poll tick
+      const hashParts = [
+        currentStats.duration,
+        currentStats.profit,
+        totalStats.duration,
+        totalStats.profit,
+        totalStats.mapCount,
+        isInMap,
+        currentMap?.mapNumber ?? -1,
+        dropsArray.length,
+        costsArray.length,
+        mapLogs.length,
+        bagArray.length,
+        // Include item-level detail to catch quantity/price changes
+        dropsArray.map((d) => `${d.itemId}:${d.quantity}:${d.price}`).join(','),
+        costsArray.map((c) => `${c.itemId}:${c.quantity}:${c.price}`).join(','),
+        bagArray.map((b) => `${b.itemId}:${b.quantity}`).join(','),
+      ];
+      const payloadHash = hashParts.join('|');
+
+      if (payloadHash !== this.lastPayloadHash) {
+        this.lastPayloadHash = payloadHash;
+        this.emit('updateDisplay', payload);
+      }
     } catch (error) {
       logger.error(`Error in log monitor poll: ${String(error)}`);
       this.emit('error', error as Error);
