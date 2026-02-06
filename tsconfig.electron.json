@@ -18,6 +18,6 @@
     "rootDir": ".",
     "sourceMap": true
   },
-  "include": ["electron", "src"],
+  "include": ["electron/**/*", "src/types/**/*"],
   "exclude": ["node_modules", "dist", "dist-electron", "dist-react"]
 }
