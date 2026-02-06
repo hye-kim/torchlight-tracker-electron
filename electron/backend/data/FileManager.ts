@@ -33,8 +33,6 @@ export interface ComprehensiveItemEntry {
 
 export class FileManager {
   private fullTableCache: Record<string, ItemData> | null = null;
-  // @ts-expect-error - Reserved for future cache invalidation
-  private _cacheTimestamp: number = 0;
   private apiUrl: string;
   private userDataPath: string;
   private resourcePath: string;
@@ -224,7 +222,7 @@ export class FileManager {
       {}
     );
     if (compDb[itemId]) {
-      return compDb[itemId] as ItemData;
+      return compDb[itemId] as unknown as ItemData;
     }
 
     // Fall back to full table

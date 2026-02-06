@@ -4,7 +4,6 @@ import type {
   Stats,
   Drop,
   MapLog,
-  BagState,
   UpdateInfo,
   UpdateConfig,
   UpdateStatus,
