@@ -74,13 +74,13 @@ export const useMapSelection = (): {
   }, [selectedMapData, costs, drops]);
 
   // Calculate totals for the selected map
-  const totalPickedUp = selectedMapDrops.reduce(
-    (sum: number, d: Drop) => sum + d.price * d.quantity,
-    0
+  const totalPickedUp = useMemo(
+    () => selectedMapDrops.reduce((sum: number, d: Drop) => sum + d.price * d.quantity, 0),
+    [selectedMapDrops]
   );
-  const totalCost = selectedMapCosts.reduce(
-    (sum: number, c: Drop) => sum + c.price * c.quantity,
-    0
+  const totalCost = useMemo(
+    () => selectedMapCosts.reduce((sum: number, c: Drop) => sum + c.price * c.quantity, 0),
+    [selectedMapCosts]
   );
 
   return {

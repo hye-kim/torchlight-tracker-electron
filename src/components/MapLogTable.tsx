@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import './MapLogTable.css';
 
 interface MapLog {
@@ -73,29 +73,31 @@ function MapLogTable({
     });
   };
 
-  const sortedLogs = [...mapLogs].sort((a, b) => {
-    let comparison = 0;
+  const sortedLogs = useMemo(() => {
+    return [...mapLogs].sort((a, b) => {
+      let comparison = 0;
 
-    switch (sortColumn) {
-      case 'mapNumber':
-        comparison = a.mapNumber - b.mapNumber;
-        break;
-      case 'revenue':
-        comparison = a.revenue - b.revenue;
-        break;
-      case 'cost':
-        comparison = a.cost - b.cost;
-        break;
-      case 'profit':
-        comparison = a.profit - b.profit;
-        break;
-      case 'duration':
-        comparison = a.duration - b.duration;
-        break;
-    }
+      switch (sortColumn) {
+        case 'mapNumber':
+          comparison = a.mapNumber - b.mapNumber;
+          break;
+        case 'revenue':
+          comparison = a.revenue - b.revenue;
+          break;
+        case 'cost':
+          comparison = a.cost - b.cost;
+          break;
+        case 'profit':
+          comparison = a.profit - b.profit;
+          break;
+        case 'duration':
+          comparison = a.duration - b.duration;
+          break;
+      }
 
-    return sortDirection === 'asc' ? comparison : -comparison;
-  });
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  }, [mapLogs, sortColumn, sortDirection]);
 
   const getSortIcon = (column: SortColumn): string => {
     if (sortColumn !== column) return '▼';
@@ -104,13 +106,15 @@ function MapLogTable({
 
   // Create display list with current map at top if active
   // Filter out current map from sorted logs to prevent duplication
-  const displayLogs: Array<MapLog & { isActive?: boolean }> =
-    isInMap && currentMap
-      ? [
-          { ...currentMap, isActive: true },
-          ...sortedLogs.filter((log) => log.mapNumber !== currentMap.mapNumber),
-        ]
-      : sortedLogs;
+  const displayLogs = useMemo((): Array<MapLog & { isActive?: boolean }> => {
+    if (isInMap && currentMap) {
+      return [
+        { ...currentMap, isActive: true },
+        ...sortedLogs.filter((log) => log.mapNumber !== currentMap.mapNumber),
+      ];
+    }
+    return sortedLogs;
+  }, [sortedLogs, isInMap, currentMap]);
 
   const handleRowClick = (mapNumber: number, sessionId?: string): void => {
     onSelectMap(mapNumber, sessionId);

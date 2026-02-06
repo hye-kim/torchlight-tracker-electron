@@ -219,6 +219,16 @@ const HistoryView: React.FC = () => {
     }
   }, [combinedMapLogs, selectedMapNumber, selectedMapSessionId]);
 
+  const selectedMapName = React.useMemo(() => {
+    if (selectedMapNumber === null || selectedMapSessionId === null) return undefined;
+    const selectedMap = combinedMapLogs.find(
+      (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
+    );
+    return selectedMap
+      ? `${selectedMap.mapName ?? `Map #${selectedMap.mapNumber}`} (${selectedMap.sessionTitle ?? 'Session'})`
+      : `Map #${selectedMapNumber}`;
+  }, [selectedMapNumber, selectedMapSessionId, combinedMapLogs]);
+
   const handleDeleteSessions = (sessionIds: string[]): void => {
     void window.electronAPI.deleteSessions(sessionIds).then(() => {
       void loadSessions();
@@ -267,19 +277,7 @@ const HistoryView: React.FC = () => {
               costs={costs}
               totalPickedUp={totalPickedUp}
               totalCost={totalCost}
-              selectedMapName={
-                selectedMapNumber !== null && selectedMapSessionId !== null
-                  ? (() => {
-                      const selectedMap = combinedMapLogs.find(
-                        (m) =>
-                          m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
-                      );
-                      return selectedMap
-                        ? `${selectedMap.mapName ?? `Map #${selectedMap.mapNumber}`} (${selectedMap.sessionTitle ?? 'Session'})`
-                        : `Map #${selectedMapNumber}`;
-                    })()
-                  : undefined
-              }
+              selectedMapName={selectedMapName}
             />
           </div>
         </div>
