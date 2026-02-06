@@ -5,7 +5,6 @@ import type {
   Stats,
   Drop,
   MapLog,
-  BagState,
   UpdateInfo,
   UpdateConfig,
   UpdateStatus,
@@ -53,6 +52,7 @@ declare global {
         callback: (data: {
           stats: Stats;
           drops: Drop[];
+          costs: Drop[];
           mapLogs: MapLog[];
           bagInventory: Drop[];
           isInMap: boolean;

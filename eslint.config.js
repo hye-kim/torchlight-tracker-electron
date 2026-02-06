@@ -21,8 +21,8 @@ module.exports = [
       '*.log',
       'coverage/**',
       '.DS_Store',
-      'Thumbs.db'
-    ]
+      'Thumbs.db',
+    ],
   },
 
   // Base ESLint recommended rules
@@ -37,9 +37,9 @@ module.exports = [
         ecmaVersion: 'latest',
         sourceType: 'module',
         ecmaFeatures: {
-          jsx: true
+          jsx: true,
         },
-        project: ['./tsconfig.json', './tsconfig.electron.json']
+        projectService: true,
       },
       globals: {
         // Browser globals
@@ -64,14 +64,14 @@ module.exports = [
         clearInterval: 'readonly',
         setImmediate: 'readonly',
         clearImmediate: 'readonly',
-        NodeJS: 'readonly'
-      }
+        NodeJS: 'readonly',
+      },
     },
     plugins: {
       '@typescript-eslint': tseslint,
-      'react': react,
+      react: react,
       'react-hooks': reactHooks,
-      'prettier': prettier
+      prettier: prettier,
     },
     rules: {
       // TypeScript recommended rules
@@ -94,16 +94,16 @@ module.exports = [
         'warn',
         {
           argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_'
-        }
+          varsIgnorePattern: '^_',
+        },
       ],
       '@typescript-eslint/explicit-function-return-type': [
         'warn',
         {
           allowExpressions: true,
           allowTypedFunctionExpressions: true,
-          allowHigherOrderFunctions: true
-        }
+          allowHigherOrderFunctions: true,
+        },
       ],
       '@typescript-eslint/no-non-null-assertion': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
@@ -116,13 +116,13 @@ module.exports = [
       'no-console': 'off',
       'react-hooks/exhaustive-deps': 'warn',
       // Disable no-undef for TypeScript files - TypeScript handles this better
-      'no-undef': 'off'
+      'no-undef': 'off',
     },
     settings: {
       react: {
-        version: 'detect'
-      }
-    }
+        version: 'detect',
+      },
+    },
   },
 
   // Configuration for JavaScript files
@@ -145,13 +145,13 @@ module.exports = [
         setInterval: 'readonly',
         clearInterval: 'readonly',
         setImmediate: 'readonly',
-        clearImmediate: 'readonly'
-      }
+        clearImmediate: 'readonly',
+      },
     },
     plugins: {
-      'react': react,
+      react: react,
       'react-hooks': reactHooks,
-      'prettier': prettier
+      prettier: prettier,
     },
     rules: {
       ...react.configs.recommended.rules,
@@ -160,12 +160,12 @@ module.exports = [
       'prettier/prettier': 'error',
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
-      'no-console': 'off'
+      'no-console': 'off',
     },
     settings: {
       react: {
-        version: 'detect'
-      }
-    }
-  }
+        version: 'detect',
+      },
+    },
+  },
 ];

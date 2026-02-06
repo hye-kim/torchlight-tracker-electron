@@ -69,6 +69,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     callback: (data: {
       stats: Stats;
       drops: Drop[];
+      costs: Drop[];
       mapLogs: MapLog[];
       bagInventory: Drop[];
       isInMap: boolean;
@@ -82,6 +83,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
         data: {
           stats: Stats;
           drops: Drop[];
+          costs: Drop[];
           mapLogs: MapLog[];
           bagInventory: Drop[];
           isInMap: boolean;
@@ -219,6 +221,7 @@ declare global {
         callback: (data: {
           stats: Stats;
           drops: Drop[];
+          costs: Drop[];
           mapLogs: MapLog[];
           bagInventory: Drop[];
           isInMap: boolean;

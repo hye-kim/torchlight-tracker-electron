@@ -4,6 +4,7 @@ import SessionSelector from './SessionSelector';
 import HistoryStatsPanel from './HistoryStatsPanel';
 import MapLogTable from './MapLogTable';
 import DropsCard from './DropsCard';
+import { useStatsStore } from '../stores';
 
 interface HistorySession {
   sessionId: string;
@@ -37,6 +38,7 @@ interface Drop {
 interface MapItemData {
   itemId: string;
   quantity: number;
+  price: number;
 }
 
 interface MapLog {
@@ -54,6 +56,7 @@ interface MapLog {
 }
 
 const HistoryView: React.FC = () => {
+  const { drops: globalDrops, costs: globalCosts } = useStatsStore();
   const [sessions, setSessions] = useState<HistorySession[]>([]);
   const [selectedSessionIds, setSelectedSessionIds] = useState<string[]>([]);
   const [selectedMapNumber, setSelectedMapNumber] = useState<number | null>(null);
@@ -146,21 +149,52 @@ const HistoryView: React.FC = () => {
     return allLogs.sort((a, b) => b.startTime - a.startTime);
   }, [sessions, selectedSessionIds]);
 
-  // Get drops for selected map or all maps
-  const drops: Drop[] = React.useMemo(() => {
-    // Convert MapItemData[] to Drop[] by enriching with item data
-    // For now, return empty array as we need backend to provide enriched data
-    // TODO: Backend should enrich MapItemData with name, price, type, etc.
-    return [];
-  }, []);
+  // Find the selected map from combined logs
+  const selectedMapData = React.useMemo(() => {
+    if (selectedMapNumber === null || selectedMapSessionId === null) return null;
+    return (
+      combinedMapLogs.find(
+        (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
+      ) ?? null
+    );
+  }, [combinedMapLogs, selectedMapNumber, selectedMapSessionId]);
 
-  // Get costs for selected map or all maps
+  // Get drops for the selected map, enriched with item metadata
+  const drops: Drop[] = React.useMemo(() => {
+    if (!selectedMapData?.drops) return [];
+
+    return selectedMapData.drops.map((item: MapItemData) => {
+      const existingDrop = globalDrops.find((d) => d.itemId === item.itemId);
+      return {
+        itemId: item.itemId,
+        name: existingDrop?.name ?? `Item ${item.itemId}`,
+        quantity: item.quantity,
+        price: item.price,
+        type: existingDrop?.type ?? 'Unknown',
+        timestamp: selectedMapData.startTime,
+        imageUrl: existingDrop?.imageUrl,
+      };
+    });
+  }, [selectedMapData, globalDrops]);
+
+  // Get costs for the selected map, enriched with item metadata
   const costs: Drop[] = React.useMemo(() => {
-    // Convert MapItemData[] to Drop[] by enriching with item data
-    // For now, return empty array as we need backend to provide enriched data
-    // TODO: Backend should enrich MapItemData with name, price, type, etc.
-    return [];
-  }, []);
+    if (!selectedMapData?.costs) return [];
+
+    return selectedMapData.costs.map((item: MapItemData) => {
+      const existingCost = globalCosts.find((c) => c.itemId === item.itemId);
+      const existingDrop = globalDrops.find((d) => d.itemId === item.itemId);
+      return {
+        itemId: item.itemId,
+        name: existingCost?.name ?? existingDrop?.name ?? `Item ${item.itemId}`,
+        quantity: item.quantity,
+        price: item.price,
+        type: existingCost?.type ?? existingDrop?.type ?? 'Unknown',
+        timestamp: selectedMapData.startTime,
+        imageUrl: existingCost?.imageUrl ?? existingDrop?.imageUrl,
+      };
+    });
+  }, [selectedMapData, globalDrops, globalCosts]);
 
   // Calculate total picked up and total cost
   const totalPickedUp = React.useMemo(() => {

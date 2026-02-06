@@ -44,6 +44,7 @@ export interface Drop {
 export interface MapItemData {
   itemId: string;
   quantity: number;
+  price: number;
 }
 
 export interface MapLog {
