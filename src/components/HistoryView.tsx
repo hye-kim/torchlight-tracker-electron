@@ -108,14 +108,12 @@ const HistoryView: React.FC = () => {
     const mapsCompleted = selectedSessions.reduce((sum, s) => sum + s.stats.mapsCompleted, 0);
     const totalDuration = selectedSessions.reduce((sum, s) => sum + s.duration, 0);
 
-    // Calculate average map duration from actual map durations
     let totalMapDuration = 0;
     selectedSessions.forEach((session) => {
       session.mapLogs.forEach((mapLog) => {
         totalMapDuration += mapLog.duration;
       });
     });
-    const avgMapDuration = mapsCompleted > 0 ? totalMapDuration / mapsCompleted : 0;
 
     return {
       totalProfit,
@@ -123,13 +121,11 @@ const HistoryView: React.FC = () => {
       totalCost,
       mapsCompleted,
       duration: totalDuration,
-      mapDuration: avgMapDuration,
+      mapDuration: totalMapDuration,
       profitPerMinute: totalDuration > 0 ? totalProfit / (totalDuration / 60) : 0,
       profitPerHour: totalDuration > 0 ? totalProfit / (totalDuration / 3600) : 0,
-      mapProfitPerMinute:
-        avgMapDuration > 0 ? totalProfit / mapsCompleted / (avgMapDuration / 60) : 0,
-      mapProfitPerHour:
-        avgMapDuration > 0 ? totalProfit / mapsCompleted / (avgMapDuration / 3600) : 0,
+      mapProfitPerMinute: totalMapDuration > 0 ? totalProfit / (totalMapDuration / 60) : 0,
+      mapProfitPerHour: totalMapDuration > 0 ? totalProfit / (totalMapDuration / 3600) : 0,
     };
   }, [sessions, selectedSessionIds]);
 
