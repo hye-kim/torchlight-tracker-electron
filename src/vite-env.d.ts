@@ -22,7 +22,7 @@ declare global {
       getStats: () => Promise<Stats>;
       getDrops: () => Promise<Drop[]>;
       getMapLogs: () => Promise<MapLog[]>;
-      getBagState: () => Promise<BagState>;
+      getBagState: () => Promise<Drop[]>;
       initializeTracker: () => Promise<{ success: boolean }>;
       exportExcel: () => Promise<{ success: boolean; filePath?: string }>;
       resetStats: () => Promise<{ success: boolean }>;
@@ -54,7 +54,9 @@ declare global {
           stats: Stats;
           drops: Drop[];
           mapLogs: MapLog[];
-          bagState: BagState;
+          bagInventory: Drop[];
+          isInMap: boolean;
+          currentMap: MapLog | null;
         }) => void
       ) => void;
       onCheckingForUpdate: (callback: () => void) => void;

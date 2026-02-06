@@ -64,6 +64,8 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps): JSX
 
     const newItems = [...sortedItems];
     const draggedItemData = newItems[draggedItem];
+    if (!draggedItemData) return;
+
     newItems.splice(draggedItem, 1);
     newItems.splice(index, 0, draggedItemData);
 

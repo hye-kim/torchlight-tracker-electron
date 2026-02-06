@@ -136,7 +136,7 @@ const TYPE_COLORS: Record<string, string> = {
 
 function getTypeColor(type: string): string {
   const normalizedType = type.toLowerCase();
-  return TYPE_COLORS[normalizedType] ?? TYPE_COLORS.unknown;
+  return TYPE_COLORS[normalizedType] ?? '#9ca3af';
 }
 
 function DropsCard({
@@ -165,7 +165,7 @@ function DropsCard({
   // Calculate FE totals by item type for the percentage bar (loot only)
   const typeBreakdown = sortedDrops.reduce(
     (acc, item) => {
-      const type = (item.type ?? 'unknown').toLowerCase();
+      const type = (item.type || 'unknown').toLowerCase();
       const total = item.price * item.quantity;
       acc[type] = (acc[type] ?? 0) + total;
       return acc;

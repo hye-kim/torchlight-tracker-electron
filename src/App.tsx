@@ -1,4 +1,3 @@
-import React from 'react';
 import NavigationSidebar from './components/NavigationSidebar';
 import SettingsDialog from './components/SettingsDialog';
 import OverlaySettings from './components/OverlaySettings';
@@ -188,9 +187,9 @@ function App(): JSX.Element {
             {activeView === 'overview' ? (
               <OverviewPage
                 onOpenSettings={() => setShowSettings(true)}
-                onToggleOverlay={() => void handleToggleOverlayMode()}
-                onExportExcel={() => void handleExportExcel()}
-                onResetStats={() => void handleResetStats()}
+                onToggleOverlay={handleToggleOverlayMode}
+                onExportExcel={handleExportExcel}
+                onResetStats={handleResetStats}
               />
             ) : activeView === 'inventory' ? (
               <InventoryPage />

@@ -8,7 +8,7 @@ import { useInitialization, useMapSelection } from '../hooks';
 
 interface OverviewPageProps {
   onOpenSettings: () => void;
-  onToggleOverlay: () => void;
+  onToggleOverlay: () => void | Promise<void>;
   onExportExcel: () => Promise<void>;
   onResetStats: () => Promise<void>;
 }

@@ -22,7 +22,7 @@ export const useElectronData = (): void => {
   useEffect(() => {
     // Load initial data
     const loadInitialData = async (): Promise<void> => {
-      const [config, stats, drops, mapLogs, bagState] = await Promise.all([
+      const [config, stats, drops, mapLogs, bagInventory] = await Promise.all([
         window.electronAPI.getConfig(),
         window.electronAPI.getStats(),
         window.electronAPI.getDrops(),
@@ -34,7 +34,7 @@ export const useElectronData = (): void => {
       setStats(stats);
       setDrops(drops);
       if (mapLogs) setMapLogs(mapLogs);
-      if (bagState) setBagInventory(bagState);
+      if (bagInventory && Array.isArray(bagInventory)) setBagInventory(bagInventory);
     };
 
     void loadInitialData();
@@ -44,7 +44,9 @@ export const useElectronData = (): void => {
       if (data.stats) setStats(data.stats);
       if (data.drops) setDrops(data.drops);
       if (data.mapLogs) setMapLogs(data.mapLogs);
-      if (data.bagState) setBagInventory(data.bagState);
+      if (data.bagInventory && Array.isArray(data.bagInventory)) {
+        setBagInventory(data.bagInventory);
+      }
     });
 
     // Listen for overlay mode changes

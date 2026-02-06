@@ -6,9 +6,8 @@ interface Config {
   user: string;
 }
 
-interface UpdateConfig {
+interface LocalUpdateConfig {
   autoCheck: boolean;
-  lastCheckTime?: number;
 }
 
 interface SettingsDialogProps {
@@ -20,21 +19,30 @@ interface SettingsDialogProps {
 function SettingsDialog({ config, onSave, onClose }: SettingsDialogProps): JSX.Element {
   const [tax, setTax] = useState(config.tax);
   const [user, setUser] = useState(config.user);
-  const [updateConfig, setUpdateConfig] = useState<UpdateConfig>({ autoCheck: true });
+  const [updateConfig, setUpdateConfig] = useState<LocalUpdateConfig>({ autoCheck: true });
   const [appVersion, setAppVersion] = useState<string>('');
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
   const [lastCheckMessage, setLastCheckMessage] = useState<string>('');
 
   useEffect(() => {
     // Load update config and app version
-    void window.electronAPI.getUpdateConfig().then(setUpdateConfig);
+    void window.electronAPI.getUpdateConfig().then((config) => {
+      setUpdateConfig({
+        autoCheck: config.checkOnStartup,
+      });
+    });
     void window.electronAPI.getAppVersion().then(setAppVersion);
   }, []);
 
   const handleSave = (): void => {
     onSave({ tax, user });
-    // Save update config separately
-    void window.electronAPI.setUpdateConfig(updateConfig);
+    // Save update config separately - convert LocalUpdateConfig to UpdateConfig
+    void window.electronAPI.setUpdateConfig({
+      autoDownload: false,
+      autoInstall: false,
+      checkOnStartup: updateConfig.autoCheck,
+      checkInterval: 3600000,
+    });
   };
 
   const handleCheckForUpdates = async (): Promise<void> => {
@@ -56,20 +64,6 @@ function SettingsDialog({ config, onSave, onClose }: SettingsDialogProps): JSX.E
     } finally {
       setIsCheckingUpdate(false);
     }
-  };
-
-  const formatLastCheckTime = (timestamp?: number): string => {
-    if (!timestamp) return 'Never';
-    const now = Date.now();
-    const diff = now - timestamp;
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-    if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    return `${days} day${days > 1 ? 's' : ''} ago`;
   };
 
   return (
@@ -140,11 +134,6 @@ function SettingsDialog({ config, onSave, onClose }: SettingsDialogProps): JSX.E
               {isCheckingUpdate ? 'Checking...' : 'Check for Updates Now'}
             </button>
             {lastCheckMessage && <span className="update-check-message">{lastCheckMessage}</span>}
-            {updateConfig.lastCheckTime && (
-              <span className="form-hint">
-                Last checked: {formatLastCheckTime(updateConfig.lastCheckTime)}
-              </span>
-            )}
           </div>
         </div>
 

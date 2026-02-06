@@ -102,7 +102,7 @@ export interface DownloadProgress {
 }
 
 export interface BagState {
-  items: MapItemData[];
+  items: Drop[];
 }
 
 export interface Session {
