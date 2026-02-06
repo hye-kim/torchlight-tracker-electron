@@ -20,7 +20,7 @@ const OverlayModePage: React.FC<OverlayModePageProps> = ({
   const displayItems = config.displayItems ?? [];
   const sortedDisplayItems = [...displayItems].sort((a, b) => a.order - b.order);
 
-  const renderStatItem = (item: DisplayItem) => {
+  const renderStatItem = (item: DisplayItem): JSX.Element | null => {
     switch (item.id) {
       case 'status':
         return (
@@ -35,7 +35,7 @@ const OverlayModePage: React.FC<OverlayModePageProps> = ({
         return (
           <div key={item.id} className="overlay-stat-item">
             <span className="label">Current Map:</span>
-            <span className="value">{currentMap?.mapName || 'N/A'}</span>
+            <span className="value">{currentMap?.mapName ?? 'N/A'}</span>
           </div>
         );
       case 'currentProfitPerMin':
@@ -43,7 +43,7 @@ const OverlayModePage: React.FC<OverlayModePageProps> = ({
           <div key={item.id} className="overlay-stat-item">
             <span className="label">Current Profit/min:</span>
             <span className="value">
-              {stats?.currentMap.incomePerMinute.toFixed(2) || '0.00'} FE
+              {stats?.currentMap.incomePerMinute.toFixed(2) ?? '0.00'} FE
             </span>
           </div>
         );
@@ -51,23 +51,21 @@ const OverlayModePage: React.FC<OverlayModePageProps> = ({
         return (
           <div key={item.id} className="overlay-stat-item">
             <span className="label">Current Profit:</span>
-            <span className="value">{stats?.currentMap.feIncome.toFixed(2) || '0.00'} FE</span>
+            <span className="value">{stats?.currentMap.feIncome.toFixed(2) ?? '0.00'} FE</span>
           </div>
         );
       case 'totalProfitPerMin':
         return (
           <div key={item.id} className="overlay-stat-item">
             <span className="label">Total Profit/min:</span>
-            <span className="value">
-              {stats?.total.incomePerMinute.toFixed(2) || '0.00'} FE
-            </span>
+            <span className="value">{stats?.total.incomePerMinute.toFixed(2) ?? '0.00'} FE</span>
           </div>
         );
       case 'totalProfit':
         return (
           <div key={item.id} className="overlay-stat-item">
             <span className="label">Total Profit:</span>
-            <span className="value">{stats?.total.feIncome.toFixed(2) || '0.00'} FE</span>
+            <span className="value">{stats?.total.feIncome.toFixed(2) ?? '0.00'} FE</span>
           </div>
         );
       case 'mapDuration':

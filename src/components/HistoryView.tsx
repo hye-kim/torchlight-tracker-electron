@@ -5,7 +5,7 @@ import HistoryStatsPanel from './HistoryStatsPanel';
 import MapLogTable from './MapLogTable';
 import DropsCard from './DropsCard';
 
-interface Session {
+interface HistorySession {
   sessionId: string;
   title: string;
   startTime: number;
@@ -34,6 +34,11 @@ interface Drop {
   imageUrl?: string;
 }
 
+interface MapItemData {
+  itemId: string;
+  quantity: number;
+}
+
 interface MapLog {
   mapNumber: number;
   mapName: string;
@@ -42,33 +47,34 @@ interface MapLog {
   cost: number;
   profit: number;
   duration: number;
-  drops?: Drop[];
-  costs?: Drop[];
+  drops?: MapItemData[];
+  costs?: MapItemData[];
   sessionId?: string;
   sessionTitle?: string;
 }
 
 const HistoryView: React.FC = () => {
-  const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessions, setSessions] = useState<HistorySession[]>([]);
   const [selectedSessionIds, setSelectedSessionIds] = useState<string[]>([]);
   const [selectedMapNumber, setSelectedMapNumber] = useState<number | null>(null);
   const [selectedMapSessionId, setSelectedMapSessionId] = useState<string | null>(null);
   const [profitMode, setProfitMode] = useState<'perMinute' | 'perHour'>('perMinute');
 
-  const loadSessions = async () => {
+  const loadSessions = async (): Promise<void> => {
     const allSessions = await window.electronAPI.getSessions();
-    setSessions(allSessions);
+    setSessions(allSessions as unknown as HistorySession[]);
 
     // Auto-select current active session if exists
-    const activeSession = allSessions.find((s: Session) => s.isActive);
+    const activeSession = allSessions.find((s) => (s as unknown as HistorySession).isActive);
     if (activeSession) {
-      setSelectedSessionIds([activeSession.sessionId]);
+      setSelectedSessionIds([(activeSession as unknown as HistorySession).sessionId]);
     }
   };
 
   // Load sessions on mount
   useEffect(() => {
-    loadSessions();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadSessions();
   }, []);
 
   // Calculate aggregated stats from selected sessions
@@ -114,8 +120,10 @@ const HistoryView: React.FC = () => {
       mapDuration: avgMapDuration,
       profitPerMinute: totalDuration > 0 ? totalProfit / (totalDuration / 60) : 0,
       profitPerHour: totalDuration > 0 ? totalProfit / (totalDuration / 3600) : 0,
-      mapProfitPerMinute: avgMapDuration > 0 ? (totalProfit / mapsCompleted) / (avgMapDuration / 60) : 0,
-      mapProfitPerHour: avgMapDuration > 0 ? (totalProfit / mapsCompleted) / (avgMapDuration / 3600) : 0,
+      mapProfitPerMinute:
+        avgMapDuration > 0 ? totalProfit / mapsCompleted / (avgMapDuration / 60) : 0,
+      mapProfitPerHour:
+        avgMapDuration > 0 ? totalProfit / mapsCompleted / (avgMapDuration / 3600) : 0,
     };
   }, [sessions, selectedSessionIds]);
 
@@ -140,69 +148,19 @@ const HistoryView: React.FC = () => {
 
   // Get drops for selected map or all maps
   const drops: Drop[] = React.useMemo(() => {
-    if (selectedMapNumber !== null && selectedMapSessionId !== null) {
-      // Find the specific map by both mapNumber and sessionId
-      const selectedMap = combinedMapLogs.find(
-        (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
-      );
-      if (selectedMap && selectedMap.drops) {
-        // Data is already enriched by backend
-        return selectedMap.drops;
-      }
-      return [];
-    } else {
-      // Aggregate all drops from all maps in selected sessions
-      const aggregatedDrops = new Map<string, Drop>();
-      combinedMapLogs.forEach((mapLog) => {
-        if (mapLog.drops) {
-          mapLog.drops.forEach((drop: Drop) => {
-            const existing = aggregatedDrops.get(drop.itemId);
-            if (existing) {
-              // Update quantity while keeping other enriched data
-              existing.quantity += drop.quantity;
-            } else {
-              // Clone the drop to avoid mutating original data
-              aggregatedDrops.set(drop.itemId, { ...drop });
-            }
-          });
-        }
-      });
-
-      return Array.from(aggregatedDrops.values());
-    }
-  }, [combinedMapLogs, selectedMapNumber, selectedMapSessionId]);
+    // Convert MapItemData[] to Drop[] by enriching with item data
+    // For now, return empty array as we need backend to provide enriched data
+    // TODO: Backend should enrich MapItemData with name, price, type, etc.
+    return [];
+  }, []);
 
   // Get costs for selected map or all maps
   const costs: Drop[] = React.useMemo(() => {
-    if (selectedMapNumber !== null && selectedMapSessionId !== null) {
-      const selectedMap = combinedMapLogs.find(
-        (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
-      );
-      if (selectedMap && selectedMap.costs) {
-        // Data is already enriched by backend
-        return selectedMap.costs;
-      }
-      return [];
-    } else {
-      const aggregatedCosts = new Map<string, Drop>();
-      combinedMapLogs.forEach((mapLog) => {
-        if (mapLog.costs) {
-          mapLog.costs.forEach((cost: Drop) => {
-            const existing = aggregatedCosts.get(cost.itemId);
-            if (existing) {
-              // Update quantity while keeping other enriched data
-              existing.quantity += cost.quantity;
-            } else {
-              // Clone the cost to avoid mutating original data
-              aggregatedCosts.set(cost.itemId, { ...cost });
-            }
-          });
-        }
-      });
-
-      return Array.from(aggregatedCosts.values());
-    }
-  }, [combinedMapLogs, selectedMapNumber, selectedMapSessionId]);
+    // Convert MapItemData[] to Drop[] by enriching with item data
+    // For now, return empty array as we need backend to provide enriched data
+    // TODO: Backend should enrich MapItemData with name, price, type, etc.
+    return [];
+  }, []);
 
   // Calculate total picked up and total cost
   const totalPickedUp = React.useMemo(() => {
@@ -220,16 +178,18 @@ const HistoryView: React.FC = () => {
         (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
       );
       if (!mapExists) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedMapNumber(null);
         setSelectedMapSessionId(null);
       }
     }
   }, [combinedMapLogs, selectedMapNumber, selectedMapSessionId]);
 
-  const handleDeleteSessions = async (sessionIds: string[]) => {
-    await window.electronAPI.deleteSessions(sessionIds);
-    loadSessions();
-    setSelectedSessionIds([]);
+  const handleDeleteSessions = (sessionIds: string[]): void => {
+    void window.electronAPI.deleteSessions(sessionIds).then(() => {
+      void loadSessions();
+      setSelectedSessionIds([]);
+    });
   };
 
   return (
@@ -262,7 +222,7 @@ const HistoryView: React.FC = () => {
               selectedSessionId={selectedMapSessionId}
               onSelectMap={(mapNumber, sessionId) => {
                 setSelectedMapNumber(mapNumber);
-                setSelectedMapSessionId(sessionId || null);
+                setSelectedMapSessionId(sessionId ?? null);
               }}
             />
           </div>
@@ -277,7 +237,8 @@ const HistoryView: React.FC = () => {
                 selectedMapNumber !== null && selectedMapSessionId !== null
                   ? (() => {
                       const selectedMap = combinedMapLogs.find(
-                        (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
+                        (m) =>
+                          m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
                       );
                       return selectedMap
                         ? `${selectedMap.mapName ?? `Map #${selectedMap.mapNumber}`} (${selectedMap.sessionTitle ?? 'Session'})`

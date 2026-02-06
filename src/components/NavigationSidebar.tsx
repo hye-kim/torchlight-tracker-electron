@@ -13,7 +13,7 @@ const NavigationSidebar: React.FC<NavigationSidebarProps> = ({ activeView, onVie
 
   useEffect(() => {
     // Load app version
-    window.electronAPI.getAppVersion().then(setAppVersion);
+    void window.electronAPI.getAppVersion().then(setAppVersion);
   }, []);
 
   return (

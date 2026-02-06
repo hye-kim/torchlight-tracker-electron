@@ -1,10 +1,11 @@
 import { create } from 'zustand';
+import type { UpdateInfo } from '../types';
 
 interface UpdateStore {
-  updateInfo: any;
+  updateInfo: UpdateInfo | null;
   showUpdateNotification: boolean;
   showUpdateDialog: boolean;
-  setUpdateInfo: (info: any) => void;
+  setUpdateInfo: (info: UpdateInfo | null) => void;
   setShowUpdateNotification: (show: boolean) => void;
   setShowUpdateDialog: (show: boolean) => void;
 }

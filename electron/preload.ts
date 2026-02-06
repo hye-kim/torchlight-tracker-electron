@@ -1,11 +1,24 @@
 import { contextBridge, ipcRenderer } from 'electron';
+import type {
+  Config,
+  Stats,
+  Drop,
+  MapLog,
+  BagState,
+  UpdateInfo,
+  UpdateConfig,
+  UpdateStatus,
+  DownloadProgress,
+  DisplayItem,
+  Session,
+} from '../src/types';
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('electronAPI', {
   // Config
   getConfig: () => ipcRenderer.invoke('get-config'),
-  updateConfig: (updates: any) => ipcRenderer.invoke('update-config', updates),
+  updateConfig: (updates: Partial<Config>) => ipcRenderer.invoke('update-config', updates),
 
   // Stats and Drops
   getStats: () => ipcRenderer.invoke('get-stats'),
@@ -24,7 +37,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   toggleClickThrough: (enabled: boolean) => ipcRenderer.invoke('toggle-click-through', enabled),
   setIgnoreMouseEvents: (ignore: boolean) => ipcRenderer.invoke('set-ignore-mouse-events', ignore),
   setFontSize: (fontSize: number) => ipcRenderer.invoke('set-font-size', fontSize),
-  setDisplayItems: (displayItems: any) => ipcRenderer.invoke('set-display-items', displayItems),
+  setDisplayItems: (displayItems: DisplayItem[]) =>
+    ipcRenderer.invoke('set-display-items', displayItems),
 
   // Window controls
   windowMinimize: () => ipcRenderer.invoke('window-minimize'),
@@ -41,7 +55,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
   getUpdateStatus: () => ipcRenderer.invoke('get-update-status'),
   getUpdateConfig: () => ipcRenderer.invoke('get-update-config'),
-  setUpdateConfig: (updateConfig: any) => ipcRenderer.invoke('set-update-config', updateConfig),
+  setUpdateConfig: (updateConfig: UpdateConfig) =>
+    ipcRenderer.invoke('set-update-config', updateConfig),
   skipUpdateVersion: (version: string) => ipcRenderer.invoke('skip-update-version', version),
 
   // Session management
@@ -51,8 +66,30 @@ contextBridge.exposeInMainWorld('electronAPI', {
   deleteSessions: (sessionIds: string[]) => ipcRenderer.invoke('delete-sessions', sessionIds),
 
   // Listen for updates
-  onUpdateDisplay: (callback: (data: any) => void) => {
-    ipcRenderer.on('update-display', (_event: Electron.IpcRendererEvent, data: any) => callback(data));
+  onUpdateDisplay: (
+    callback: (data: {
+      stats: Stats;
+      drops: Drop[];
+      mapLogs: MapLog[];
+      bagInventory: Drop[];
+      isInMap: boolean;
+      currentMap: MapLog | null;
+    }) => void
+  ) => {
+    ipcRenderer.on(
+      'update-display',
+      (
+        _event: Electron.IpcRendererEvent,
+        data: {
+          stats: Stats;
+          drops: Drop[];
+          mapLogs: MapLog[];
+          bagInventory: Drop[];
+          isInMap: boolean;
+          currentMap: MapLog | null;
+        }
+      ) => callback(data)
+    );
   },
 
   // Update event listeners
@@ -60,24 +97,35 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('checking-for-update', () => callback());
   },
 
-  onUpdateAvailable: (callback: (info: any) => void) => {
-    ipcRenderer.on('update-available', (_event: Electron.IpcRendererEvent, info: any) => callback(info));
+  onUpdateAvailable: (callback: (info: UpdateInfo) => void) => {
+    ipcRenderer.on('update-available', (_event: Electron.IpcRendererEvent, info: UpdateInfo) =>
+      callback(info)
+    );
   },
 
-  onUpdateNotAvailable: (callback: (info: any) => void) => {
-    ipcRenderer.on('update-not-available', (_event: Electron.IpcRendererEvent, info: any) => callback(info));
+  onUpdateNotAvailable: (callback: (info: UpdateInfo) => void) => {
+    ipcRenderer.on('update-not-available', (_event: Electron.IpcRendererEvent, info: UpdateInfo) =>
+      callback(info)
+    );
   },
 
-  onUpdateError: (callback: (error: any) => void) => {
-    ipcRenderer.on('update-error', (_event: Electron.IpcRendererEvent, error: any) => callback(error));
+  onUpdateError: (callback: (error: Error) => void) => {
+    ipcRenderer.on('update-error', (_event: Electron.IpcRendererEvent, error: Error) =>
+      callback(error)
+    );
   },
 
-  onDownloadProgress: (callback: (progress: any) => void) => {
-    ipcRenderer.on('download-progress', (_event: Electron.IpcRendererEvent, progress: any) => callback(progress));
+  onDownloadProgress: (callback: (progress: DownloadProgress) => void) => {
+    ipcRenderer.on(
+      'download-progress',
+      (_event: Electron.IpcRendererEvent, progress: DownloadProgress) => callback(progress)
+    );
   },
 
-  onUpdateDownloaded: (callback: (info: any) => void) => {
-    ipcRenderer.on('update-downloaded', (_event: Electron.IpcRendererEvent, info: any) => callback(info));
+  onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => {
+    ipcRenderer.on('update-downloaded', (_event: Electron.IpcRendererEvent, info: UpdateInfo) =>
+      callback(info)
+    );
   },
 
   onInitializationComplete: (callback: () => void) => {
@@ -85,20 +133,23 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
 
   onOverlayModeChanged: (callback: (overlayMode: boolean) => void) => {
-    ipcRenderer.on('overlay-mode-changed', (_event: Electron.IpcRendererEvent, overlayMode: boolean) => callback(overlayMode));
+    ipcRenderer.on(
+      'overlay-mode-changed',
+      (_event: Electron.IpcRendererEvent, overlayMode: boolean) => callback(overlayMode)
+    );
   },
 });
 
 // Handle interactive elements for click-through functionality
 window.addEventListener('DOMContentLoaded', () => {
-  const attachHandlers = (element: Element) => {
+  const attachHandlers = (element: Element): void => {
     element.addEventListener('pointerenter', () => {
       ipcRenderer.send('set-ignore-mouse-events', false);
     });
 
     element.addEventListener('pointerleave', () => {
       // Only enable click-through if clickThrough is enabled in config
-      ipcRenderer.invoke('get-config').then((config: any) => {
+      void ipcRenderer.invoke('get-config').then((config: Config) => {
         if (config.clickThrough) {
           ipcRenderer.send('set-ignore-mouse-events', true, { forward: true });
         }
@@ -133,12 +184,12 @@ window.addEventListener('DOMContentLoaded', () => {
 declare global {
   interface Window {
     electronAPI: {
-      getConfig: () => Promise<any>;
-      updateConfig: (updates: any) => Promise<any>;
-      getStats: () => Promise<any>;
-      getDrops: () => Promise<any>;
-      getMapLogs: () => Promise<any>;
-      getBagState: () => Promise<any>;
+      getConfig: () => Promise<Config>;
+      updateConfig: (updates: Partial<Config>) => Promise<Config>;
+      getStats: () => Promise<Stats>;
+      getDrops: () => Promise<Drop[]>;
+      getMapLogs: () => Promise<MapLog[]>;
+      getBagState: () => Promise<Drop[]>;
       initializeTracker: () => Promise<{ success: boolean }>;
       exportExcel: () => Promise<{ success: boolean; filePath?: string }>;
       resetStats: () => Promise<{ success: boolean }>;
@@ -147,31 +198,40 @@ declare global {
       toggleClickThrough: (enabled: boolean) => Promise<{ success: boolean }>;
       setIgnoreMouseEvents: (ignore: boolean) => Promise<{ success: boolean }>;
       setFontSize: (fontSize: number) => Promise<{ success: boolean }>;
-      setDisplayItems: (displayItems: any) => Promise<{ success: boolean }>;
+      setDisplayItems: (displayItems: DisplayItem[]) => Promise<{ success: boolean }>;
       windowMinimize: () => Promise<{ success: boolean }>;
       windowMaximize: () => Promise<{ success: boolean }>;
       windowClose: () => Promise<{ success: boolean }>;
       windowResize: (width: number, height: number) => Promise<{ success: boolean }>;
       getWindowBounds: () => Promise<{ x: number; y: number; width: number; height: number }>;
-      checkForUpdates: () => Promise<{ success: boolean; updateInfo?: any }>;
+      checkForUpdates: () => Promise<{ success: boolean; updateInfo?: UpdateInfo }>;
       downloadUpdate: () => Promise<{ success: boolean; error?: string }>;
       installUpdate: () => Promise<{ success: boolean }>;
       getAppVersion: () => Promise<string>;
-      getUpdateStatus: () => Promise<any>;
-      getUpdateConfig: () => Promise<any>;
-      setUpdateConfig: (updateConfig: any) => Promise<{ success: boolean }>;
+      getUpdateStatus: () => Promise<UpdateStatus>;
+      getUpdateConfig: () => Promise<UpdateConfig>;
+      setUpdateConfig: (updateConfig: UpdateConfig) => Promise<{ success: boolean }>;
       skipUpdateVersion: (version: string) => Promise<{ success: boolean }>;
-      getSessions: () => Promise<any[]>;
-      getSession: (sessionId: string) => Promise<any | null>;
-      getCurrentSession: () => Promise<any | null>;
+      getSessions: () => Promise<Session[]>;
+      getSession: (sessionId: string) => Promise<Session | null>;
+      getCurrentSession: () => Promise<Session | null>;
       deleteSessions: (sessionIds: string[]) => Promise<{ success: boolean }>;
-      onUpdateDisplay: (callback: (data: any) => void) => void;
+      onUpdateDisplay: (
+        callback: (data: {
+          stats: Stats;
+          drops: Drop[];
+          mapLogs: MapLog[];
+          bagInventory: Drop[];
+          isInMap: boolean;
+          currentMap: MapLog | null;
+        }) => void
+      ) => void;
       onCheckingForUpdate: (callback: () => void) => void;
-      onUpdateAvailable: (callback: (info: any) => void) => void;
-      onUpdateNotAvailable: (callback: (info: any) => void) => void;
-      onUpdateError: (callback: (error: any) => void) => void;
-      onDownloadProgress: (callback: (progress: any) => void) => void;
-      onUpdateDownloaded: (callback: (info: any) => void) => void;
+      onUpdateAvailable: (callback: (info: UpdateInfo) => void) => void;
+      onUpdateNotAvailable: (callback: (info: UpdateInfo) => void) => void;
+      onUpdateError: (callback: (error: Error) => void) => void;
+      onDownloadProgress: (callback: (progress: DownloadProgress) => void) => void;
+      onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => void;
       onInitializationComplete: (callback: () => void) => void;
       onOverlayModeChanged: (callback: (overlayMode: boolean) => void) => void;
     };

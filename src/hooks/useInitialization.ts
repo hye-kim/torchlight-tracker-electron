@@ -4,7 +4,7 @@ import { useUIStore, useInitStore } from '../stores';
 /**
  * Custom hook to handle tracker initialization
  */
-export const useInitialization = () => {
+export const useInitialization = (): { handleInitializeTracker: () => Promise<void> } => {
   const { setShowInitDialog } = useUIStore();
   const { setIsInitialized, setIsWaitingForInit } = useInitStore();
 
@@ -17,7 +17,7 @@ export const useInitialization = () => {
     });
   }, [setIsInitialized, setIsWaitingForInit]);
 
-  const handleInitializeTracker = async () => {
+  const handleInitializeTracker = async (): Promise<void> => {
     setShowInitDialog(true);
     setIsWaitingForInit(true);
     await window.electronAPI.initializeTracker();

@@ -136,10 +136,16 @@ const TYPE_COLORS: Record<string, string> = {
 
 function getTypeColor(type: string): string {
   const normalizedType = type.toLowerCase();
-  return TYPE_COLORS[normalizedType] || TYPE_COLORS.unknown;
+  return TYPE_COLORS[normalizedType] ?? '#9ca3af';
 }
 
-function DropsCard({ drops, costs, totalPickedUp, totalCost, selectedMapName }: DropsCardProps) {
+function DropsCard({
+  drops,
+  costs,
+  totalPickedUp,
+  totalCost,
+  selectedMapName,
+}: DropsCardProps): JSX.Element {
   const [lootView, setLootView] = useState<LootView>('drops');
 
   // Sort drops by total FE value (price * quantity) descending
@@ -161,7 +167,7 @@ function DropsCard({ drops, costs, totalPickedUp, totalCost, selectedMapName }: 
     (acc, item) => {
       const type = (item.type || 'unknown').toLowerCase();
       const total = item.price * item.quantity;
-      acc[type] = (acc[type] || 0) + total;
+      acc[type] = (acc[type] ?? 0) + total;
       return acc;
     },
     {} as Record<string, number>

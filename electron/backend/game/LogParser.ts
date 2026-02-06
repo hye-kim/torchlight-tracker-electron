@@ -64,7 +64,7 @@ export class LogParser {
   constructor(private fileManager: FileManager) {}
 
   shouldProcessLine(line: string): boolean {
-    if (!line || !line.trim()) {
+    if (!line?.trim()) {
       return false;
     }
     return !NOISE_REGEX.test(line);
@@ -116,7 +116,7 @@ export class LogParser {
       );
 
       const match = pattern.exec(text);
-      if (!match || !match[1]) {
+      if (!match?.[1]) {
         logger.debug(`No price data found for ID: ${itemId}`);
         return null;
       }
@@ -139,7 +139,7 @@ export class LogParser {
       // Try to find mode (most common price)
       const counter = new Map<number, number>();
       for (const value of roundedValues) {
-        counter.set(value, (counter.get(value) || 0) + 1);
+        counter.set(value, (counter.get(value) ?? 0) + 1);
       }
 
       const entries = Array.from(counter.entries()).sort((a, b) => b[1] - a[1]);
@@ -193,7 +193,7 @@ export class LogParser {
         });
 
         if (updated) {
-          const itemName = item.name || itemId;
+          const itemName = item.name ?? itemId;
           logger.info(`Updated price: ${itemName} (ID:${itemId}) = ${price}`);
           updateCount++;
         }
@@ -212,16 +212,16 @@ export class LogParser {
     return matches
       .filter((m) => m[1] && m[2] && m[3] && m[4] && m[5])
       .map((m) => {
-        const fullId = m[2]!;
+        const fullId = m[2] as string;
         const baseIdParts = fullId.split('_');
-        const baseId = baseIdParts[0] || fullId; // Extract base ID from fullId
+        const baseId = baseIdParts[0] ?? fullId; // Extract base ID from fullId
         return {
           action: m[1] as 'Add' | 'Update' | 'Remove',
           fullId: fullId,
-          pageId: m[4]!,
-          slotId: m[5]!,
+          pageId: m[4] as string,
+          slotId: m[5] as string,
           configBaseId: baseId,
-          count: parseInt(m[3]!),
+          count: parseInt(m[3] as string),
         };
       });
   }
@@ -235,10 +235,10 @@ export class LogParser {
     return matches
       .filter((m) => m[1] && m[2] && m[3] && m[4])
       .map((m) => {
-        const pageId = m[1]!;
-        const slotId = m[2]!;
-        const configBaseId = m[3]!;
-        const count = parseInt(m[4]!);
+        const pageId = m[1] as string;
+        const slotId = m[2] as string;
+        const configBaseId = m[3] as string;
+        const count = parseInt(m[4] as string);
         // Create synthetic fullId for bag data (will be replaced when real ItemChange@ appears)
         const syntheticFullId = `${configBaseId}_init_${pageId}_${slotId}`;
         return {
@@ -289,7 +289,7 @@ export class LogParser {
    */
   detectSubregionEntry(text: string): string | null {
     const match = PATTERN_SUBREGION_ENTER.exec(text);
-    if (match && match[1] && match[2]) {
+    if (match?.[1] && match[2]) {
       const areaId = match[1];
       const areaLevel = parseInt(match[2], 10);
       return getSubregionDisplayName(areaId, areaLevel);

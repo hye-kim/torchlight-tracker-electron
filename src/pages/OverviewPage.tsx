@@ -8,7 +8,7 @@ import { useInitialization, useMapSelection } from '../hooks';
 
 interface OverviewPageProps {
   onOpenSettings: () => void;
-  onToggleOverlay: () => void;
+  onToggleOverlay: () => Promise<void>;
   onExportExcel: () => Promise<void>;
   onResetStats: () => Promise<void>;
 }
@@ -51,9 +51,7 @@ const OverviewPage: React.FC<OverviewPageProps> = ({
           isInMap={isInMap}
           currentMap={currentMap}
           mapCount={stats?.total.mapCount ?? 0}
-          selectedMapNumber={
-            selectedMapData ? selectedMapData.mapNumber : null
-          }
+          selectedMapNumber={selectedMapData ? selectedMapData.mapNumber : null}
           onSelectMap={setSelectedMapNumber}
         />
       </div>
