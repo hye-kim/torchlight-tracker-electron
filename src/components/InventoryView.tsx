@@ -265,4 +265,4 @@ const InventoryView: React.FC<InventoryViewProps> = ({ drops }) => {
   );
 };
 
-export default InventoryView;
+export default React.memo(InventoryView);

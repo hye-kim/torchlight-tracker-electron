@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, memo } from 'react';
 import './DropsCard.css';
 
 interface Drop {
@@ -149,34 +149,43 @@ function DropsCard({
   const [lootView, setLootView] = useState<LootView>('drops');
 
   // Sort drops by total FE value (price * quantity) descending
-  const sortedDrops = [...drops].sort((a, b) => {
-    const aTotal = a.price * a.quantity;
-    const bTotal = b.price * b.quantity;
-    return bTotal - aTotal;
-  });
-
-  // Sort costs by total FE value descending
-  const sortedCosts = [...costs].sort((a, b) => {
-    const aTotal = a.price * a.quantity;
-    const bTotal = b.price * b.quantity;
-    return bTotal - aTotal;
-  });
-
-  // Calculate FE totals by item type for the percentage bar (loot only)
-  const typeBreakdown = sortedDrops.reduce(
-    (acc, item) => {
-      const type = (item.type || 'unknown').toLowerCase();
-      const total = item.price * item.quantity;
-      acc[type] = (acc[type] ?? 0) + total;
-      return acc;
-    },
-    {} as Record<string, number>
+  const sortedDrops = useMemo(
+    () =>
+      [...drops].sort((a, b) => {
+        const aTotal = a.price * a.quantity;
+        const bTotal = b.price * b.quantity;
+        return bTotal - aTotal;
+      }),
+    [drops]
   );
 
-  // Get sorted types by FE value for consistent display
-  const sortedTypes = Object.entries(typeBreakdown)
-    .sort(([, a], [, b]) => b - a)
-    .filter(([, value]) => value > 0);
+  // Sort costs by total FE value descending
+  const sortedCosts = useMemo(
+    () =>
+      [...costs].sort((a, b) => {
+        const aTotal = a.price * a.quantity;
+        const bTotal = b.price * b.quantity;
+        return bTotal - aTotal;
+      }),
+    [costs]
+  );
+
+  // Calculate FE totals by item type and get sorted types for the percentage bar (loot only)
+  const sortedTypes = useMemo(() => {
+    const typeBreakdown = sortedDrops.reduce(
+      (acc, item) => {
+        const type = (item.type || 'unknown').toLowerCase();
+        const total = item.price * item.quantity;
+        acc[type] = (acc[type] ?? 0) + total;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+
+    return Object.entries(typeBreakdown)
+      .sort(([, a], [, b]) => b - a)
+      .filter(([, value]) => value > 0);
+  }, [sortedDrops]);
 
   const totalProfit = totalPickedUp - totalCost;
 
@@ -247,10 +256,10 @@ function DropsCard({
           <>
             {/* Drops Section */}
             {lootView === 'drops' &&
-              sortedDrops.map((item, index) => {
+              sortedDrops.map((item) => {
                 const totalFE = item.price * item.quantity;
                 return (
-                  <div key={`drop-${item.itemId}-${index}`} className="drop-item">
+                  <div key={`drop-${item.itemId}`} className="drop-item">
                     <div className="drop-main">
                       <div className="drop-left">
                         <div className="item-image-wrapper">
@@ -284,10 +293,10 @@ function DropsCard({
             {/* Costs Section */}
             {lootView === 'costs' && sortedCosts.length > 0 && (
               <>
-                {sortedCosts.map((item, index) => {
+                {sortedCosts.map((item) => {
                   const totalFE = item.price * item.quantity;
                   return (
-                    <div key={`cost-${item.itemId}-${index}`} className="drop-item cost-item">
+                    <div key={`cost-${item.itemId}`} className="drop-item cost-item">
                       <div className="drop-main">
                         <div className="drop-left">
                           <div className="item-image-wrapper">
@@ -347,4 +356,4 @@ function DropsCard({
   );
 }
 
-export default DropsCard;
+export default memo(DropsCard);

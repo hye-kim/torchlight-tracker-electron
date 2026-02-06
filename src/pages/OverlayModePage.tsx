@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useConfigStore, useStatsStore, useMapStore } from '../stores';
 import { DisplayItem } from '../types';
 
@@ -18,7 +18,10 @@ const OverlayModePage: React.FC<OverlayModePageProps> = ({
   const { currentMap, isInMap } = useMapStore();
 
   const displayItems = config.displayItems ?? [];
-  const sortedDisplayItems = [...displayItems].sort((a, b) => a.order - b.order);
+  const sortedDisplayItems = useMemo(
+    () => [...displayItems].sort((a, b) => a.order - b.order),
+    [displayItems]
+  );
 
   const renderStatItem = (item: DisplayItem): JSX.Element | null => {
     switch (item.id) {
