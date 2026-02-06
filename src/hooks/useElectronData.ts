@@ -4,7 +4,6 @@ import {
   useStatsStore,
   useMapStore,
   useInventoryStore,
-  useInitStore,
   useUpdateStore,
 } from '../stores';
 
@@ -13,10 +12,9 @@ import {
  */
 export const useElectronData = (): void => {
   const { setConfig, updateConfig } = useConfigStore();
-  const { setStats, setDrops, setCosts: _setCosts, setMapLogs } = useStatsStore();
-  const { setCurrentMap: _setCurrentMap, setIsInMap: _setIsInMap } = useMapStore();
+  const { setStats, setDrops, setCosts, setMapLogs } = useStatsStore();
+  const { setCurrentMap, setIsInMap } = useMapStore();
   const { setBagInventory } = useInventoryStore();
-  const { setIsInitialized: _setIsInitialized } = useInitStore();
   const { setUpdateInfo, setShowUpdateNotification } = useUpdateStore();
 
   useEffect(() => {
@@ -43,7 +41,10 @@ export const useElectronData = (): void => {
     window.electronAPI.onUpdateDisplay((data) => {
       if (data.stats) setStats(data.stats);
       if (data.drops) setDrops(data.drops);
+      if (data.costs) setCosts(data.costs);
       if (data.mapLogs) setMapLogs(data.mapLogs);
+      if (data.currentMap !== undefined) setCurrentMap(data.currentMap);
+      if (data.isInMap !== undefined) setIsInMap(data.isInMap);
       if (data.bagInventory && Array.isArray(data.bagInventory)) {
         setBagInventory(data.bagInventory);
       }
@@ -71,7 +72,10 @@ export const useElectronData = (): void => {
     setConfig,
     setStats,
     setDrops,
+    setCosts,
     setMapLogs,
+    setCurrentMap,
+    setIsInMap,
     setBagInventory,
     updateConfig,
     setUpdateInfo,
