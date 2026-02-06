@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './HistoryView.css';
 import SessionSelector from './SessionSelector';
 import HistoryStatsPanel from './HistoryStatsPanel';
@@ -39,6 +39,9 @@ interface MapItemData {
   itemId: string;
   quantity: number;
   price: number;
+  name?: string;
+  type?: string;
+  imageUrl?: string;
 }
 
 interface MapLog {
@@ -105,14 +108,12 @@ const HistoryView: React.FC = () => {
     const mapsCompleted = selectedSessions.reduce((sum, s) => sum + s.stats.mapsCompleted, 0);
     const totalDuration = selectedSessions.reduce((sum, s) => sum + s.duration, 0);
 
-    // Calculate average map duration from actual map durations
     let totalMapDuration = 0;
     selectedSessions.forEach((session) => {
       session.mapLogs.forEach((mapLog) => {
         totalMapDuration += mapLog.duration;
       });
     });
-    const avgMapDuration = mapsCompleted > 0 ? totalMapDuration / mapsCompleted : 0;
 
     return {
       totalProfit,
@@ -120,13 +121,11 @@ const HistoryView: React.FC = () => {
       totalCost,
       mapsCompleted,
       duration: totalDuration,
-      mapDuration: avgMapDuration,
+      mapDuration: totalMapDuration,
       profitPerMinute: totalDuration > 0 ? totalProfit / (totalDuration / 60) : 0,
       profitPerHour: totalDuration > 0 ? totalProfit / (totalDuration / 3600) : 0,
-      mapProfitPerMinute:
-        avgMapDuration > 0 ? totalProfit / mapsCompleted / (avgMapDuration / 60) : 0,
-      mapProfitPerHour:
-        avgMapDuration > 0 ? totalProfit / mapsCompleted / (avgMapDuration / 3600) : 0,
+      mapProfitPerMinute: totalMapDuration > 0 ? totalProfit / (totalMapDuration / 60) : 0,
+      mapProfitPerHour: totalMapDuration > 0 ? totalProfit / (totalMapDuration / 3600) : 0,
     };
   }, [sessions, selectedSessionIds]);
 
@@ -159,7 +158,9 @@ const HistoryView: React.FC = () => {
     );
   }, [combinedMapLogs, selectedMapNumber, selectedMapSessionId]);
 
-  // Get drops for the selected map, enriched with item metadata
+  // Get drops for the selected map, enriched with item metadata.
+  // Prefer metadata from the session data (populated by getSessions backend handler),
+  // falling back to globalDrops only when session data lacks enrichment.
   const drops: Drop[] = React.useMemo(() => {
     if (!selectedMapData?.drops) return [];
 
@@ -167,17 +168,18 @@ const HistoryView: React.FC = () => {
       const existingDrop = globalDrops.find((d) => d.itemId === item.itemId);
       return {
         itemId: item.itemId,
-        name: existingDrop?.name ?? `Item ${item.itemId}`,
+        name: item.name ?? existingDrop?.name ?? `Item ${item.itemId}`,
         quantity: item.quantity,
         price: item.price,
-        type: existingDrop?.type ?? 'Unknown',
+        type: item.type ?? existingDrop?.type ?? 'Unknown',
         timestamp: selectedMapData.startTime,
-        imageUrl: existingDrop?.imageUrl,
+        imageUrl: item.imageUrl ?? existingDrop?.imageUrl,
       };
     });
   }, [selectedMapData, globalDrops]);
 
-  // Get costs for the selected map, enriched with item metadata
+  // Get costs for the selected map, enriched with item metadata.
+  // Prefer metadata from the session data, falling back to globalCosts/globalDrops.
   const costs: Drop[] = React.useMemo(() => {
     if (!selectedMapData?.costs) return [];
 
@@ -186,12 +188,12 @@ const HistoryView: React.FC = () => {
       const existingDrop = globalDrops.find((d) => d.itemId === item.itemId);
       return {
         itemId: item.itemId,
-        name: existingCost?.name ?? existingDrop?.name ?? `Item ${item.itemId}`,
+        name: item.name ?? existingCost?.name ?? existingDrop?.name ?? `Item ${item.itemId}`,
         quantity: item.quantity,
         price: item.price,
-        type: existingCost?.type ?? existingDrop?.type ?? 'Unknown',
+        type: item.type ?? existingCost?.type ?? existingDrop?.type ?? 'Unknown',
         timestamp: selectedMapData.startTime,
-        imageUrl: existingCost?.imageUrl ?? existingDrop?.imageUrl,
+        imageUrl: item.imageUrl ?? existingCost?.imageUrl ?? existingDrop?.imageUrl,
       };
     });
   }, [selectedMapData, globalDrops, globalCosts]);
@@ -219,12 +221,31 @@ const HistoryView: React.FC = () => {
     }
   }, [combinedMapLogs, selectedMapNumber, selectedMapSessionId]);
 
-  const handleDeleteSessions = (sessionIds: string[]): void => {
+  const selectedMapName = React.useMemo(() => {
+    if (selectedMapNumber === null || selectedMapSessionId === null) return undefined;
+    const selectedMap = combinedMapLogs.find(
+      (m) => m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
+    );
+    return selectedMap
+      ? `${selectedMap.mapName ?? `Map #${selectedMap.mapNumber}`} (${selectedMap.sessionTitle ?? 'Session'})`
+      : `Map #${selectedMapNumber}`;
+  }, [selectedMapNumber, selectedMapSessionId, combinedMapLogs]);
+
+  const handleDeleteSessions = useCallback((sessionIds: string[]): void => {
     void window.electronAPI.deleteSessions(sessionIds).then(() => {
       void loadSessions();
       setSelectedSessionIds([]);
     });
-  };
+  }, []);
+
+  const handleProfitModeToggle = useCallback(() => {
+    setProfitMode((prev) => (prev === 'perMinute' ? 'perHour' : 'perMinute'));
+  }, []);
+
+  const handleSelectMap = useCallback((mapNumber: number | null, sessionId?: string | null) => {
+    setSelectedMapNumber(mapNumber);
+    setSelectedMapSessionId(sessionId ?? null);
+  }, []);
 
   return (
     <div className="history-view">
@@ -239,9 +260,7 @@ const HistoryView: React.FC = () => {
         <HistoryStatsPanel
           stats={aggregatedStats}
           profitMode={profitMode}
-          onProfitModeToggle={() =>
-            setProfitMode(profitMode === 'perMinute' ? 'perHour' : 'perMinute')
-          }
+          onProfitModeToggle={handleProfitModeToggle}
         />
 
         <div className="history-tables">
@@ -254,10 +273,7 @@ const HistoryView: React.FC = () => {
               mapCount={combinedMapLogs.length}
               selectedMapNumber={selectedMapNumber}
               selectedSessionId={selectedMapSessionId}
-              onSelectMap={(mapNumber, sessionId) => {
-                setSelectedMapNumber(mapNumber);
-                setSelectedMapSessionId(sessionId ?? null);
-              }}
+              onSelectMap={handleSelectMap}
             />
           </div>
 
@@ -267,19 +283,7 @@ const HistoryView: React.FC = () => {
               costs={costs}
               totalPickedUp={totalPickedUp}
               totalCost={totalCost}
-              selectedMapName={
-                selectedMapNumber !== null && selectedMapSessionId !== null
-                  ? (() => {
-                      const selectedMap = combinedMapLogs.find(
-                        (m) =>
-                          m.mapNumber === selectedMapNumber && m.sessionId === selectedMapSessionId
-                      );
-                      return selectedMap
-                        ? `${selectedMap.mapName ?? `Map #${selectedMap.mapNumber}`} (${selectedMap.sessionTitle ?? 'Session'})`
-                        : `Map #${selectedMapNumber}`;
-                    })()
-                  : undefined
-              }
+              selectedMapName={selectedMapName}
             />
           </div>
         </div>

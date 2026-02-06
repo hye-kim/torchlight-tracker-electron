@@ -88,4 +88,4 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
   );
 };
 
-export default ControlsBar;
+export default React.memo(ControlsBar);

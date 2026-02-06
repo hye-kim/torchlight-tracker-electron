@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import './SessionSelector.css';
 
 interface Session {
@@ -115,12 +115,19 @@ const SessionSelector: React.FC<SessionSelectorProps> = ({
   };
 
   // Sort sessions by start time (newest first)
-  const sortedSessions = [...sessions].sort((a, b) => b.startTime - a.startTime);
+  const sortedSessions = useMemo(
+    () => [...sessions].sort((a, b) => b.startTime - a.startTime),
+    [sessions]
+  );
 
-  const selectedNonActiveSessions = selectedSessionIds.filter((id) => {
-    const session = sessions.find((s) => s.sessionId === id);
-    return session && !session.isActive;
-  });
+  const selectedNonActiveSessions = useMemo(
+    () =>
+      selectedSessionIds.filter((id) => {
+        const session = sessions.find((s) => s.sessionId === id);
+        return session && !session.isActive;
+      }),
+    [selectedSessionIds, sessions]
+  );
 
   return (
     <div className="session-selector">
@@ -206,4 +213,4 @@ const SessionSelector: React.FC<SessionSelectorProps> = ({
   );
 };
 
-export default SessionSelector;
+export default React.memo(SessionSelector);

@@ -109,4 +109,4 @@ const StatsBar: React.FC<StatsBarProps> = ({ stats }) => {
   );
 };
 
-export default StatsBar;
+export default React.memo(StatsBar);

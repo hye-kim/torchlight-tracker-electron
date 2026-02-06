@@ -101,4 +101,4 @@ const NavigationSidebar: React.FC<NavigationSidebarProps> = ({ activeView, onVie
   );
 };
 
-export default NavigationSidebar;
+export default React.memo(NavigationSidebar);
