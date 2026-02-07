@@ -628,7 +628,7 @@ ipcMain.handle('skip-update-version', (_event: IpcMainInvokeEvent, version: stri
 ipcMain.handle('get-sessions', () => {
   const sessions = sessionManager.getAllSessions();
   const fullTable = fileManager.loadFullTable();
-  const itemMapping = fileManager.loadJson<
+  const itemMapping = fileManager.loadBundledJson<
     Record<string, { id: string; img?: string; name_en?: string; type_en?: string }>
   >(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
 

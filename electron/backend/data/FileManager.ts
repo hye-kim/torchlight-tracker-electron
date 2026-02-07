@@ -56,6 +56,10 @@ export class FileManager {
     return path.join(this.resourcePath, filename);
   }
 
+  private getBundledResourcePath(filename: string): string {
+    return path.join(this.resourcePath, filename);
+  }
+
   private getWritablePath(filename: string): string {
     return path.join(this.userDataPath, filename);
   }
@@ -85,6 +89,17 @@ export class FileManager {
     }
   }
 
+  loadBundledJson<T = unknown>(filename: string, defaultValue: T = {} as T): T {
+    try {
+      const filePath = this.getBundledResourcePath(filename);
+      const data = fs.readFileSync(filePath, 'utf-8');
+      return JSON.parse(data) as T;
+    } catch (error) {
+      logger.warn(`Could not load bundled ${filename}:`, error);
+      return defaultValue;
+    }
+  }
+
   saveJson(filename: string, data: unknown): boolean {
     try {
       const writablePath = this.getWritablePath(filename);
@@ -108,7 +123,7 @@ export class FileManager {
     const data = this.loadJson<Record<string, ItemData>>(FULL_TABLE_FILE, {});
 
     // Merge with comprehensive item database to get proper names
-    this.itemDatabase ??= this.loadJson<Record<string, ComprehensiveItemEntry>>(
+    this.itemDatabase ??= this.loadBundledJson<Record<string, ComprehensiveItemEntry>>(
       COMPREHENSIVE_ITEM_DATABASE_FILE,
       {}
     );
@@ -152,7 +167,7 @@ export class FileManager {
     }
 
     logger.info('Initializing full_table.json from comprehensive_item_mapping.json');
-    const itemMapping = this.loadJson<
+    const itemMapping = this.loadBundledJson<
       Record<string, { id: string; name_en?: string; type_en?: string }>
     >(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
 
@@ -217,7 +232,7 @@ export class FileManager {
 
   getItemInfo(itemId: string): ItemData | null {
     // First check comprehensive item database
-    const compDb = this.loadJson<Record<string, ComprehensiveItemEntry>>(
+    const compDb = this.loadBundledJson<Record<string, ComprehensiveItemEntry>>(
       COMPREHENSIVE_ITEM_DATABASE_FILE,
       {}
     );
@@ -300,7 +315,7 @@ export class FileManager {
       }
 
       // Load comprehensive mapping for item names/types
-      const itemMapping = this.loadJson<
+      const itemMapping = this.loadBundledJson<
         Record<string, { id: string; name_en?: string; type_en?: string }>
       >(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
 
