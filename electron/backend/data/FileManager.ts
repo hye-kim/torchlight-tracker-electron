@@ -123,10 +123,15 @@ export class FileManager {
     const data = this.loadJson<Record<string, ItemData>>(FULL_TABLE_FILE, {});
 
     // Merge with comprehensive item database to get proper names
+    const bundledPath = this.getBundledResourcePath(COMPREHENSIVE_ITEM_DATABASE_FILE);
+    logger.info(`DEBUG: Bundled comprehensive mapping path: ${bundledPath}`);
     this.itemDatabase ??= this.loadBundledJson<Record<string, ComprehensiveItemEntry>>(
       COMPREHENSIVE_ITEM_DATABASE_FILE,
       {}
     );
+    const debugItem = this.itemDatabase['100300'];
+    logger.info(`DEBUG: Item 100300 from comprehensive mapping: ${debugItem?.name_en ?? 'NOT FOUND'}`);
+    logger.info(`DEBUG: Item 100300 in full_table before enrichment: ${data['100300']?.name ?? 'NOT FOUND'}`);
 
     // Enrich full table with item names and types from comprehensive database
     for (const [itemId, item] of Object.entries(data)) {
