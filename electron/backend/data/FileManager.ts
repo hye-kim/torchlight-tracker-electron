@@ -301,8 +301,9 @@ export class FileManager {
   }
 
   /**
-   * Sync all items from the API to local table.
-   * Completely overwrites full_table.json with API data on startup.
+   * Sync prices from the API into the existing local table.
+   * Only updates price-related fields; item names/types come from the
+   * bundled comprehensive mapping (set during initialization).
    */
   async syncAllPricesFromAPI(): Promise<number> {
     try {
@@ -314,46 +315,34 @@ export class FileManager {
         return 0;
       }
 
-      // Load comprehensive mapping for item names/types
-      const itemMapping = this.loadBundledJson<
-        Record<string, { id: string; name_en?: string; type_en?: string }>
-      >(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
-
-      // Build complete table from API data
-      const fullTable: Record<string, ItemData> = {};
-      let itemCount = 0;
+      const fullTable = this.loadFullTable(false);
+      let updatedCount = 0;
 
       for (const [itemId, apiItem] of Object.entries(apiItems)) {
-        const mappingData = itemMapping[itemId];
         const apiLastUpdate = apiItem.last_update ?? Math.floor(Date.now() / 1000);
 
-        fullTable[itemId] = {
-          name: mappingData?.name_en ?? apiItem.name_en ?? apiItem.name ?? `Item ${itemId}`,
-          type: mappingData?.type_en ?? apiItem.type_en ?? apiItem.type,
-          price: apiItem.price ?? 0,
-          last_update: apiLastUpdate,
-          last_api_sync: apiLastUpdate,
-        };
-        itemCount++;
-      }
-
-      // Add any items from comprehensive mapping that aren't in API yet
-      for (const [itemId, data] of Object.entries(itemMapping)) {
-        if (!fullTable[itemId]) {
+        if (fullTable[itemId]) {
+          // Update only price-related fields on existing items
+          fullTable[itemId].price = apiItem.price ?? fullTable[itemId].price ?? 0;
+          fullTable[itemId].last_update = apiLastUpdate;
+          fullTable[itemId].last_api_sync = apiLastUpdate;
+        } else {
+          // New item not in comprehensive mapping — add with API metadata
           fullTable[itemId] = {
-            name: data.name_en ?? `Item ${itemId}`,
-            type: data.type_en,
-            price: 0,
-            last_update: 0,
+            name: apiItem.name_en ?? apiItem.name ?? `Item ${itemId}`,
+            type: apiItem.type_en ?? apiItem.type,
+            price: apiItem.price ?? 0,
+            last_update: apiLastUpdate,
+            last_api_sync: apiLastUpdate,
           };
-          itemCount++;
         }
+        updatedCount++;
       }
 
       this.saveFullTable(fullTable);
-      logger.info(`Synced ${itemCount} items from API to full_table.json`);
+      logger.info(`Synced prices for ${updatedCount} items from API`);
 
-      return itemCount;
+      return updatedCount;
     } catch (error) {
       logger.error('Error syncing prices from API:', error);
       return 0;
