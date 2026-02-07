@@ -168,10 +168,12 @@ export class FileManager {
       return;
     }
 
-    logger.info('Initializing full_table.json from comprehensive_item_mapping.json');
+    const bundledPath = this.getBundledResourcePath(COMPREHENSIVE_ITEM_DATABASE_FILE);
+    logger.info(`Initializing full_table.json from ${bundledPath}`);
     const itemMapping = this.loadBundledJson<
       Record<string, { id: string; name_en?: string; type_en?: string }>
     >(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
+    logger.info(`DEBUG initializeFullTable: loaded ${Object.keys(itemMapping).length} items, 100300 name_en=${itemMapping['100300']?.name_en ?? 'MISSING'}`);
 
     const fullTable: Record<string, ItemData> = {};
     for (const [id, data] of Object.entries(itemMapping)) {
