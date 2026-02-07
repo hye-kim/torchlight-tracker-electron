@@ -15,9 +15,9 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist-electron",
-    "rootDir": ".",
+    "rootDir": "electron",
     "sourceMap": true
   },
-  "include": ["electron/**/*", "src/types/**/*"],
+  "include": ["electron/**/*"],
   "exclude": ["node_modules", "dist", "dist-electron", "dist-react"]
 }
