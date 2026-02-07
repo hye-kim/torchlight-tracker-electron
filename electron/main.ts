@@ -61,7 +61,7 @@ function createWindow(): void {
       contextIsolation: true,
       nodeIntegration: false,
     },
-    icon: path.join(__dirname, '../build-resources/icon.ico'),
+    icon: path.join(__dirname, '../../build-resources/icon.ico'),
   });
 
   // Click through is always disabled on startup
@@ -71,7 +71,7 @@ function createWindow(): void {
     void mainWindow.loadURL('http://localhost:5174');
     mainWindow.webContents.openDevTools();
   } else {
-    void mainWindow.loadFile(path.join(__dirname, '../dist-react/index.html'));
+    void mainWindow.loadFile(path.join(__dirname, '../../dist-react/index.html'));
   }
 
   mainWindow.on('close', () => {
