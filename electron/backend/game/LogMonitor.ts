@@ -331,7 +331,7 @@ export class LogMonitor extends EventEmitter {
       const currentStats = this.statisticsTracker.getCurrentMapStats();
       const totalStats = this.statisticsTracker.getTotalStats();
       const fullTable = this.fileManager.loadFullTable();
-      const itemMapping = this.fileManager.loadJson<
+      const itemMapping = this.fileManager.loadBundledJson<
         Record<string, { id: string; img?: string; name_en?: string; type_en?: string }>
       >(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
 

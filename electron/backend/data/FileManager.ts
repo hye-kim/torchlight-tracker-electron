@@ -41,7 +41,7 @@ export class FileManager {
 
   constructor() {
     this.userDataPath = app.getPath('userData');
-    this.resourcePath = app.isPackaged ? process.resourcesPath : path.join(process.cwd(), '..');
+    this.resourcePath = app.isPackaged ? process.resourcesPath : process.cwd();
 
     this.apiUrl = DEFAULT_API_URL;
     this.apiClient = new APIClient(this.apiUrl, 60, 3);
@@ -53,6 +53,10 @@ export class FileManager {
     if (fs.existsSync(userFile)) {
       return userFile;
     }
+    return path.join(this.resourcePath, filename);
+  }
+
+  private getBundledResourcePath(filename: string): string {
     return path.join(this.resourcePath, filename);
   }
 
@@ -85,6 +89,17 @@ export class FileManager {
     }
   }
 
+  loadBundledJson<T = unknown>(filename: string, defaultValue: T = {} as T): T {
+    try {
+      const filePath = this.getBundledResourcePath(filename);
+      const data = fs.readFileSync(filePath, 'utf-8');
+      return JSON.parse(data) as T;
+    } catch (error) {
+      logger.warn(`Could not load bundled ${filename}:`, error);
+      return defaultValue;
+    }
+  }
+
   saveJson(filename: string, data: unknown): boolean {
     try {
       const writablePath = this.getWritablePath(filename);
@@ -108,7 +123,7 @@ export class FileManager {
     const data = this.loadJson<Record<string, ItemData>>(FULL_TABLE_FILE, {});
 
     // Merge with comprehensive item database to get proper names
-    this.itemDatabase ??= this.loadJson<Record<string, ComprehensiveItemEntry>>(
+    this.itemDatabase ??= this.loadBundledJson<Record<string, ComprehensiveItemEntry>>(
       COMPREHENSIVE_ITEM_DATABASE_FILE,
       {}
     );
@@ -117,13 +132,10 @@ export class FileManager {
     for (const [itemId, item] of Object.entries(data)) {
       const comprehensiveItem = this.itemDatabase[itemId];
       if (comprehensiveItem) {
-        // Always prefer comprehensive database name (it's more reliable)
-        // Or use it if current name is missing or not a string
-        if (comprehensiveItem.name_en && (typeof item.name !== 'string' || !item.name)) {
+        if (comprehensiveItem.name_en) {
           item.name = comprehensiveItem.name_en;
         }
-        // Add type if missing or not a string
-        if (comprehensiveItem.type_en && (typeof item.type !== 'string' || !item.type)) {
+        if (comprehensiveItem.type_en) {
           item.type = comprehensiveItem.type_en;
         }
       }
@@ -152,7 +164,7 @@ export class FileManager {
     }
 
     logger.info('Initializing full_table.json from comprehensive_item_mapping.json');
-    const itemMapping = this.loadJson<
+    const itemMapping = this.loadBundledJson<
       Record<string, { id: string; name_en?: string; type_en?: string }>
     >(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
 
@@ -217,7 +229,7 @@ export class FileManager {
 
   getItemInfo(itemId: string): ItemData | null {
     // First check comprehensive item database
-    const compDb = this.loadJson<Record<string, ComprehensiveItemEntry>>(
+    const compDb = this.loadBundledJson<Record<string, ComprehensiveItemEntry>>(
       COMPREHENSIVE_ITEM_DATABASE_FILE,
       {}
     );
@@ -286,8 +298,9 @@ export class FileManager {
   }
 
   /**
-   * Sync all items from the API to local table.
-   * Completely overwrites full_table.json with API data on startup.
+   * Sync prices from the API into the existing local table.
+   * Only updates price-related fields; item names/types come from the
+   * bundled comprehensive mapping (set during initialization).
    */
   async syncAllPricesFromAPI(): Promise<number> {
     try {
@@ -299,46 +312,34 @@ export class FileManager {
         return 0;
       }
 
-      // Load comprehensive mapping for item names/types
-      const itemMapping = this.loadJson<
-        Record<string, { id: string; name_en?: string; type_en?: string }>
-      >(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
-
-      // Build complete table from API data
-      const fullTable: Record<string, ItemData> = {};
-      let itemCount = 0;
+      const fullTable = this.loadFullTable(false);
+      let updatedCount = 0;
 
       for (const [itemId, apiItem] of Object.entries(apiItems)) {
-        const mappingData = itemMapping[itemId];
         const apiLastUpdate = apiItem.last_update ?? Math.floor(Date.now() / 1000);
 
-        fullTable[itemId] = {
-          name: mappingData?.name_en ?? apiItem.name_en ?? apiItem.name ?? `Item ${itemId}`,
-          type: mappingData?.type_en ?? apiItem.type_en ?? apiItem.type,
-          price: apiItem.price ?? 0,
-          last_update: apiLastUpdate,
-          last_api_sync: apiLastUpdate,
-        };
-        itemCount++;
-      }
-
-      // Add any items from comprehensive mapping that aren't in API yet
-      for (const [itemId, data] of Object.entries(itemMapping)) {
-        if (!fullTable[itemId]) {
+        if (fullTable[itemId]) {
+          // Update only price-related fields on existing items
+          fullTable[itemId].price = apiItem.price ?? fullTable[itemId].price ?? 0;
+          fullTable[itemId].last_update = apiLastUpdate;
+          fullTable[itemId].last_api_sync = apiLastUpdate;
+        } else {
+          // New item not in comprehensive mapping — add with API metadata
           fullTable[itemId] = {
-            name: data.name_en ?? `Item ${itemId}`,
-            type: data.type_en,
-            price: 0,
-            last_update: 0,
+            name: apiItem.name_en ?? apiItem.name ?? `Item ${itemId}`,
+            type: apiItem.type_en ?? apiItem.type,
+            price: apiItem.price ?? 0,
+            last_update: apiLastUpdate,
+            last_api_sync: apiLastUpdate,
           };
-          itemCount++;
         }
+        updatedCount++;
       }
 
       this.saveFullTable(fullTable);
-      logger.info(`Synced ${itemCount} items from API to full_table.json`);
+      logger.info(`Synced prices for ${updatedCount} items from API`);
 
-      return itemCount;
+      return updatedCount;
     } catch (error) {
       logger.error('Error syncing prices from API:', error);
       return 0;
