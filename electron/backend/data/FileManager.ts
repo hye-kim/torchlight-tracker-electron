@@ -132,13 +132,10 @@ export class FileManager {
     for (const [itemId, item] of Object.entries(data)) {
       const comprehensiveItem = this.itemDatabase[itemId];
       if (comprehensiveItem) {
-        // Always prefer comprehensive database name (it's more reliable)
-        // Or use it if current name is missing or not a string
-        if (comprehensiveItem.name_en && (typeof item.name !== 'string' || !item.name)) {
+        if (comprehensiveItem.name_en) {
           item.name = comprehensiveItem.name_en;
         }
-        // Add type if missing or not a string
-        if (comprehensiveItem.type_en && (typeof item.type !== 'string' || !item.type)) {
+        if (comprehensiveItem.type_en) {
           item.type = comprehensiveItem.type_en;
         }
       }
