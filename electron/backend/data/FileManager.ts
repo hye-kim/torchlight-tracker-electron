@@ -41,7 +41,7 @@ export class FileManager {
 
   constructor() {
     this.userDataPath = app.getPath('userData');
-    this.resourcePath = app.isPackaged ? process.resourcesPath : path.join(process.cwd(), '..');
+    this.resourcePath = app.isPackaged ? process.resourcesPath : process.cwd();
 
     this.apiUrl = DEFAULT_API_URL;
     this.apiClient = new APIClient(this.apiUrl, 60, 3);
