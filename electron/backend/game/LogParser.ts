@@ -76,8 +76,8 @@ export class LogParser {
     return lines.filter((line) => this.shouldProcessLine(line)).join('\n');
   }
 
-  extractPriceInfo(text: string): Array<[string, number]> {
-    const priceUpdates: Array<[string, number]> = [];
+  extractPriceInfo(text: string): Array<[string, number, boolean | undefined]> {
+    const priceUpdates: Array<[string, number, boolean | undefined]> = [];
 
     try {
       const matches = Array.from(text.matchAll(PATTERN_PRICE_ID));
@@ -96,7 +96,9 @@ export class LogParser {
 
         const price = this.extractPriceForItem(text, synid, itemId);
         if (price !== null) {
-          priceUpdates.push([itemId, price]);
+          // Extract identification status from filters (for Legendary Gear only)
+          const identified = this.extractIdentificationStatus(text, synid, itemId);
+          priceUpdates.push([itemId, price, identified]);
         }
       }
     } catch (error) {
@@ -174,6 +176,67 @@ export class LogParser {
     }
   }
 
+  /**
+   * Extract identification status from filters (for Legendary Gear only).
+   * Returns true if identified, false if unidentified, undefined if not Legendary Gear or status cannot be determined.
+   */
+  private extractIdentificationStatus(
+    text: string,
+    synid: string,
+    itemId: string
+  ): boolean | undefined {
+    try {
+      // First check if this item is Legendary Gear
+      const fullTable = this.fileManager.loadFullTable();
+      const item = fullTable[itemId];
+      const itemType = item?.type ?? item?.type_en;
+
+      if (itemType !== 'Legendary Gear') {
+        return undefined; // Not a legendary item, don't track identification status
+      }
+
+      // Extract the SendMessage block with filters
+      const sendPattern = new RegExp(
+        `----Socket SendMessage STT----XchgSearchPrice----SynId = ${synid}\\s+` +
+          `\\[.*?\\]\\s*GameLog: Display: \\[Game\\]\\s+` +
+          `(.*?)(?=----Socket SendMessage End----|$)`,
+        's'
+      );
+
+      const sendMatch = sendPattern.exec(text);
+      if (!sendMatch?.[1]) {
+        return undefined;
+      }
+
+      const filtersBlock = sendMatch[1];
+
+      // Look for key [32] with its min/max parameters
+      // Pattern: +key [32] followed by +params with +min and +max values
+      const key32Pattern = /\+key \[32\][\s\S]*?\+min \[(\d+)\][\s\S]*?\+max \[(\d+)\]/;
+      const key32Match = key32Pattern.exec(filtersBlock);
+
+      if (!key32Match?.[1] || !key32Match[2]) {
+        return undefined; // Filter not found or incomplete
+      }
+
+      const minValue = parseInt(key32Match[1]);
+      const maxValue = parseInt(key32Match[2]);
+
+      // min=1, max=1 means identified
+      // min=0, max=0 means unidentified
+      if (minValue === 1 && maxValue === 1) {
+        return true; // Identified
+      } else if (minValue === 0 && maxValue === 0) {
+        return false; // Unidentified
+      }
+
+      return undefined; // Unknown state
+    } catch (error) {
+      logger.error(`Error extracting identification status for item ${itemId}:`, error);
+      return undefined;
+    }
+  }
+
   async updatePricesInTable(text: string): Promise<number> {
     const priceUpdates = this.extractPriceInfo(text);
     if (priceUpdates.length === 0) {
@@ -184,17 +247,26 @@ export class LogParser {
     const currentTime = Math.floor(Date.now() / 1000);
     const fullTable = this.fileManager.loadFullTable();
 
-    for (const [itemId, price] of priceUpdates) {
+    for (const [itemId, price, identified] of priceUpdates) {
       const item = fullTable[itemId];
       if (item) {
-        const updated = await this.fileManager.updateItem(itemId, {
+        const updateData: { price: number; last_update: number; identified?: boolean } = {
           price,
           last_update: currentTime,
-        });
+        };
+
+        // Only include identified status if it's defined (for Legendary Gear)
+        if (identified !== undefined) {
+          updateData.identified = identified;
+        }
+
+        const updated = await this.fileManager.updateItem(itemId, updateData);
 
         if (updated) {
           const itemName = item.name ?? itemId;
-          logger.info(`Updated price: ${itemName} (ID:${itemId}) = ${price}`);
+          const identifiedStr =
+            identified !== undefined ? ` (${identified ? 'Identified' : 'Unidentified'})` : '';
+          logger.info(`Updated price: ${itemName} (ID:${itemId}) = ${price}${identifiedStr}`);
           updateCount++;
         }
       }
@@ -212,16 +284,16 @@ export class LogParser {
     return matches
       .filter((m) => m[1] && m[2] && m[3] && m[4] && m[5])
       .map((m) => {
-        const fullId = m[2] as string;
+        const fullId = m[2];
         const baseIdParts = fullId.split('_');
         const baseId = baseIdParts[0] ?? fullId; // Extract base ID from fullId
         return {
           action: m[1] as 'Add' | 'Update' | 'Remove',
           fullId: fullId,
-          pageId: m[4] as string,
-          slotId: m[5] as string,
+          pageId: m[4],
+          slotId: m[5],
           configBaseId: baseId,
-          count: parseInt(m[3] as string),
+          count: parseInt(m[3]),
         };
       });
   }
@@ -235,10 +307,10 @@ export class LogParser {
     return matches
       .filter((m) => m[1] && m[2] && m[3] && m[4])
       .map((m) => {
-        const pageId = m[1] as string;
-        const slotId = m[2] as string;
-        const configBaseId = m[3] as string;
-        const count = parseInt(m[4] as string);
+        const pageId = m[1];
+        const slotId = m[2];
+        const configBaseId = m[3];
+        const count = parseInt(m[4]);
         // Create synthetic fullId for bag data (will be replaced when real ItemChange@ appears)
         const syntheticFullId = `${configBaseId}_init_${pageId}_${slotId}`;
         return {

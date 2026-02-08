@@ -21,6 +21,7 @@ export interface ItemData {
   name_en?: string;
   type?: string;
   type_en?: string;
+  identified?: boolean; // For Legendary Gear: true = identified, false = unidentified
   [key: string]: unknown;
 }
 
