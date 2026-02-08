@@ -194,8 +194,8 @@ export class StatisticsTracker extends EventEmitter {
       for (const [itemId, quantity] of this.costList) {
         const item = fullTable[itemId];
         const basePrice = item?.price ?? 0.0;
-        const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
-        mapCosts.push({ itemId, quantity, price });
+        // Costs use base price (no tax)
+        mapCosts.push({ itemId, quantity, price: basePrice });
       }
 
       // Create map log entry with drops and costs
@@ -280,25 +280,23 @@ export class StatisticsTracker extends EventEmitter {
       }
     }
 
-    // Recalculate current map costs
+    // Recalculate current map costs (no tax on costs)
     this.currentMapCost = 0.0;
     for (const [itemId, quantity] of this.costList) {
       const item = fullTable[itemId];
       if (item) {
         const basePrice = item.price ?? 0.0;
-        const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
-        this.currentMapCost += price * quantity;
+        this.currentMapCost += basePrice * quantity;
       }
     }
 
-    // Recalculate total costs
+    // Recalculate total costs (no tax on costs)
     this.totalCost = 0.0;
     for (const [itemId, quantity] of this.costListAll) {
       const item = fullTable[itemId];
       if (item) {
         const basePrice = item.price ?? 0.0;
-        const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
-        this.totalCost += price * quantity;
+        this.totalCost += basePrice * quantity;
       }
     }
 
@@ -319,8 +317,8 @@ export class StatisticsTracker extends EventEmitter {
         const item = fullTable[costItem.itemId];
         if (item) {
           const basePrice = item.price ?? 0.0;
-          const price = calculatePriceWithTax(basePrice, costItem.itemId, taxEnabled);
-          cost += price * costItem.quantity;
+          // Costs use base price (no tax)
+          cost += basePrice * costItem.quantity;
         }
       }
 
@@ -391,16 +389,16 @@ export class StatisticsTracker extends EventEmitter {
     let price = 0.0;
     if (itemData) {
       const basePrice = itemData.price ?? 0.0;
-      // Apply tax if enabled using centralized calculation
       const taxEnabled = this.configManager.getTaxMode() === 1;
-      price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
 
       if (amount > 0) {
-        // Positive = income (loot)
+        // Positive = income (loot) - apply tax if enabled
+        price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         this.income += price * amount;
         this.incomeAll += price * amount;
       } else {
-        // Negative = cost
+        // Negative = cost - use base price (no tax)
+        price = basePrice;
         this.currentMapCost += price * Math.abs(amount);
         this.totalCost += price * Math.abs(amount);
       }
@@ -578,8 +576,8 @@ export class StatisticsTracker extends EventEmitter {
     for (const [itemId, quantity] of this.costList) {
       const item = fullTable[itemId];
       const basePrice = item?.price ?? 0.0;
-      const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
-      currentCosts.push({ itemId, quantity, price });
+      // Costs use base price (no tax)
+      currentCosts.push({ itemId, quantity, price: basePrice });
     }
 
     return {
