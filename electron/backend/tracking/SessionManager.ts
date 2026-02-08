@@ -8,6 +8,9 @@ import path from 'path';
 import { app } from 'electron';
 import { Logger } from '../core/Logger';
 import { MapLog } from './StatisticsTracker';
+import { FileManager } from '../data/FileManager';
+import { ConfigManager } from '../core/ConfigManager';
+import { calculatePriceWithTax } from '../core/constants';
 
 const logger = Logger.getInstance();
 const SESSIONS_FILE = 'sessions.json';
@@ -39,6 +42,7 @@ export interface Session {
   mapLogs: MapLog[];
   isActive: boolean;
   lastModified: number;
+  priceSnapshotAtEnd?: Record<string, { price: number; taxedPrice: number }>;
 }
 
 export interface SessionsData {
@@ -50,7 +54,10 @@ export class SessionManager {
   private sessionsPath: string;
   private sessionsData: SessionsData;
 
-  constructor() {
+  constructor(
+    private fileManager: FileManager,
+    private configManager: ConfigManager
+  ) {
     const userDataPath = app.getPath('userData');
     this.sessionsPath = path.join(userDataPath, SESSIONS_FILE);
     this.sessionsData = this.loadSessions();
@@ -183,11 +190,25 @@ export class SessionManager {
       return;
     }
 
+    // Capture price snapshot at session end
+    const fullTable = this.fileManager.loadFullTable();
+    const taxEnabled = this.configManager.getTaxMode() === 1;
+    const priceSnapshot: Record<string, { price: number; taxedPrice: number }> = {};
+
+    for (const [itemId, itemData] of Object.entries(fullTable)) {
+      const basePrice = itemData.price ?? 0;
+      priceSnapshot[itemId] = {
+        price: basePrice,
+        taxedPrice: calculatePriceWithTax(basePrice, itemId, taxEnabled),
+      };
+    }
+
     const endTime = Date.now();
     currentSession.endTime = endTime;
     currentSession.duration = Math.floor((endTime - currentSession.startTime) / 1000);
     currentSession.isActive = false;
     currentSession.lastModified = endTime;
+    currentSession.priceSnapshotAtEnd = priceSnapshot;
 
     // Recalculate stats with final duration
     currentSession.stats = this.calculateSessionStats(

@@ -106,6 +106,13 @@ export interface BagState {
   items: Drop[];
 }
 
+export interface CurrentPrices {
+  [itemId: string]: {
+    price: number;
+    taxedPrice: number;
+  };
+}
+
 export interface Session {
   id: string;
   startTime: number;
@@ -113,4 +120,5 @@ export interface Session {
   mapCount: number;
   totalIncome: number;
   totalDuration: number;
+  priceSnapshotAtEnd?: Record<string, { price: number; taxedPrice: number }>;
 }

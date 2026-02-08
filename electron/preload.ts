@@ -24,6 +24,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getDrops: () => ipcRenderer.invoke('get-drops'),
   getMapLogs: () => ipcRenderer.invoke('get-map-logs'),
   getBagState: () => ipcRenderer.invoke('get-bag-state'),
+  getCurrentPrices: () => ipcRenderer.invoke('get-current-prices'),
 
   // Actions
   initializeTracker: () => ipcRenderer.invoke('initialize-tracker'),
@@ -191,6 +192,7 @@ declare global {
       getDrops: () => Promise<Drop[]>;
       getMapLogs: () => Promise<MapLog[]>;
       getBagState: () => Promise<Drop[]>;
+      getCurrentPrices: () => Promise<Record<string, { price: number; taxedPrice: number }>>;
       initializeTracker: () => Promise<{ success: boolean }>;
       exportExcel: () => Promise<{ success: boolean; filePath?: string }>;
       resetStats: () => Promise<{ success: boolean }>;

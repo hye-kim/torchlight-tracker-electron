@@ -61,6 +61,8 @@ coverage/
 # =====================
 .vscode/
 .idea/
+.omc/
+.claude/
 
 # =====================
 # OS junk

@@ -1,11 +1,12 @@
 import { useEffect, useMemo } from 'react';
-import { useStatsStore, useMapStore } from '../stores';
+import { useStatsStore, useMapStore, usePricesStore } from '../stores';
 import { Drop, MapItemData, MapLog, CurrentMapData } from '../types';
 
 /**
  * Custom hook to handle map selection and retrieve map data
+ * @param useCurrentPrices - If true, use current prices from price store; if false, use historical prices from map data
  */
-export const useMapSelection = (): {
+export const useMapSelection = (useCurrentPrices: boolean = true): {
   selectedMapData: MapLog | CurrentMapData | null;
   selectedMapDrops: Drop[];
   selectedMapCosts: Drop[];
@@ -15,6 +16,7 @@ export const useMapSelection = (): {
 } => {
   const { drops, costs, mapLogs } = useStatsStore();
   const { currentMap, isInMap, selectedMapNumber, setSelectedMapNumber } = useMapStore();
+  const { currentPrices } = usePricesStore();
 
   // Auto-select current map when in map
   useEffect(() => {
@@ -42,17 +44,23 @@ export const useMapSelection = (): {
 
     return selectedMapData.drops.map((item: MapItemData) => {
       const existingDrop = drops.find((d) => d.itemId === item.itemId);
+
+      // Use current prices if enabled, otherwise use historical price
+      const price = useCurrentPrices
+        ? (currentPrices[item.itemId]?.taxedPrice ?? item.price)
+        : item.price;
+
       return {
         itemId: item.itemId,
         name: existingDrop?.name ?? `Item ${item.itemId}`,
         quantity: item.quantity,
-        price: item.price,
+        price,
         type: existingDrop?.type ?? 'Unknown',
         timestamp: selectedMapData.startTime,
         imageUrl: existingDrop?.imageUrl,
       };
     });
-  }, [selectedMapData, drops]);
+  }, [selectedMapData, drops, useCurrentPrices, currentPrices]);
 
   // Get costs for the selected map
   const selectedMapCosts = useMemo(() => {
@@ -61,17 +69,23 @@ export const useMapSelection = (): {
     return selectedMapData.costs.map((item: MapItemData) => {
       const existingCost = costs.find((c) => c.itemId === item.itemId);
       const existingDrop = drops.find((d) => d.itemId === item.itemId);
+
+      // Use current prices if enabled (base price for costs, no tax), otherwise use historical price
+      const price = useCurrentPrices
+        ? (currentPrices[item.itemId]?.price ?? item.price)
+        : item.price;
+
       return {
         itemId: item.itemId,
         name: existingCost?.name ?? existingDrop?.name ?? `Item ${item.itemId}`,
         quantity: item.quantity,
-        price: item.price,
+        price,
         type: existingCost?.type ?? existingDrop?.type ?? 'Unknown',
         timestamp: selectedMapData.startTime,
         imageUrl: existingCost?.imageUrl ?? existingDrop?.imageUrl,
       };
     });
-  }, [selectedMapData, costs, drops]);
+  }, [selectedMapData, costs, drops, useCurrentPrices, currentPrices]);
 
   // Calculate totals for the selected map
   const totalPickedUp = useMemo(

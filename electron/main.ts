@@ -19,7 +19,7 @@ import { Logger } from './backend/core/Logger';
 import { ExcelExporter } from './backend/export/ExcelExporter';
 import { UpdateManager } from './backend/updates/UpdateManager';
 import { SessionManager } from './backend/tracking/SessionManager';
-import { CONFIG_FILE, COMPREHENSIVE_ITEM_DATABASE_FILE } from './backend/core/constants';
+import { CONFIG_FILE, COMPREHENSIVE_ITEM_DATABASE_FILE, calculatePriceWithTax } from './backend/core/constants';
 
 const logger = Logger.getInstance();
 const isDev = process.env.NODE_ENV === 'development';
@@ -33,7 +33,7 @@ const fileManager = new FileManager();
 const logParser = new LogParser(fileManager);
 const inventoryTracker = new InventoryTracker(logParser);
 const statisticsTracker = new StatisticsTracker(fileManager, configManager);
-const sessionManager = new SessionManager();
+const sessionManager = new SessionManager(fileManager, configManager);
 const gameDetector = new GameDetector();
 const excelExporter = new ExcelExporter(fileManager);
 const updateManager = new UpdateManager(logger);
@@ -333,6 +333,21 @@ ipcMain.handle('get-bag-state', () => {
   });
 
   return bagArray;
+});
+
+ipcMain.handle('get-current-prices', () => {
+  const fullTable = fileManager.loadFullTable();
+  const taxEnabled = configManager.getTaxMode() === 1;
+
+  const prices: Record<string, { price: number; taxedPrice: number }> = {};
+  for (const [itemId, itemData] of Object.entries(fullTable)) {
+    const basePrice = itemData.price ?? 0;
+    prices[itemId] = {
+      price: basePrice,
+      taxedPrice: calculatePriceWithTax(basePrice, itemId, taxEnabled),
+    };
+  }
+  return prices;
 });
 
 ipcMain.handle('initialize-tracker', () => {

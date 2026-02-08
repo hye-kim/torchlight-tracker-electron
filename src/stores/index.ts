@@ -6,3 +6,4 @@ export { useUIStore } from './uiStore';
 export { useInventoryStore } from './inventoryStore';
 export { useInitStore } from './initStore';
 export { useUpdateStore } from './updateStore';
+export { usePricesStore } from './pricesStore';

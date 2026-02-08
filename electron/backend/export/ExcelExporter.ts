@@ -104,13 +104,13 @@ export class ExcelExporter {
         cell.alignment = { vertical: 'middle', horizontal: 'center' };
       });
 
-      // Add costs data rows
+      // Add costs data rows (costs never have tax applied)
       for (let i = 0; i < costs.length; i++) {
         const cost = costs[i];
         if (!cost) continue;
 
-        const taxMultiplier = applyTax ? 0.875 : 1.0; // 12.5% tax
-        const effectivePrice = cost.price * taxMultiplier;
+        // Costs always use base price (no tax)
+        const effectivePrice = cost.price;
         const rowNum = costsHeaderRow + 1 + i;
 
         worksheet.addRow({
