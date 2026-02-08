@@ -23,6 +23,7 @@ interface HistorySession {
   mapLogs: MapLog[];
   isActive: boolean;
   lastModified: number;
+  priceSnapshotAtEnd?: Record<string, { price: number; taxedPrice: number }>;
 }
 
 interface Drop {
@@ -159,44 +160,59 @@ const HistoryView: React.FC = () => {
   }, [combinedMapLogs, selectedMapNumber, selectedMapSessionId]);
 
   // Get drops for the selected map, enriched with item metadata.
-  // Prefer metadata from the session data (populated by getSessions backend handler),
-  // falling back to globalDrops only when session data lacks enrichment.
+  // Use session-end prices if available, otherwise fall back to map-level prices.
   const drops: Drop[] = React.useMemo(() => {
     if (!selectedMapData?.drops) return [];
 
+    // Find the session for this map to get price snapshot
+    const session = sessions.find((s) => s.sessionId === selectedMapData.sessionId);
+    const priceSnapshot = session?.priceSnapshotAtEnd;
+
     return selectedMapData.drops.map((item: MapItemData) => {
       const existingDrop = globalDrops.find((d) => d.itemId === item.itemId);
+
+      // Use session-end price if available, otherwise use map-level price
+      const price = priceSnapshot?.[item.itemId]?.taxedPrice ?? item.price;
+
       return {
         itemId: item.itemId,
         name: item.name ?? existingDrop?.name ?? `Item ${item.itemId}`,
         quantity: item.quantity,
-        price: item.price,
+        price,
         type: item.type ?? existingDrop?.type ?? 'Unknown',
         timestamp: selectedMapData.startTime,
         imageUrl: item.imageUrl ?? existingDrop?.imageUrl,
       };
     });
-  }, [selectedMapData, globalDrops]);
+  }, [selectedMapData, globalDrops, sessions]);
 
   // Get costs for the selected map, enriched with item metadata.
-  // Prefer metadata from the session data, falling back to globalCosts/globalDrops.
+  // Use session-end prices if available (base price for costs, no tax), otherwise fall back to map-level prices.
   const costs: Drop[] = React.useMemo(() => {
     if (!selectedMapData?.costs) return [];
+
+    // Find the session for this map to get price snapshot
+    const session = sessions.find((s) => s.sessionId === selectedMapData.sessionId);
+    const priceSnapshot = session?.priceSnapshotAtEnd;
 
     return selectedMapData.costs.map((item: MapItemData) => {
       const existingCost = globalCosts.find((c) => c.itemId === item.itemId);
       const existingDrop = globalDrops.find((d) => d.itemId === item.itemId);
+
+      // Use session-end price if available (base price, no tax), otherwise use map-level price
+      const price = priceSnapshot?.[item.itemId]?.price ?? item.price;
+
       return {
         itemId: item.itemId,
         name: item.name ?? existingCost?.name ?? existingDrop?.name ?? `Item ${item.itemId}`,
         quantity: item.quantity,
-        price: item.price,
+        price,
         type: item.type ?? existingCost?.type ?? existingDrop?.type ?? 'Unknown',
         timestamp: selectedMapData.startTime,
         imageUrl: item.imageUrl ?? existingCost?.imageUrl ?? existingDrop?.imageUrl,
       };
     });
-  }, [selectedMapData, globalDrops, globalCosts]);
+  }, [selectedMapData, globalDrops, globalCosts, sessions]);
 
   // Calculate total picked up and total cost
   const totalPickedUp = React.useMemo(() => {

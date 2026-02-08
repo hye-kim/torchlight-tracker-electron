@@ -30,7 +30,7 @@ const OverviewPage: React.FC<OverviewPageProps> = ({
     totalPickedUp,
     totalCost,
     setSelectedMapNumber,
-  } = useMapSelection();
+  } = useMapSelection(true); // Use current prices in Overview
 
   return (
     <>

@@ -5,6 +5,7 @@ import {
   useMapStore,
   useInventoryStore,
   useUpdateStore,
+  usePricesStore,
 } from '../stores';
 
 /**
@@ -16,23 +17,26 @@ export const useElectronData = (): void => {
   const { setCurrentMap, setIsInMap } = useMapStore();
   const { setBagInventory } = useInventoryStore();
   const { setUpdateInfo, setShowUpdateNotification } = useUpdateStore();
+  const { setCurrentPrices } = usePricesStore();
 
   useEffect(() => {
     // Load initial data
     const loadInitialData = async (): Promise<void> => {
-      const [config, stats, drops, mapLogs, bagInventory] = await Promise.all([
-        window.electronAPI.getConfig(),
-        window.electronAPI.getStats(),
-        window.electronAPI.getDrops(),
-        window.electronAPI.getMapLogs?.() ?? Promise.resolve(null),
-        window.electronAPI.getBagState?.() ?? Promise.resolve(null),
-      ]);
+      const config = await window.electronAPI.getConfig();
+      const stats = await window.electronAPI.getStats();
+      const drops = await window.electronAPI.getDrops();
+      const mapLogs = await (window.electronAPI.getMapLogs?.() ?? Promise.resolve(null));
+      const bagInventory = await (window.electronAPI.getBagState?.() ?? Promise.resolve(null));
 
       setConfig(config);
       setStats(stats);
       setDrops(drops);
       if (mapLogs) setMapLogs(mapLogs);
       if (bagInventory && Array.isArray(bagInventory)) setBagInventory(bagInventory);
+
+      // Load current prices
+      const currentPrices = await window.electronAPI.getCurrentPrices();
+      setCurrentPrices(currentPrices);
     };
 
     void loadInitialData();
@@ -48,6 +52,12 @@ export const useElectronData = (): void => {
       if (data.bagInventory && Array.isArray(data.bagInventory)) {
         setBagInventory(data.bagInventory);
       }
+
+      // Refresh current prices when display updates (prices may have changed)
+      void (async () => {
+        const prices = await window.electronAPI.getCurrentPrices();
+        setCurrentPrices(prices);
+      })();
     });
 
     // Listen for overlay mode changes
@@ -80,5 +90,6 @@ export const useElectronData = (): void => {
     updateConfig,
     setUpdateInfo,
     setShowUpdateNotification,
+    setCurrentPrices,
   ]);
 };
