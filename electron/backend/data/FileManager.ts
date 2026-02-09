@@ -3,6 +3,7 @@ import path from 'path';
 import { app } from 'electron';
 import { Logger } from '../core/Logger';
 import { APIClient } from './APIClient';
+import { ItemIdNormalizer } from './ItemIdNormalizer';
 import {
   API_UPDATE_THROTTLE,
   DEFAULT_API_URL,
@@ -30,6 +31,7 @@ export interface ComprehensiveItemEntry {
   name_en: string;
   type_en: string;
   img?: string;
+  baseItemId?: string; // For legendary gear: the pickup/drop form ID
 }
 
 export class FileManager {
@@ -39,6 +41,7 @@ export class FileManager {
   private resourcePath: string;
   private itemDatabase: Record<string, ComprehensiveItemEntry> | null = null;
   private apiClient: APIClient;
+  private itemIdNormalizer: ItemIdNormalizer;
 
   constructor() {
     this.userDataPath = app.getPath('userData');
@@ -46,6 +49,7 @@ export class FileManager {
 
     this.apiUrl = DEFAULT_API_URL;
     this.apiClient = new APIClient(this.apiUrl, 60, 3);
+    this.itemIdNormalizer = new ItemIdNormalizer();
   }
 
   private getResourcePath(filename: string): string {
@@ -128,6 +132,11 @@ export class FileManager {
       COMPREHENSIVE_ITEM_DATABASE_FILE,
       {}
     );
+
+    // Initialize ItemIdNormalizer with comprehensive mapping (only once)
+    if (this.itemDatabase) {
+      this.itemIdNormalizer.initialize(this.itemDatabase);
+    }
 
     // Enrich full table with item names and types from comprehensive database
     for (const [itemId, item] of Object.entries(data)) {
@@ -241,6 +250,10 @@ export class FileManager {
     // Fall back to full table
     const fullTable = this.loadFullTable(true);
     return fullTable[itemId] ?? null;
+  }
+
+  getItemIdNormalizer(): ItemIdNormalizer {
+    return this.itemIdNormalizer;
   }
 
   exportDebugLog(filePath: string): void {

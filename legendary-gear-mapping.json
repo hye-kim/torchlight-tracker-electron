@@ -1,0 +1,1004 @@
+{
+  "102": {
+    "id": "102",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Claw_Epic_101_128.webp",
+    "name_en": "Eternal Moon",
+    "type_en": "Legendary Gear"
+  },
+  "112": {
+    "id": "112",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Claw_Epic_102_128.webp",
+    "name_en": "Throat-Slasher",
+    "type_en": "Legendary Gear"
+  },
+  "113": {
+    "id": "113",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Claw_Epic_004_128.webp",
+    "name_en": "Flying Bird",
+    "type_en": "Legendary Gear"
+  },
+  "202": {
+    "id": "202",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_1HMace_Epic_101_128.webp",
+    "name_en": "Scorching Words",
+    "type_en": "Legendary Gear"
+  },
+  "205": {
+    "id": "205",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_1HMace_Epic_104_128.webp",
+    "name_en": "Misube's Refusal",
+    "type_en": "Legendary Gear"
+  },
+  "206": {
+    "id": "206",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_1HMace_Epic_104_128.webp",
+    "name_en": "Interlocking Soul",
+    "type_en": "Legendary Gear"
+  },
+  "210": {
+    "id": "210",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_1HMace_Epic_104_128.webp",
+    "name_en": "Frozen Will",
+    "type_en": "Legendary Gear"
+  },
+  "214": {
+    "id": "214",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_1HMace_Epic_001_128.webp",
+    "name_en": "Steel Stagnation",
+    "type_en": "Legendary Gear"
+  },
+  "405": {
+    "id": "405",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_1HSword_Epic_103_128.webp",
+    "name_en": "Thunder Branch",
+    "type_en": "Legendary Gear"
+  },
+  "412": {
+    "id": "412",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_1HSword_Epic_105_128.webp",
+    "name_en": "Oathkeeper",
+    "type_en": "Legendary Gear"
+  },
+  "413": {
+    "id": "413",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_1HSword_Epic_106_128.webp",
+    "name_en": "Fleeting Regret",
+    "type_en": "Legendary Gear"
+  },
+  "414": {
+    "id": "414",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_1HSword_Epic_001_128.webp",
+    "name_en": "Farewell Desire",
+    "type_en": "Legendary Gear"
+  },
+  "513": {
+    "id": "513",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_1HAxe_Epic_101_128.webp",
+    "name_en": "End Night Banquet",
+    "type_en": "Legendary Gear"
+  },
+  "514": {
+    "id": "514",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_1HAxe_Epic_001_128.webp",
+    "name_en": "Ominous Gift",
+    "type_en": "Legendary Gear"
+  },
+  "603": {
+    "id": "603",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Dagger_Epic_105_128.webp",
+    "name_en": "Shadow of Thunderlight's Eyes",
+    "type_en": "Legendary Gear"
+  },
+  "611": {
+    "id": "611",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Dagger_Epic_002_128.webp",
+    "name_en": "Frantic Shadow",
+    "type_en": "Legendary Gear"
+  },
+  "613": {
+    "id": "613",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Dagger_Epic_001_128.webp",
+    "name_en": "Memory",
+    "type_en": "Legendary Gear"
+  },
+  "815": {
+    "id": "815",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Wand_Epic_105_128.webp",
+    "name_en": "Twisted Branch",
+    "type_en": "Legendary Gear"
+  },
+  "1109": {
+    "id": "1109",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_2HAxe_Epic_106_128.webp",
+    "name_en": "Varagon's Attack",
+    "type_en": "Legendary Gear"
+  },
+  "1113": {
+    "id": "1113",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_2HAxe_Epic_001_128.webp",
+    "name_en": "Highest Glance",
+    "type_en": "Legendary Gear"
+  },
+  "1118": {
+    "id": "1118",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_2HAxe_Epic_101_128.webp",
+    "name_en": "Arminius Guillotine",
+    "type_en": "Legendary Gear"
+  },
+  "1203": {
+    "id": "1203",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_2HSword_Epic_105_128.webp",
+    "name_en": "Crosser",
+    "type_en": "Legendary Gear"
+  },
+  "1204": {
+    "id": "1204",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_2HSword_Epic_105_128.webp",
+    "name_en": "Shamed",
+    "type_en": "Legendary Gear"
+  },
+  "1205": {
+    "id": "1205",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_2HSword_Epic_101_128.webp",
+    "name_en": "Cursed Flame",
+    "type_en": "Legendary Gear"
+  },
+  "1206": {
+    "id": "1206",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_2HSword_Epic_105_128.webp",
+    "name_en": "Will",
+    "type_en": "Legendary Gear"
+  },
+  "1212": {
+    "id": "1212",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_2HSword_Epic_104_128.webp",
+    "name_en": "Harbinger's Reversed Plumes",
+    "type_en": "Legendary Gear"
+  },
+  "1214": {
+    "id": "1214",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_2HSword_Epic_101_128.webp",
+    "name_en": "Circular Clearing",
+    "type_en": "Legendary Gear"
+  },
+  "1402": {
+    "id": "1402",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Staff_Epic_103_128.webp",
+    "name_en": "Sage's Foresight",
+    "type_en": "Legendary Gear"
+  },
+  "1411": {
+    "id": "1411",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Staff_Epic_001_128.webp",
+    "name_en": "Scorching Tempo",
+    "type_en": "Legendary Gear"
+  },
+  "1502": {
+    "id": "1502",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Pistol_Epic_103_128.webp",
+    "name_en": "Frozen Sight",
+    "type_en": "Legendary Gear"
+  },
+  "1505": {
+    "id": "1505",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Pistol_Epic_103_128.webp",
+    "name_en": "Buzzing",
+    "type_en": "Legendary Gear"
+  },
+  "1513": {
+    "id": "1513",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Pistol_Epic_002_128.webp",
+    "name_en": "Gravel",
+    "type_en": "Legendary Gear"
+  },
+  "1514": {
+    "id": "1514",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Pistol_Epic_003_128.webp",
+    "name_en": "Severed Wrist",
+    "type_en": "Legendary Gear"
+  },
+  "1602": {
+    "id": "1602",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Bow_Epic_105_128.webp",
+    "name_en": "Sun-shooter Long Bow",
+    "type_en": "Legendary Gear"
+  },
+  "1604": {
+    "id": "1604",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Bow_Epic_103_128.webp",
+    "name_en": "Shadow of Thunderlight's Touch",
+    "type_en": "Legendary Gear"
+  },
+  "1612": {
+    "id": "1612",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Bow_Epic_001_128.webp",
+    "name_en": "Glacial Abyss Arrow",
+    "type_en": "Legendary Gear"
+  },
+  "1614": {
+    "id": "1614",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Bow_Epic_103_128.webp",
+    "name_en": "Mountain Howling",
+    "type_en": "Legendary Gear"
+  },
+  "1707": {
+    "id": "1707",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_crossbow_Epic_104_128.webp",
+    "name_en": "Plain Echo",
+    "type_en": "Legendary Gear"
+  },
+  "1710": {
+    "id": "1710",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_crossbow_Epic_104_128.webp",
+    "name_en": "Ralph's Ambition",
+    "type_en": "Legendary Gear"
+  },
+  "1713": {
+    "id": "1713",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_crossbow_Epic_101_128.webp",
+    "name_en": "Dumb Voice",
+    "type_en": "Legendary Gear"
+  },
+  "1902": {
+    "id": "1902",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Shotgun_Epic_101_128.webp",
+    "name_en": "Scorching Wave",
+    "type_en": "Legendary Gear"
+  },
+  "1912": {
+    "id": "1912",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Shotgun_Epic_002_128.webp",
+    "name_en": "King Lionheart's Ambition",
+    "type_en": "Legendary Gear"
+  },
+  "2001": {
+    "id": "2001",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Wand_Epic_104_128.webp",
+    "name_en": "Spring Resurrection",
+    "type_en": "Legendary Gear"
+  },
+  "2006": {
+    "id": "2006",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Wand_Epic_103_128.webp",
+    "name_en": "Scepter of Excommunication",
+    "type_en": "Legendary Gear"
+  },
+  "2008": {
+    "id": "2008",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Wand_Epic_001_128.webp",
+    "name_en": "Fiery Oath",
+    "type_en": "Legendary Gear"
+  },
+  "2009": {
+    "id": "2009",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Wand_Epic_105_128.webp",
+    "name_en": "Fire Lord's Promise",
+    "type_en": "Legendary Gear"
+  },
+  "2011": {
+    "id": "2011",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Wand_Epic_104_128.webp",
+    "name_en": "Oversight",
+    "type_en": "Legendary Gear"
+  },
+  "2013": {
+    "id": "2013",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Wand_Epic_001_128.webp",
+    "name_en": "Jumble Ice",
+    "type_en": "Legendary Gear"
+  },
+  "2210": {
+    "id": "2210",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Weapon/128/Icon_Equip_Weapon_Wand_Epic_001_128.webp",
+    "name_en": "Supreme Throne",
+    "type_en": "Legendary Gear"
+  },
+  "3000": {
+    "id": "3000",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_401_128.webp",
+    "name_en": "Glorious Journey",
+    "type_en": "Legendary Gear"
+  },
+  "3001": {
+    "id": "3001",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_449_128.webp",
+    "name_en": "Futile Tradeoff",
+    "type_en": "Legendary Gear"
+  },
+  "3005": {
+    "id": "3005",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_410_128.webp",
+    "name_en": "Vestment of Song",
+    "type_en": "Legendary Gear"
+  },
+  "3009": {
+    "id": "3009",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_404_128.webp",
+    "name_en": "Dragon Breath Armor",
+    "type_en": "Legendary Gear"
+  },
+  "3010": {
+    "id": "3010",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_428_128.webp",
+    "name_en": "Arrival of the Polar Night",
+    "type_en": "Legendary Gear"
+  },
+  "3011": {
+    "id": "3011",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_448_128.webp",
+    "name_en": "Silent Avowal",
+    "type_en": "Legendary Gear"
+  },
+  "3012": {
+    "id": "3012",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_445_128.webp",
+    "name_en": "Varagon's Lament",
+    "type_en": "Legendary Gear"
+  },
+  "3101": {
+    "id": "3101",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_423_128.webp",
+    "name_en": "Double Rainbow",
+    "type_en": "Legendary Gear"
+  },
+  "3106": {
+    "id": "3106",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_412_128.webp",
+    "name_en": "Phantasm",
+    "type_en": "Legendary Gear"
+  },
+  "3108": {
+    "id": "3108",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_201_128.webp",
+    "name_en": "Evil Heart Armor",
+    "type_en": "Legendary Gear"
+  },
+  "3110": {
+    "id": "3110",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_440_128.webp",
+    "name_en": "Trinity",
+    "type_en": "Legendary Gear"
+  },
+  "3111": {
+    "id": "3111",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_323_128.webp",
+    "name_en": "Lightning Striker's Sacrum",
+    "type_en": "Legendary Gear"
+  },
+  "3201": {
+    "id": "3201",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_427_128.webp",
+    "name_en": "Cicada Shell",
+    "type_en": "Legendary Gear"
+  },
+  "3204": {
+    "id": "3204",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_441_128.webp",
+    "name_en": "Genius Battlegear",
+    "type_en": "Legendary Gear"
+  },
+  "3205": {
+    "id": "3205",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_321_128.webp",
+    "name_en": "Gauze of Phantom Sin",
+    "type_en": "Legendary Gear"
+  },
+  "3209": {
+    "id": "3209",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_304_128.webp",
+    "name_en": "Stellar Vestment of Eminence",
+    "type_en": "Legendary Gear"
+  },
+  "3210": {
+    "id": "3210",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_322_128.webp",
+    "name_en": "Agony's Embrace",
+    "type_en": "Legendary Gear"
+  },
+  "3211": {
+    "id": "3211",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_325_128.webp",
+    "name_en": "Ruinous Star",
+    "type_en": "Legendary Gear"
+  },
+  "3212": {
+    "id": "3212",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_446_128.webp",
+    "name_en": "Imperious Verdict",
+    "type_en": "Legendary Gear"
+  },
+  "3214": {
+    "id": "3214",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_444_128.webp",
+    "name_en": "Agony of Lost Self",
+    "type_en": "Legendary Gear"
+  },
+  "3299": {
+    "id": "3299",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Armor/128/Icon_Equip_Armor_Epic_310_128.webp",
+    "name_en": "Omniscient Prototype",
+    "type_en": "Legendary Gear"
+  },
+  "3305": {
+    "id": "3305",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_407_128.webp",
+    "name_en": "Boom Gloves",
+    "type_en": "Legendary Gear"
+  },
+  "3308": {
+    "id": "3308",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_434_128.webp",
+    "name_en": "Grandmaster's Hands",
+    "type_en": "Legendary Gear"
+  },
+  "3309": {
+    "id": "3309",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_209_128.webp",
+    "name_en": "Varagon Shroud",
+    "type_en": "Legendary Gear"
+  },
+  "3310": {
+    "id": "3310",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_433_128.webp",
+    "name_en": "Quantum Convergence",
+    "type_en": "Legendary Gear"
+  },
+  "3311": {
+    "id": "3311",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_437_128.webp",
+    "name_en": "Demons' Touch",
+    "type_en": "Legendary Gear"
+  },
+  "3402": {
+    "id": "3402",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_408_128.webp",
+    "name_en": "Feline Gloves",
+    "type_en": "Legendary Gear"
+  },
+  "3403": {
+    "id": "3403",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_439_128.webp",
+    "name_en": "Vendetta's Sleeve-Blade",
+    "type_en": "Legendary Gear"
+  },
+  "3404": {
+    "id": "3404",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_411_128.webp",
+    "name_en": "Marksman Bracers",
+    "type_en": "Legendary Gear"
+  },
+  "3405": {
+    "id": "3405",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_413_128.webp",
+    "name_en": "Blinding Bracers",
+    "type_en": "Legendary Gear"
+  },
+  "3409": {
+    "id": "3409",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_415_128.webp",
+    "name_en": "Wings of Light",
+    "type_en": "Legendary Gear"
+  },
+  "3410": {
+    "id": "3410",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_213_128.webp",
+    "name_en": "Torturer's Touch",
+    "type_en": "Legendary Gear"
+  },
+  "3411": {
+    "id": "3411",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_438_128.webp",
+    "name_en": "Vajra Handguards",
+    "type_en": "Legendary Gear"
+  },
+  "3501": {
+    "id": "3501",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_409_128.webp",
+    "name_en": "Ice Pulse",
+    "type_en": "Legendary Gear"
+  },
+  "3505": {
+    "id": "3505",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_432_128.webp",
+    "name_en": "Hand of Malice",
+    "type_en": "Legendary Gear"
+  },
+  "3508": {
+    "id": "3508",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_215_128.webp",
+    "name_en": "Miniature Void Sea",
+    "type_en": "Legendary Gear"
+  },
+  "3509": {
+    "id": "3509",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_212_128.webp",
+    "name_en": "Archmage's Hands",
+    "type_en": "Legendary Gear"
+  },
+  "3510": {
+    "id": "3510",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_435_128.webp",
+    "name_en": "Grasp of Truth",
+    "type_en": "Legendary Gear"
+  },
+  "3511": {
+    "id": "3511",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_203_128.webp",
+    "name_en": "Sage's Insight",
+    "type_en": "Legendary Gear"
+  },
+  "3601": {
+    "id": "3601",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Helmet/128/Icon_Equip_Helmet_Epic_401_128.webp",
+    "name_en": "Rock Lizard's Skull",
+    "type_en": "Legendary Gear"
+  },
+  "3602": {
+    "id": "3602",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Helmet/128/Icon_Equip_Helmet_Epic_411_128.webp",
+    "name_en": "Scarlet Decree",
+    "type_en": "Legendary Gear"
+  },
+  "3605": {
+    "id": "3605",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Helmet/128/Icon_Equip_Helmet_Epic_319_128.webp",
+    "name_en": "Boor's Iron Crown",
+    "type_en": "Legendary Gear"
+  },
+  "3609": {
+    "id": "3609",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Helmet/128/Icon_Equip_Helmet_Epic_305_128.webp",
+    "name_en": "Sun's Embrace",
+    "type_en": "Legendary Gear"
+  },
+  "3610": {
+    "id": "3610",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Helmet/128/Icon_Equip_Helmet_Epic_312_128.webp",
+    "name_en": "Divine Ember",
+    "type_en": "Legendary Gear"
+  },
+  "3611": {
+    "id": "3611",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Helmet/128/Icon_Equip_Helmet_Epic_332_128.webp",
+    "name_en": "Iron and Bloom",
+    "type_en": "Legendary Gear"
+  },
+  "3705": {
+    "id": "3705",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Helmet/128/Icon_Equip_Helmet_Epic_307_128.webp",
+    "name_en": "Corrupted Marrow",
+    "type_en": "Legendary Gear"
+  },
+  "3709": {
+    "id": "3709",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Helmet/128/Icon_Equip_Helmet_Epic_413_128.webp",
+    "name_en": "Flying Light at Daybreak",
+    "type_en": "Legendary Gear"
+  },
+  "3710": {
+    "id": "3710",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Helmet/128/Icon_Equip_Helmet_Epic_330_128.webp",
+    "name_en": "Trauma's Embrace",
+    "type_en": "Legendary Gear"
+  },
+  "3711": {
+    "id": "3711",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Helmet/128/Icon_Equip_Helmet_Epic_323_128.webp",
+    "name_en": "Hanging Two-Tone Mask",
+    "type_en": "Legendary Gear"
+  },
+  "3801": {
+    "id": "3801",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Helmet/128/Icon_Equip_Helmet_Epic_325_128.webp",
+    "name_en": "Headless Crown",
+    "type_en": "Legendary Gear"
+  },
+  "3802": {
+    "id": "3802",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Helmet/128/Icon_Equip_Helmet_Epic_410_128.webp",
+    "name_en": "Siren Faceguard",
+    "type_en": "Legendary Gear"
+  },
+  "3803": {
+    "id": "3803",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Helmet/128/Icon_Equip_Helmet_Epic_327_128.webp",
+    "name_en": "Brainwave Emitter",
+    "type_en": "Legendary Gear"
+  },
+  "3809": {
+    "id": "3809",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Helmet/128/Icon_Equip_Helmet_Epic_313_128.webp",
+    "name_en": "Hekate's Vision",
+    "type_en": "Legendary Gear"
+  },
+  "3810": {
+    "id": "3810",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Helmet/128/Icon_Equip_Helmet_Epic_333_128.webp",
+    "name_en": "Malign Embrace",
+    "type_en": "Legendary Gear"
+  },
+  "3811": {
+    "id": "3811",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Helmet/128/Icon_Equip_Helmet_Epic_326_128.webp",
+    "name_en": "Solid River",
+    "type_en": "Legendary Gear"
+  },
+  "3901": {
+    "id": "3901",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_416_128.webp",
+    "name_en": "Fire Shielding Prosthetics",
+    "type_en": "Legendary Gear"
+  },
+  "3902": {
+    "id": "3902",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_402_128.webp",
+    "name_en": "Boots of Sinned Fire",
+    "type_en": "Legendary Gear"
+  },
+  "3910": {
+    "id": "3910",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_428_128.webp",
+    "name_en": "Fire Lord's Pyric Stride",
+    "type_en": "Legendary Gear"
+  },
+  "3911": {
+    "id": "3911",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_205_128.webp",
+    "name_en": "Mind Infusion",
+    "type_en": "Legendary Gear"
+  },
+  "4001": {
+    "id": "4001",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_418_128.webp",
+    "name_en": "Thunder Channeling Prosthetics",
+    "type_en": "Legendary Gear"
+  },
+  "4004": {
+    "id": "4004",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_432_128.webp",
+    "name_en": "Trickster's Tread",
+    "type_en": "Legendary Gear"
+  },
+  "4005": {
+    "id": "4005",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_422_128.webp",
+    "name_en": "Wind Chasers",
+    "type_en": "Legendary Gear"
+  },
+  "4008": {
+    "id": "4008",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_212_128.webp",
+    "name_en": "Rat King's Escape Show",
+    "type_en": "Legendary Gear"
+  },
+  "4009": {
+    "id": "4009",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_415_128.webp",
+    "name_en": "Crow's Plume",
+    "type_en": "Legendary Gear"
+  },
+  "4010": {
+    "id": "4010",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_431_128.webp",
+    "name_en": "Pathfinder's Path",
+    "type_en": "Legendary Gear"
+  },
+  "4011": {
+    "id": "4011",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_425_128.webp",
+    "name_en": "Heels of Hands",
+    "type_en": "Legendary Gear"
+  },
+  "4101": {
+    "id": "4101",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_420_128.webp",
+    "name_en": "Shadow Dance",
+    "type_en": "Legendary Gear"
+  },
+  "4103": {
+    "id": "4103",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_412_128.webp",
+    "name_en": "Fighting Stompers",
+    "type_en": "Legendary Gear"
+  },
+  "4104": {
+    "id": "4104",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_407_128.webp",
+    "name_en": "Grace Boots",
+    "type_en": "Legendary Gear"
+  },
+  "4108": {
+    "id": "4108",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_204_128.webp",
+    "name_en": "King's Boon",
+    "type_en": "Legendary Gear"
+  },
+  "4109": {
+    "id": "4109",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_410_128.webp",
+    "name_en": "Guild Guard Boots",
+    "type_en": "Legendary Gear"
+  },
+  "4110": {
+    "id": "4110",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_409_128.webp",
+    "name_en": "Powered Battle Greaves",
+    "type_en": "Legendary Gear"
+  },
+  "4111": {
+    "id": "4111",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shoes/128/Icon_Equip_Shoes_Epic_430_128.webp",
+    "name_en": "Frozen Ripples",
+    "type_en": "Legendary Gear"
+  },
+  "4204": {
+    "id": "4204",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shield/128/Icon_Equip_Weapon_Shield_Epic_106_128.webp",
+    "name_en": "Shield of Judgment",
+    "type_en": "Legendary Gear"
+  },
+  "4205": {
+    "id": "4205",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shield/128/Icon_Equip_Weapon_Shield_Epic_106_128.webp",
+    "name_en": "Heavy Soul",
+    "type_en": "Legendary Gear"
+  },
+  "4206": {
+    "id": "4206",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shield/128/Icon_Equip_Weapon_Shield_Epic_106_128.webp",
+    "name_en": "Last Stand",
+    "type_en": "Legendary Gear"
+  },
+  "4210": {
+    "id": "4210",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shield/128/Icon_Equip_Weapon_Shield_Epic_103_128.webp",
+    "name_en": "Cover the Sun",
+    "type_en": "Legendary Gear"
+  },
+  "4304": {
+    "id": "4304",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shield/128/Icon_Equip_Weapon_Shield_Epic_105_128.webp",
+    "name_en": "Silent Sentry Shield",
+    "type_en": "Legendary Gear"
+  },
+  "4305": {
+    "id": "4305",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shield/128/Icon_Equip_Weapon_Shield_Epic_105_128.webp",
+    "name_en": "Electricity Amplifier",
+    "type_en": "Legendary Gear"
+  },
+  "4409": {
+    "id": "4409",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shield/128/Icon_Equip_Weapon_Shield_Epic_103_128.webp",
+    "name_en": "Glacier Caster Shield",
+    "type_en": "Legendary Gear"
+  },
+  "4411": {
+    "id": "4411",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Shield/128/Icon_Equip_Weapon_Shield_Epic_001_128.webp",
+    "name_en": "The Coward's Counterfire",
+    "type_en": "Legendary Gear"
+  },
+  "4518": {
+    "id": "4518",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Amulet/128/Icon_Equip_Amulet_Epic_322_128.webp",
+    "name_en": "Despised Shadow",
+    "type_en": "Legendary Gear"
+  },
+  "4520": {
+    "id": "4520",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Amulet/128/Icon_Equip_Amulet_Epic_307_128.webp",
+    "name_en": "Chain behind the Curtain",
+    "type_en": "Legendary Gear"
+  },
+  "4521": {
+    "id": "4521",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Amulet/128/Icon_Equip_Amulet_Epic_409_128.webp",
+    "name_en": "Ocean of Rock",
+    "type_en": "Legendary Gear"
+  },
+  "4522": {
+    "id": "4522",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Amulet/128/Icon_Equip_Amulet_Epic_309_128.webp",
+    "name_en": "False God's Skin",
+    "type_en": "Legendary Gear"
+  },
+  "4526": {
+    "id": "4526",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Amulet/128/Icon_Equip_Amulet_Epic_318_128.webp",
+    "name_en": "Photophobia",
+    "type_en": "Legendary Gear"
+  },
+  "4527": {
+    "id": "4527",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Amulet/128/Icon_Equip_Amulet_Epic_404_128.webp",
+    "name_en": "Master Defender Pendant",
+    "type_en": "Legendary Gear"
+  },
+  "4528": {
+    "id": "4528",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Amulet/128/Icon_Equip_Amulet_Epic_330_128.webp",
+    "name_en": "Heart of Animitta",
+    "type_en": "Legendary Gear"
+  },
+  "4532": {
+    "id": "4532",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Amulet/128/Icon_Equip_Amulet_Epic_323_128.webp",
+    "name_en": "Decaying Blessing",
+    "type_en": "Legendary Gear"
+  },
+  "4533": {
+    "id": "4533",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Amulet/128/Icon_Equip_Amulet_Epic_333_128.webp",
+    "name_en": "Old Grudge",
+    "type_en": "Legendary Gear"
+  },
+  "4534": {
+    "id": "4534",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Amulet/128/Icon_Equip_Amulet_Epic_315_128.webp",
+    "name_en": "Iron Nest",
+    "type_en": "Legendary Gear"
+  },
+  "4535": {
+    "id": "4535",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Amulet/128/Icon_Equip_Amulet_Epic_325_128.webp",
+    "name_en": "Prayer Bead of Evil",
+    "type_en": "Legendary Gear"
+  },
+  "4536": {
+    "id": "4536",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Amulet/128/Icon_Equip_Amulet_Epic_316_128.webp",
+    "name_en": "Elegy of Immortality",
+    "type_en": "Legendary Gear"
+  },
+  "4601": {
+    "id": "4601",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_408_128.webp",
+    "name_en": "Restless Glacier",
+    "type_en": "Legendary Gear"
+  },
+  "4620": {
+    "id": "4620",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_401_128.webp",
+    "name_en": "Born in Fire",
+    "type_en": "Legendary Gear"
+  },
+  "4622": {
+    "id": "4622",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_222_128.webp",
+    "name_en": "Fury Heart",
+    "type_en": "Legendary Gear"
+  },
+  "4623": {
+    "id": "4623",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_417_128.webp",
+    "name_en": "Stream of Steel",
+    "type_en": "Legendary Gear"
+  },
+  "4624": {
+    "id": "4624",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_205_128.webp",
+    "name_en": "Frozen Flame",
+    "type_en": "Legendary Gear"
+  },
+  "4626": {
+    "id": "4626",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_212_128.webp",
+    "name_en": "Lonesome",
+    "type_en": "Legendary Gear"
+  },
+  "4627": {
+    "id": "4627",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_414_128.webp",
+    "name_en": "Frozen Lightning",
+    "type_en": "Legendary Gear"
+  },
+  "4628": {
+    "id": "4628",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_223_128.webp",
+    "name_en": "Heart of Rock",
+    "type_en": "Legendary Gear"
+  },
+  "4630": {
+    "id": "4630",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_217_128.webp",
+    "name_en": "Passing of Time",
+    "type_en": "Legendary Gear"
+  },
+  "4633": {
+    "id": "4633",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_220_128.webp",
+    "name_en": "Unholy Prayer",
+    "type_en": "Legendary Gear"
+  },
+  "4634": {
+    "id": "4634",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_224_128.webp",
+    "name_en": "Heart of Magic",
+    "type_en": "Legendary Gear"
+  },
+  "4635": {
+    "id": "4635",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_413_128.webp",
+    "name_en": "Exemption Thunderhell",
+    "type_en": "Legendary Gear"
+  },
+  "4636": {
+    "id": "4636",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_218_128.webp",
+    "name_en": "Time of Vow",
+    "type_en": "Legendary Gear"
+  },
+  "4638": {
+    "id": "4638",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_202_128.webp",
+    "name_en": "Chaotic Ending",
+    "type_en": "Legendary Gear"
+  },
+  "4639": {
+    "id": "4639",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_211_128.webp",
+    "name_en": "Kaleidoscope",
+    "type_en": "Legendary Gear"
+  },
+  "4640": {
+    "id": "4640",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_216_128.webp",
+    "name_en": "Folklore of Locking Fingers",
+    "type_en": "Legendary Gear"
+  },
+  "4646": {
+    "id": "4646",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_201_128.webp",
+    "name_en": "Decayed Mind",
+    "type_en": "Legendary Gear"
+  },
+  "4647": {
+    "id": "4647",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Ring/128/Icon_Equip_Ring_Epic_407_128.webp",
+    "name_en": "Horn Ring",
+    "type_en": "Legendary Gear"
+  },
+  "4720": {
+    "id": "4720",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Belt/128/Icon_Equip_Belt_Epic_410_128.webp",
+    "name_en": "Compensatory Life",
+    "type_en": "Legendary Gear"
+  },
+  "4721": {
+    "id": "4721",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Belt/128/Icon_Equip_Belt_Epic_224_128.webp",
+    "name_en": "Bodhi Girdle",
+    "type_en": "Legendary Gear"
+  },
+  "4722": {
+    "id": "4722",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Belt/128/Icon_Equip_Belt_Epic_223_128.webp",
+    "name_en": "Tranquil Stir",
+    "type_en": "Legendary Gear"
+  },
+  "4725": {
+    "id": "4725",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Belt/128/Icon_Equip_Belt_Epic_218_128.webp",
+    "name_en": "Eternity",
+    "type_en": "Legendary Gear"
+  },
+  "4726": {
+    "id": "4726",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Belt/128/Icon_Equip_Belt_Epic_207_128.webp",
+    "name_en": "Polygonal Enclosure",
+    "type_en": "Legendary Gear"
+  },
+  "4727": {
+    "id": "4727",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Belt/128/Icon_Equip_Belt_Epic_206_128.webp",
+    "name_en": "Corrosion of Manifolds",
+    "type_en": "Legendary Gear"
+  },
+  "4728": {
+    "id": "4728",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Belt/128/Icon_Equip_Belt_Epic_214_128.webp",
+    "name_en": "Formation Breaker",
+    "type_en": "Legendary Gear"
+  }
+}

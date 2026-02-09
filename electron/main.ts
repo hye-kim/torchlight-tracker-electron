@@ -19,7 +19,11 @@ import { Logger } from './backend/core/Logger';
 import { ExcelExporter } from './backend/export/ExcelExporter';
 import { UpdateManager } from './backend/updates/UpdateManager';
 import { SessionManager } from './backend/tracking/SessionManager';
-import { CONFIG_FILE, COMPREHENSIVE_ITEM_DATABASE_FILE, calculatePriceWithTax } from './backend/core/constants';
+import {
+  CONFIG_FILE,
+  COMPREHENSIVE_ITEM_DATABASE_FILE,
+  calculatePriceWithTax,
+} from './backend/core/constants';
 
 const logger = Logger.getInstance();
 const isDev = process.env.NODE_ENV === 'development';
@@ -31,7 +35,7 @@ let logMonitor: LogMonitor | null = null;
 const configManager = new ConfigManager();
 const fileManager = new FileManager();
 const logParser = new LogParser(fileManager);
-const inventoryTracker = new InventoryTracker(logParser);
+const inventoryTracker = new InventoryTracker(logParser, fileManager);
 const statisticsTracker = new StatisticsTracker(fileManager, configManager);
 const sessionManager = new SessionManager(fileManager, configManager);
 const gameDetector = new GameDetector();
