@@ -284,18 +284,18 @@ export class LogParser {
     return matches
       .filter((m) => m[1] && m[2] && m[4] && m[5]) // m[3] (BagNum) is optional for Delete events
       .map((m) => {
-        const fullId = m[2];
+        const fullId = m[2]!;
         const baseIdParts = fullId.split('_');
         const baseId = baseIdParts[0] ?? fullId; // Extract base ID from fullId
-        const action = m[1] === 'Delete' ? 'Remove' : m[1];
+        const action = m[1] === 'Delete' ? 'Remove' : m[1]!;
         // For Delete events, BagNum is not present (m[3] is undefined), but count is not used
         // for Remove actions anyway (InventoryTracker uses previousInstance.count instead)
         const count = m[3] ? parseInt(m[3]) : 0;
         return {
           action: action as 'Add' | 'Update' | 'Remove',
           fullId: fullId,
-          pageId: m[4],
-          slotId: m[5],
+          pageId: m[4]!,
+          slotId: m[5]!,
           configBaseId: baseId,
           count: count,
         };
@@ -311,10 +311,10 @@ export class LogParser {
     return matches
       .filter((m) => m[1] && m[2] && m[3] && m[4])
       .map((m) => {
-        const pageId = m[1];
-        const slotId = m[2];
-        const configBaseId = m[3];
-        const count = parseInt(m[4]);
+        const pageId = m[1]!;
+        const slotId = m[2]!;
+        const configBaseId = m[3]!;
+        const count = parseInt(m[4]!);
         // Create synthetic fullId for bag data (will be replaced when real ItemChange@ appears)
         const syntheticFullId = `${configBaseId}_init_${pageId}_${slotId}`;
         return {
