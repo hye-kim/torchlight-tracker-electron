@@ -12,7 +12,7 @@ const logger = Logger.getInstance();
 // Constants
 const PATTERN_PRICE_ID = /XchgSearchPrice----SynId = (\d+).*?\+refer \[(\d+)\]/gs;
 const PATTERN_ITEM_CHANGE =
-  /\[.*?\]GameLog: Display: \[Game\] ItemChange@ (Add|Update|Remove) Id=(\d+_[^ ]+) BagNum=(\d+) in PageId=(\d+) SlotId=(\d+)/g;
+  /\[.*?\]GameLog: Display: \[Game\] ItemChange@ (Add|Update|Remove|Delete) Id=(\d+_[^ ]+)(?: BagNum=(\d+))? in PageId=(\d+) SlotId=(\d+)/g;
 const PATTERN_RESET_ITEMS_START = /ItemChange@ ProtoName=ResetItemsLayout start/;
 const PATTERN_RESET_ITEMS_END = /ItemChange@ ProtoName=ResetItemsLayout end/;
 // const PATTERN_ITEM_CHANGE_RESET = /ItemChange@ Reset PageId=(\d+)/g; // Reserved for future use
@@ -282,18 +282,22 @@ export class LogParser {
   extractItemChanges(text: string): BagModification[] {
     const matches = Array.from(text.matchAll(PATTERN_ITEM_CHANGE));
     return matches
-      .filter((m) => m[1] && m[2] && m[3] && m[4] && m[5])
+      .filter((m) => m[1] && m[2] && m[4] && m[5]) // m[3] (BagNum) is optional for Delete events
       .map((m) => {
         const fullId = m[2]!;
         const baseIdParts = fullId.split('_');
         const baseId = baseIdParts[0] ?? fullId; // Extract base ID from fullId
+        const action = m[1] === 'Delete' ? 'Remove' : m[1]!;
+        // For Delete events, BagNum is not present (m[3] is undefined), but count is not used
+        // for Remove actions anyway (InventoryTracker uses previousInstance.count instead)
+        const count = m[3] ? parseInt(m[3]) : 0;
         return {
-          action: m[1]! as 'Add' | 'Update' | 'Remove',
+          action: action as 'Add' | 'Update' | 'Remove',
           fullId: fullId,
           pageId: m[4]!,
           slotId: m[5]!,
           configBaseId: baseId,
-          count: parseInt(m[3]!),
+          count: count,
         };
       });
   }
