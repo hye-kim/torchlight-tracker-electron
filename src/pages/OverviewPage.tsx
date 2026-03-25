@@ -11,6 +11,7 @@ interface OverviewPageProps {
   onToggleOverlay: () => Promise<void>;
   onExportExcel: () => Promise<void>;
   onResetStats: () => Promise<void>;
+  isExporting?: boolean;
 }
 
 const OverviewPage: React.FC<OverviewPageProps> = ({
@@ -18,6 +19,7 @@ const OverviewPage: React.FC<OverviewPageProps> = ({
   onToggleOverlay,
   onExportExcel,
   onResetStats,
+  isExporting = false,
 }) => {
   const { stats, mapLogs } = useStatsStore();
   const { currentMap, isInMap } = useMapStore();
@@ -43,6 +45,7 @@ const OverviewPage: React.FC<OverviewPageProps> = ({
           onToggleOverlay={onToggleOverlay}
           isInitialized={isInitialized}
           isWaitingForInit={isWaitingForInit}
+          isExporting={isExporting}
         />
         <StatsBar stats={stats} />
         <MapLogTable

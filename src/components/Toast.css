@@ -1,0 +1,94 @@
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  min-width: 300px;
+  max-width: 500px;
+  animation: slideInRight var(--transition-normal);
+  border: 1px solid;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.toast-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.toast-close {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.toast-close:hover {
+  opacity: 1;
+}
+
+.toast-close:focus-visible {
+  outline: var(--focus-ring-width) solid currentColor;
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-sm);
+}
+
+.toast-close svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Toast types */
+.toast-success {
+  background-color: var(--color-success);
+  color: white;
+  border-color: var(--color-success-dark);
+}
+
+.toast-error {
+  background-color: var(--color-danger);
+  color: white;
+  border-color: var(--color-danger-dark);
+}
+
+.toast-warning {
+  background-color: var(--color-warning);
+  color: var(--color-text-inverse);
+  border-color: #f59e0b;
+}
+
+.toast-info {
+  background-color: var(--color-info);
+  color: white;
+  border-color: #2563eb;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}

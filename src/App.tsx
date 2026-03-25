@@ -18,6 +18,7 @@ import {
   useInitStore,
 } from './stores';
 import { useElectronData, useKeyboardShortcuts, useInitialization } from './hooks';
+import { useToast } from './components/ToastContainer';
 import { Config } from './types';
 import './App.css';
 
@@ -62,16 +63,24 @@ function App(): JSX.Element {
   const handleWindowClose = useCallback((): void => void window.electronAPI.windowClose(), []);
 
   // Action handlers
-  const [showExportSuccess, setShowExportSuccess] = useState(false);
-  const [exportFilePath, setExportFilePath] = useState('');
+  const toast = useToast();
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleExportExcel = useCallback(async (): Promise<void> => {
-    const result = await window.electronAPI.exportExcel();
-    if (result.success) {
-      setExportFilePath(result.filePath);
-      setShowExportSuccess(true);
+    setIsExporting(true);
+    try {
+      const result = await window.electronAPI.exportExcel();
+      if (result.success) {
+        toast.showSuccess(`Excel exported successfully to: ${result.filePath}`);
+      } else {
+        toast.showError('Failed to export Excel file');
+      }
+    } catch (error) {
+      toast.showError('An error occurred while exporting');
+    } finally {
+      setIsExporting(false);
     }
-  }, []);
+  }, [toast]);
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
@@ -81,11 +90,16 @@ function App(): JSX.Element {
 
   const handleConfirmReset = useCallback(async (): Promise<void> => {
     setShowResetConfirm(false);
-    await window.electronAPI.resetStats();
-    resetStats();
-    resetMap();
-    resetInventory();
-  }, [resetStats, resetMap, resetInventory]);
+    try {
+      await window.electronAPI.resetStats();
+      resetStats();
+      resetMap();
+      resetInventory();
+      toast.showSuccess('Statistics reset successfully');
+    } catch (error) {
+      toast.showError('Failed to reset statistics');
+    }
+  }, [resetStats, resetMap, resetInventory, toast]);
 
   const handleCancelReset = useCallback((): void => {
     setShowResetConfirm(false);
@@ -314,6 +328,7 @@ function App(): JSX.Element {
                 onToggleOverlay={handleToggleOverlayMode}
                 onExportExcel={handleExportExcel}
                 onResetStats={handleResetStats}
+                isExporting={isExporting}
               />
             ) : activeView === 'inventory' ? (
               <InventoryPage />
@@ -366,18 +381,6 @@ function App(): JSX.Element {
           confirmVariant="danger"
           onConfirm={() => void handleConfirmReset()}
           onCancel={handleCancelReset}
-        />
-      )}
-
-      {showExportSuccess && (
-        <ConfirmDialog
-          title="Export Successful"
-          message={`Excel file exported successfully to: ${exportFilePath}`}
-          confirmText="OK"
-          cancelText="Close"
-          confirmVariant="primary"
-          onConfirm={() => setShowExportSuccess(false)}
-          onCancel={() => setShowExportSuccess(false)}
         />
       )}
     </div>
