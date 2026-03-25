@@ -93,7 +93,6 @@
   background: var(--color-surface);
   border-color: var(--color-primary);
   color: var(--color-primary);
-  transform: rotate(15deg);
 }
 
 .theme-toggle:focus-visible {
@@ -110,7 +109,7 @@
 .header h1 {
   font-size: 18px;
   font-weight: 600;
-  color: #8b5cf6;
+  color: var(--color-primary);
   margin: 0;
 }
 
@@ -186,8 +185,8 @@
   bottom: -32px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #1e1e2e;
-  color: #e2e8f0;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
@@ -196,7 +195,7 @@
   pointer-events: none;
   transition: opacity 0.2s ease;
   z-index: 1000;
-  border: 1px solid #4a4a5e;
+  border: 1px solid var(--color-border);
 }
 
 .icon-btn:hover::after,
@@ -254,14 +253,14 @@
 
 .opacity-control label {
   font-size: 14px;
-  color: #94a3b8;
+  color: var(--color-text-secondary);
   min-width: 90px;
 }
 
 .opacity-control input[type='range'] {
   width: 120px;
   height: 6px;
-  background: #4a4a5e;
+  background: var(--color-border);
   border: none;
   border-radius: 3px;
   outline: none;
@@ -273,7 +272,7 @@
   appearance: none;
   width: 16px;
   height: 16px;
-  background: #8b5cf6;
+  background: var(--color-primary);
   cursor: pointer;
   border-radius: 50%;
 }
@@ -281,7 +280,7 @@
 .opacity-control input[type='range']::-moz-range-thumb {
   width: 16px;
   height: 16px;
-  background: #8b5cf6;
+  background: var(--color-primary);
   cursor: pointer;
   border-radius: 50%;
   border: none;
@@ -298,7 +297,7 @@
   display: flex;
   flex-direction: column;
   padding: 16px;
-  border-right: 1px solid #4a4a5e;
+  border-right: 1px solid var(--color-border);
   overflow-y: auto;
   min-width: 0;
 }
@@ -359,18 +358,18 @@
 
 .overlay-stat-item .label {
   font-size: 0.9em;
-  color: #94a3b8;
+  color: var(--color-text-secondary);
   font-weight: 500;
 }
 
 .overlay-stat-item .value {
   font-size: 0.95em;
-  color: #e2e8f0;
+  color: var(--color-text-primary);
   font-weight: 600;
 }
 
 .overlay-stat-item .value.recording {
-  color: #10b981;
+  color: var(--color-success);
   animation: pulse 2s ease-in-out infinite;
 }
 

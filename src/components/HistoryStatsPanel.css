@@ -5,8 +5,8 @@
 }
 
 .history-stat-card {
-  background-color: #363650;
-  border: 1px solid #4a4a5e;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 16px;
   display: flex;
@@ -20,14 +20,14 @@
 }
 
 .history-stat-card.clickable:hover {
-  border-color: #8b5cf6;
-  background-color: #3e3e60;
+  border-color: var(--color-primary);
+  background-color: var(--color-surface);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
 }
 
 .history-stat-label {
-  color: #94a3b8;
+  color: var(--color-text-secondary);
   font-size: 12px;
   font-weight: 500;
   text-transform: uppercase;
@@ -38,24 +38,24 @@
 }
 
 .toggle-indicator {
-  color: #8b5cf6;
+  color: var(--color-primary);
   font-size: 14px;
   font-weight: bold;
 }
 
 .history-stat-value {
-  color: #e2e8f0;
+  color: var(--color-text-primary);
   font-size: 24px;
   font-weight: 700;
   line-height: 1.2;
 }
 
 .history-stat-value.positive {
-  color: #10b981;
+  color: var(--color-success);
 }
 
 .history-stat-value.negative {
-  color: #ef4444;
+  color: var(--color-danger);
 }
 
 /* Responsive layout */

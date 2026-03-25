@@ -92,7 +92,7 @@
 .type-breakdown {
   margin-bottom: 12px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #4a4a5e;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .percentage-bar {
@@ -100,7 +100,7 @@
   height: 8px;
   border-radius: 4px;
   overflow: hidden;
-  background-color: #2a2a3e;
+  background-color: var(--color-bg-secondary);
   margin-bottom: 8px;
 }
 
@@ -131,12 +131,12 @@
 }
 
 .legend-label {
-  color: #94a3b8;
+  color: var(--color-text-secondary);
   text-transform: capitalize;
 }
 
 .legend-value {
-  color: #e2e8f0;
+  color: var(--color-text-primary);
   font-weight: 500;
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
 }
@@ -152,7 +152,7 @@
 
 .no-drops {
   text-align: center;
-  color: #94a3b8;
+  color: var(--color-text-secondary);
   padding: 40px 20px;
   font-style: italic;
 }
@@ -229,13 +229,13 @@
   height: 100%;
   object-fit: contain;
   border-radius: 4px;
-  background-color: #1a1a2e;
+  background-color: var(--color-bg-tertiary);
 }
 
 .item-image-placeholder {
   width: 100%;
   height: 100%;
-  background-color: #4a4a5e;
+  background-color: var(--color-border);
   border-radius: 4px;
 }
 
@@ -243,7 +243,7 @@
   position: absolute;
   bottom: -4px;
   right: -4px;
-  background: #1e293b;
+  background: var(--color-surface);
   color: #ffffff;
   font-size: 9px;
   font-weight: bold;
@@ -317,7 +317,7 @@
 
 .drop-type {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--color-text-secondary);
   text-transform: capitalize;
 }
 
@@ -326,7 +326,7 @@
   display: flex;
   align-items: center;
   margin: 12px 0;
-  color: #ef4444;
+  color: var(--color-danger);
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
@@ -338,7 +338,7 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: #4a4a5e;
+  background: var(--color-border);
 }
 
 .costs-divider::before {
@@ -353,7 +353,7 @@
 .drops-footer {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid #4a4a5e;
+  border-top: 1px solid var(--color-border);
 }
 
 .summary-row {
@@ -409,15 +409,15 @@
 }
 
 .drops-list::-webkit-scrollbar-track {
-  background: #2a2a3e;
+  background: var(--color-bg-secondary);
   border-radius: 3px;
 }
 
 .drops-list::-webkit-scrollbar-thumb {
-  background: #4a4a5e;
+  background: var(--color-border);
   border-radius: 3px;
 }
 
 .drops-list::-webkit-scrollbar-thumb:hover {
-  background: #5a5a6e;
+  background: var(--color-border-hover);
 }

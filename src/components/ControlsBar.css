@@ -31,50 +31,50 @@
 
 /* Primary Button (Initialize) */
 .control-btn.primary {
-  background-color: #8b5cf6;
-  border-color: #8b5cf6;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
   color: #ffffff;
 }
 
 .control-btn.primary:hover:not(:disabled) {
-  background-color: #7c3aed;
-  border-color: #7c3aed;
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
 }
 
 .control-btn.primary:active:not(:disabled) {
-  background-color: #6d28d9;
+  background-color: var(--color-primary-active);
 }
 
 /* Danger Button (Reset) */
 .control-btn.danger {
-  background-color: #2a2a3e;
-  border-color: #ef4444;
-  color: #ef4444;
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
 }
 
 .control-btn.danger:hover {
-  background-color: #ef4444;
+  background-color: var(--color-danger);
   color: #ffffff;
 }
 
 .control-btn.danger:active {
-  background-color: #dc2626;
+  background-color: var(--color-danger);
 }
 
 /* Secondary Button (Export) */
 .control-btn.secondary {
-  background-color: #2a2a3e;
-  border-color: #4a4a5e;
-  color: #e2e8f0;
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
 }
 
 .control-btn.secondary:hover {
-  background-color: #363650;
-  border-color: #8b5cf6;
+  background-color: var(--color-surface);
+  border-color: var(--color-primary);
 }
 
 .control-btn.secondary:active {
-  background-color: #2a2a3e;
+  background-color: var(--color-bg-secondary);
 }
 
 /* Icon Button (Settings) */
@@ -85,9 +85,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #2a2a3e;
-  border-color: #4a4a5e;
-  color: #94a3b8;
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
   margin-left: auto;
 }
 
@@ -97,11 +97,11 @@
 }
 
 .control-btn.icon:hover {
-  background-color: #363650;
-  color: #8b5cf6;
-  border-color: #8b5cf6;
+  background-color: var(--color-surface);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .control-btn.icon:active {
-  background-color: #2a2a3e;
+  background-color: var(--color-bg-secondary);
 }

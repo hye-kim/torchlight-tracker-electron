@@ -78,13 +78,13 @@
 .toast-warning {
   background-color: var(--color-warning);
   color: var(--color-text-inverse);
-  border-color: #f59e0b;
+  border-color: var(--color-warning);
 }
 
 .toast-info {
   background-color: var(--color-info);
   color: white;
-  border-color: #2563eb;
+  border-color: var(--color-info);
 }
 
 @media (prefers-reduced-motion: reduce) {
