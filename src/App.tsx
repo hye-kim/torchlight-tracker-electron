@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import NavigationSidebar from './components/NavigationSidebar';
 import SettingsDialog from './components/SettingsDialog';
 import OverlaySettings from './components/OverlaySettings';
@@ -15,8 +15,9 @@ import {
   useInventoryStore,
   useUIStore,
   useUpdateStore,
+  useInitStore,
 } from './stores';
-import { useElectronData } from './hooks';
+import { useElectronData, useKeyboardShortcuts, useInitialization } from './hooks';
 import { Config } from './types';
 import './App.css';
 
@@ -46,6 +47,8 @@ function App(): JSX.Element {
     setShowUpdateNotification,
     setShowUpdateDialog,
   } = useUpdateStore();
+  const { isInitialized, isWaitingForInit } = useInitStore();
+  const { handleInitializeTracker } = useInitialization();
 
   // Window control handlers
   const handleWindowMinimize = useCallback(
@@ -168,6 +171,67 @@ function App(): JSX.Element {
 
   const overlayMode = config.overlayMode ?? false;
   const fontSize = config.fontSize ?? 14;
+
+  // Keyboard shortcuts
+  const shortcuts = useMemo(
+    () => [
+      {
+        key: 'i',
+        ctrl: true,
+        callback: () => {
+          if (!isInitialized && !isWaitingForInit && !overlayMode) {
+            void handleInitializeTracker();
+          }
+        },
+        description: 'Initialize Tracker',
+      },
+      {
+        key: 'e',
+        ctrl: true,
+        callback: () => {
+          if (!overlayMode) {
+            void handleExportExcel();
+          }
+        },
+        description: 'Export to Excel',
+      },
+      {
+        key: ',',
+        ctrl: true,
+        callback: () => {
+          if (!overlayMode) {
+            setShowSettings(true);
+          } else {
+            setShowOverlaySettings(true);
+          }
+        },
+        description: 'Open Settings',
+      },
+      {
+        key: 'r',
+        ctrl: true,
+        shift: true,
+        callback: () => {
+          if (!overlayMode) {
+            handleResetStats();
+          }
+        },
+        description: 'Reset Statistics',
+      },
+    ],
+    [
+      isInitialized,
+      isWaitingForInit,
+      overlayMode,
+      handleInitializeTracker,
+      handleExportExcel,
+      handleResetStats,
+      setShowSettings,
+      setShowOverlaySettings,
+    ]
+  );
+
+  useKeyboardShortcuts(shortcuts);
 
   return (
     <div
