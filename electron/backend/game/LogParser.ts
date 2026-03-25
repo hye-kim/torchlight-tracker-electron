@@ -19,11 +19,11 @@ const PATTERN_RESET_ITEMS_END = /ItemChange@ ProtoName=ResetItemsLayout end/;
 const PATTERN_BAG_INIT_DATA =
   /BagMgr@:InitBagData PageId = (\d+) SlotId = (\d+) ConfigBaseId = (\d+) Num = (\d+)/g;
 const PATTERN_MAP_ENTER =
-  /PageApplyBase@ _UpdateGameEnd: LastSceneName = World'\/Game\/Art\/Maps\/01SD\/XZ_YuJinZhiXiBiNanSuo200\/XZ_YuJinZhiXiBiNanSuo200.XZ_YuJinZhiXiBiNanSuo200' NextSceneName = World'\/Game\/Art\/Maps/;
+  /PageApplyBase@ _UpdateGameEnd: LastSceneName = World'\/Game\/Art\/Maps\/01SD\/XZ_YuJinZhiXiBiNanSuo200\/XZ_YuJinZhiXiBiNanSuo200.XZ_YuJinZhiXiBiNanSuo200' NextSceneName = (World'\/Game\/Art\/Maps\/[^']+)/;
 const PATTERN_MAP_EXIT =
   /NextSceneName = World'\/Game\/Art\/Maps\/01SD\/XZ_YuJinZhiXiBiNanSuo200\/XZ_YuJinZhiXiBiNanSuo200.XZ_YuJinZhiXiBiNanSuo200'/;
 const PATTERN_DIXIAZHEN_ENTER =
-  /NextSceneName = World'\/Game\/Art\/Season\/S13\/Maps\/DiXiaZhenSuo\/DiXiaZhenSuo\.DiXiaZhenSuo'/;
+  /NextSceneName = (World'\/Game\/Art\/Season\/S13\/Maps\/DiXiaZhenSuo\/DiXiaZhenSuo\.DiXiaZhenSuo')/;
 const PATTERN_VALUE = /\+\d+\s+\[([\d.]+)\]/g;
 
 const LOG_NOISE_PATTERNS = [
@@ -284,18 +284,18 @@ export class LogParser {
     return matches
       .filter((m) => m[1] && m[2] && m[4] && m[5]) // m[3] (BagNum) is optional for Delete events
       .map((m) => {
-        const fullId = m[2]!;
+        const fullId = m[2];
         const baseIdParts = fullId.split('_');
         const baseId = baseIdParts[0] ?? fullId; // Extract base ID from fullId
-        const action = m[1] === 'Delete' ? 'Remove' : m[1]!;
+        const action = m[1] === 'Delete' ? 'Remove' : m[1];
         // For Delete events, BagNum is not present (m[3] is undefined), but count is not used
         // for Remove actions anyway (InventoryTracker uses previousInstance.count instead)
         const count = m[3] ? parseInt(m[3]) : 0;
         return {
           action: action as 'Add' | 'Update' | 'Remove',
           fullId: fullId,
-          pageId: m[4]!,
-          slotId: m[5]!,
+          pageId: m[4],
+          slotId: m[5],
           configBaseId: baseId,
           count: count,
         };
@@ -311,10 +311,10 @@ export class LogParser {
     return matches
       .filter((m) => m[1] && m[2] && m[3] && m[4])
       .map((m) => {
-        const pageId = m[1]!;
-        const slotId = m[2]!;
-        const configBaseId = m[3]!;
-        const count = parseInt(m[4]!);
+        const pageId = m[1];
+        const slotId = m[2];
+        const configBaseId = m[3];
+        const count = parseInt(m[4]);
         // Create synthetic fullId for bag data (will be replaced when real ItemChange@ appears)
         const syntheticFullId = `${configBaseId}_init_${pageId}_${slotId}`;
         return {
@@ -342,19 +342,35 @@ export class LogParser {
     return PATTERN_RESET_ITEMS_END.test(text);
   }
 
-  detectMapChange(text: string): { entering: boolean; exiting: boolean; subregion?: string } {
+  detectMapChange(text: string): {
+    entering: boolean;
+    exiting: boolean;
+    subregion?: string;
+    sceneName?: string;
+  } {
     // Check for DiXiaZhenSuo entry (special seasonal map)
-    const dixiazhenMatch = PATTERN_DIXIAZHEN_ENTER.test(text);
+    const dixiazhenMatch = PATTERN_DIXIAZHEN_ENTER.exec(text);
     if (dixiazhenMatch) {
       return {
         entering: true,
         exiting: false,
         subregion: "Vorax - Shelly's Operating Theater",
+        sceneName: dixiazhenMatch[1],
+      };
+    }
+
+    // Check for regular map entry
+    const mapEnterMatch = PATTERN_MAP_ENTER.exec(text);
+    if (mapEnterMatch) {
+      return {
+        entering: true,
+        exiting: false,
+        sceneName: mapEnterMatch[1],
       };
     }
 
     return {
-      entering: PATTERN_MAP_ENTER.test(text),
+      entering: false,
       exiting: PATTERN_MAP_EXIT.test(text),
     };
   }

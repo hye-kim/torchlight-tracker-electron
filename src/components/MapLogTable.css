@@ -136,16 +136,18 @@
 }
 
 .map-log-table tbody tr {
-  border-bottom: 1px solid #4a4a5e;
-  transition: background-color 0.2s;
-}
-
-.map-log-table tbody tr {
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color var(--transition-fast);
   cursor: pointer;
 }
 
 .map-log-table tbody tr:hover {
-  background-color: #3a3a54;
+  background-color: var(--color-bg-elevated);
+}
+
+.map-log-table tbody tr:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: -2px;
 }
 
 .map-log-table tbody tr.active-row {

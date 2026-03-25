@@ -573,6 +573,12 @@ export class LogMonitor extends EventEmitter {
     if (mapChange.entering) {
       // Use subregion from mapChange if provided (e.g., DiXiaZhenSuo), otherwise use pending or detected subregion
       const mapSubregion = mapChange.subregion ?? this.pendingSubregion ?? subregion;
+
+      // Log scene name for mapping
+      if (mapChange.sceneName) {
+        logger.info(`Entering map: ${mapChange.sceneName} => ${mapSubregion ?? 'Unknown'}`);
+      }
+
       this.statisticsTracker.enterMap(mapSubregion);
       this.pendingSubregion = null;
       this.inventoryTracker.resetMapBaseline();

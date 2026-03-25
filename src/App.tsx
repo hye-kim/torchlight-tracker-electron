@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import NavigationSidebar from './components/NavigationSidebar';
 import SettingsDialog from './components/SettingsDialog';
 import OverlaySettings from './components/OverlaySettings';
@@ -6,6 +6,7 @@ import InitializationDialog from './components/InitializationDialog';
 import UpdateNotification from './components/UpdateNotification';
 import UpdateDialog from './components/UpdateDialog';
 import HistoryView from './components/HistoryView';
+import ConfirmDialog from './components/ConfirmDialog';
 import { OverviewPage, InventoryPage, OverlayModePage } from './pages';
 import {
   useConfigStore,
@@ -58,21 +59,34 @@ function App(): JSX.Element {
   const handleWindowClose = useCallback((): void => void window.electronAPI.windowClose(), []);
 
   // Action handlers
+  const [showExportSuccess, setShowExportSuccess] = useState(false);
+  const [exportFilePath, setExportFilePath] = useState('');
+
   const handleExportExcel = useCallback(async (): Promise<void> => {
     const result = await window.electronAPI.exportExcel();
     if (result.success) {
-      alert(`Excel exported successfully to: ${result.filePath}`);
+      setExportFilePath(result.filePath);
+      setShowExportSuccess(true);
     }
   }, []);
 
-  const handleResetStats = useCallback(async (): Promise<void> => {
-    if (confirm('Are you sure you want to reset all statistics?')) {
-      await window.electronAPI.resetStats();
-      resetStats();
-      resetMap();
-      resetInventory();
-    }
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  const handleResetStats = useCallback((): void => {
+    setShowResetConfirm(true);
+  }, []);
+
+  const handleConfirmReset = useCallback(async (): Promise<void> => {
+    setShowResetConfirm(false);
+    await window.electronAPI.resetStats();
+    resetStats();
+    resetMap();
+    resetInventory();
   }, [resetStats, resetMap, resetInventory]);
+
+  const handleCancelReset = useCallback((): void => {
+    setShowResetConfirm(false);
+  }, []);
 
   const handleSaveSettings = useCallback(
     async (updates: Partial<Config>): Promise<void> => {
@@ -277,6 +291,30 @@ function App(): JSX.Element {
 
       {showUpdateDialog && updateInfo && (
         <UpdateDialog updateInfo={updateInfo} onClose={handleCloseUpdateDialog} />
+      )}
+
+      {showResetConfirm && (
+        <ConfirmDialog
+          title="Reset Statistics"
+          message="Are you sure you want to reset all statistics? This action cannot be undone."
+          confirmText="Reset"
+          cancelText="Cancel"
+          confirmVariant="danger"
+          onConfirm={() => void handleConfirmReset()}
+          onCancel={handleCancelReset}
+        />
+      )}
+
+      {showExportSuccess && (
+        <ConfirmDialog
+          title="Export Successful"
+          message={`Excel file exported successfully to: ${exportFilePath}`}
+          confirmText="OK"
+          cancelText="Close"
+          confirmVariant="primary"
+          onConfirm={() => setShowExportSuccess(false)}
+          onCancel={() => setShowExportSuccess(false)}
+        />
       )}
     </div>
   );

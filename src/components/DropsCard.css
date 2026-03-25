@@ -34,27 +34,32 @@
 .tab-button {
   flex: 1;
   padding: 6px 12px;
-  background-color: #2a2a3e;
-  border: 1px solid #4a4a5e;
-  border-radius: 4px;
-  color: #94a3b8;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
   font-size: 12px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 }
 
 .tab-button:hover {
-  background-color: #363650;
-  border-color: #8b5cf6;
-  color: #e2e8f0;
+  background-color: var(--color-surface);
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+.tab-button:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .tab-button.active {
-  background-color: #8b5cf6;
-  border-color: #8b5cf6;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
   color: #ffffff;
   font-weight: 600;
 }
@@ -130,16 +135,22 @@
 
 /* Drop Item */
 .drop-item {
-  background-color: #2a2a3e;
-  border: 1px solid #4a4a5e;
-  border-radius: 6px;
-  padding: 12px;
-  transition: all 0.2s ease;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  transition: all var(--transition-fast);
+  cursor: pointer;
 }
 
 .drop-item:hover {
-  border-color: #8b5cf6;
-  background-color: #363650;
+  border-color: var(--color-primary);
+  background-color: var(--color-surface);
+}
+
+.drop-item:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .drop-item.cost-item {
