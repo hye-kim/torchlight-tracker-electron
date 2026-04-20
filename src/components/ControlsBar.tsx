@@ -1,4 +1,5 @@
 import React from 'react';
+import LoadingSpinner from './LoadingSpinner';
 import './ControlsBar.css';
 
 interface ControlsBarProps {
@@ -9,6 +10,7 @@ interface ControlsBarProps {
   onToggleOverlay: () => void | Promise<void>;
   isInitialized: boolean;
   isWaitingForInit: boolean;
+  isExporting?: boolean;
 }
 
 const ControlsBar: React.FC<ControlsBarProps> = ({
@@ -19,6 +21,7 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
   onToggleOverlay,
   isInitialized,
   isWaitingForInit,
+  isExporting = false,
 }) => {
   return (
     <div className="controls-bar">
@@ -50,8 +53,16 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
         onClick={() => {
           void onExportExcel();
         }}
+        disabled={isExporting}
       >
-        Export Excel
+        {isExporting ? (
+          <>
+            <LoadingSpinner size="small" />
+            <span style={{ marginLeft: '8px' }}>Exporting...</span>
+          </>
+        ) : (
+          'Export Excel'
+        )}
       </button>
 
       <button

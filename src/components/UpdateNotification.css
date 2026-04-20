@@ -19,7 +19,7 @@
 }
 
 .update-notification-content {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--color-accent-bright) 0%, var(--color-primary) 100%);
   border-radius: 12px;
   padding: 16px 24px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -59,7 +59,7 @@
 
 .update-notification-actions .btn-primary {
   background: white;
-  color: #667eea;
+  color: var(--color-accent-bright);
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
@@ -70,7 +70,7 @@
 }
 
 .update-notification-actions .btn-primary:hover {
-  background: #f0f0f0;
+  background: var(--color-bg-primary);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

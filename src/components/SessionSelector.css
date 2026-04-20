@@ -1,8 +1,8 @@
 .session-selector {
-  background-color: #363650;
+  background-color: var(--color-surface);
   border-radius: 8px;
   padding: 16px;
-  border: 1px solid #4a4a5e;
+  border: 1px solid var(--color-border);
 }
 
 .session-selector-header {
@@ -11,11 +11,11 @@
   align-items: center;
   margin-bottom: 12px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #4a4a5e;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .session-selector-header h2 {
-  color: #e2e8f0;
+  color: var(--color-text-primary);
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
@@ -28,10 +28,10 @@
 
 .session-control-btn {
   padding: 6px 12px;
-  background-color: #2a2a3e;
-  border: 1px solid #4a4a5e;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
   border-radius: 4px;
-  color: #94a3b8;
+  color: var(--color-text-secondary);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -39,9 +39,9 @@
 }
 
 .session-control-btn:hover:not(:disabled) {
-  background-color: #363650;
-  border-color: #8b5cf6;
-  color: #e2e8f0;
+  background-color: var(--color-surface);
+  border-color: var(--color-primary);
+  color: var(--color-text-primary);
 }
 
 .session-control-btn:disabled {
@@ -50,14 +50,14 @@
 }
 
 .session-control-btn.delete-btn:hover:not(:disabled) {
-  border-color: #ef4444;
-  color: #ef4444;
+  border-color: var(--color-danger);
+  color: var(--color-danger);
 }
 
 .session-empty-state {
   padding: 32px;
   text-align: center;
-  color: #94a3b8;
+  color: var(--color-text-secondary);
 }
 
 .session-grid {
@@ -74,17 +74,17 @@
 }
 
 .session-grid::-webkit-scrollbar-track {
-  background: #2a2a3e;
+  background: var(--color-bg-secondary);
   border-radius: 4px;
 }
 
 .session-grid::-webkit-scrollbar-thumb {
-  background: #4a4a5e;
+  background: var(--color-border);
   border-radius: 4px;
 }
 
 .session-grid::-webkit-scrollbar-thumb:hover {
-  background: #6a6a7e;
+  background: var(--color-surface2);
 }
 
 .session-box {
@@ -92,8 +92,8 @@
   flex-direction: column;
   gap: 8px;
   padding: 12px;
-  background-color: #2a2a3e;
-  border: 2px solid #4a4a5e;
+  background-color: var(--color-bg-secondary);
+  border: 2px solid var(--color-border);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -101,15 +101,15 @@
 }
 
 .session-box:hover {
-  background-color: #363650;
-  border-color: #6a6a7e;
+  background-color: var(--color-surface);
+  border-color: var(--color-surface2);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .session-box.selected {
-  background-color: #3e3e60;
-  border-color: #8b5cf6;
+  background-color: var(--color-surface);
+  border-color: var(--color-primary);
   box-shadow:
     0 0 0 2px rgba(139, 92, 246, 0.3),
     0 4px 12px rgba(139, 92, 246, 0.4);
@@ -117,11 +117,11 @@
 }
 
 .session-box.active {
-  border-color: #10b981;
+  border-color: var(--color-success);
 }
 
 .session-box.active.selected {
-  border-color: #8b5cf6;
+  border-color: var(--color-primary);
   box-shadow:
     0 0 0 2px rgba(139, 92, 246, 0.3),
     0 0 0 4px rgba(16, 185, 129, 0.2);
@@ -143,7 +143,7 @@
 }
 
 .session-date {
-  color: #e2e8f0;
+  color: var(--color-text-primary);
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
@@ -152,7 +152,7 @@
 }
 
 .session-time {
-  color: #94a3b8;
+  color: var(--color-text-secondary);
   font-size: 12px;
   font-weight: 500;
 }
@@ -160,7 +160,7 @@
 .session-active-badge {
   display: inline-block;
   padding: 3px 8px;
-  background-color: #10b981;
+  background-color: var(--color-success);
   color: #ffffff;
   font-size: 10px;
   font-weight: 700;
@@ -172,23 +172,23 @@
 
 .session-stats-row {
   padding-top: 4px;
-  border-top: 1px solid #4a4a5e;
+  border-top: 1px solid var(--color-border);
 }
 
 .session-stat {
-  color: #94a3b8;
+  color: var(--color-text-secondary);
   font-size: 11px;
   font-weight: 500;
   white-space: nowrap;
 }
 
 .profit-positive {
-  color: #10b981;
+  color: var(--color-success);
   font-weight: 600;
 }
 
 .profit-negative {
-  color: #ef4444;
+  color: var(--color-danger);
   font-weight: 600;
 }
 
@@ -207,8 +207,8 @@
 }
 
 .delete-confirm-content {
-  background-color: #363650;
-  border: 1px solid #4a4a5e;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 24px;
   max-width: 400px;
@@ -216,13 +216,13 @@
 }
 
 .delete-confirm-content h3 {
-  color: #e2e8f0;
+  color: var(--color-text-primary);
   margin: 0 0 16px 0;
   font-size: 18px;
 }
 
 .delete-confirm-content p {
-  color: #94a3b8;
+  color: var(--color-text-secondary);
   margin: 0 0 24px 0;
   line-height: 1.6;
 }
@@ -235,7 +235,7 @@
 
 .delete-confirm-buttons button {
   padding: 8px 16px;
-  border: 1px solid #4a4a5e;
+  border: 1px solid var(--color-border);
   border-radius: 4px;
   font-size: 14px;
   font-weight: 500;
@@ -244,22 +244,22 @@
 }
 
 .delete-confirm-buttons button:first-child {
-  background-color: #2a2a3e;
-  color: #94a3b8;
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
 }
 
 .delete-confirm-buttons button:first-child:hover {
-  background-color: #363650;
-  color: #e2e8f0;
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
 }
 
 .delete-confirm-buttons .delete-confirm-btn {
-  background-color: #ef4444;
+  background-color: var(--color-danger);
   color: #ffffff;
-  border-color: #ef4444;
+  border-color: var(--color-danger);
 }
 
 .delete-confirm-buttons .delete-confirm-btn:hover {
-  background-color: #dc2626;
-  border-color: #dc2626;
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
 }

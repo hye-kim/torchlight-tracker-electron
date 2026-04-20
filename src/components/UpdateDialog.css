@@ -45,7 +45,7 @@
 .version-number {
   font-size: 20px;
   font-weight: 700;
-  color: #667eea;
+  color: var(--color-accent-bright);
 }
 
 .version-badge.current .version-number {
@@ -54,13 +54,13 @@
 
 .version-arrow {
   font-size: 24px;
-  color: #667eea;
+  color: var(--color-accent-bright);
   font-weight: bold;
 }
 
 .update-description {
   text-align: center;
-  color: #666;
+  color: var(--color-text-secondary);
   line-height: 1.5;
   margin: 0;
 }
@@ -77,12 +77,12 @@
 }
 
 .progress-label {
-  color: #333;
+  color: var(--color-text-primary);
   font-weight: 500;
 }
 
 .progress-stats {
-  color: #666;
+  color: var(--color-text-secondary);
   font-size: 13px;
 }
 
@@ -97,7 +97,7 @@
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, var(--color-accent-bright) 0%, var(--color-primary) 100%);
   transition: width 0.3s ease;
   border-radius: 4px;
 }
@@ -106,7 +106,7 @@
   text-align: center;
   font-size: 14px;
   font-weight: 600;
-  color: #667eea;
+  color: var(--color-accent-bright);
 }
 
 .update-ready {
@@ -131,13 +131,13 @@
 .ready-title {
   font-size: 16px;
   font-weight: 600;
-  color: #4caf50;
+  color: var(--color-success);
   margin: 0 0 8px 0;
 }
 
 .ready-description {
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-secondary);
   margin: 0;
   line-height: 1.5;
 }
@@ -170,19 +170,19 @@
 
 .error-description {
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-secondary);
   margin: 0;
   line-height: 1.5;
   word-wrap: break-word;
 }
 
 .btn-install {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--color-accent-bright) 0%, var(--color-primary) 100%);
   font-weight: 600;
 }
 
 .btn-install:hover {
-  background: linear-gradient(135deg, #5568d3 0%, #654091 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary) 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }

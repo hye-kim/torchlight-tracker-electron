@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import NavigationSidebar from './components/NavigationSidebar';
 import SettingsDialog from './components/SettingsDialog';
 import OverlaySettings from './components/OverlaySettings';
@@ -6,6 +6,7 @@ import InitializationDialog from './components/InitializationDialog';
 import UpdateNotification from './components/UpdateNotification';
 import UpdateDialog from './components/UpdateDialog';
 import HistoryView from './components/HistoryView';
+import ConfirmDialog from './components/ConfirmDialog';
 import { OverviewPage, InventoryPage, OverlayModePage } from './pages';
 import {
   useConfigStore,
@@ -14,14 +15,19 @@ import {
   useInventoryStore,
   useUIStore,
   useUpdateStore,
+  useInitStore,
 } from './stores';
-import { useElectronData } from './hooks';
+import { useElectronData, useKeyboardShortcuts, useInitialization, useTheme } from './hooks';
+import { useToast } from './components/ToastContainer';
 import { Config } from './types';
 import './App.css';
 
 function App(): JSX.Element {
   // Initialize data loading and IPC listeners
   useElectronData();
+
+  // Theme management
+  const { theme, toggleTheme } = useTheme();
 
   // Zustand stores
   const { config, setConfig, updateConfig } = useConfigStore();
@@ -45,6 +51,8 @@ function App(): JSX.Element {
     setShowUpdateNotification,
     setShowUpdateDialog,
   } = useUpdateStore();
+  const { isInitialized, isWaitingForInit } = useInitStore();
+  const { handleInitializeTracker } = useInitialization();
 
   // Window control handlers
   const handleWindowMinimize = useCallback(
@@ -58,21 +66,47 @@ function App(): JSX.Element {
   const handleWindowClose = useCallback((): void => void window.electronAPI.windowClose(), []);
 
   // Action handlers
+  const toast = useToast();
+  const [isExporting, setIsExporting] = useState(false);
+
   const handleExportExcel = useCallback(async (): Promise<void> => {
-    const result = await window.electronAPI.exportExcel();
-    if (result.success) {
-      alert(`Excel exported successfully to: ${result.filePath}`);
+    setIsExporting(true);
+    try {
+      const result = await window.electronAPI.exportExcel();
+      if (result.success) {
+        toast.showSuccess(`Excel exported successfully to: ${result.filePath}`);
+      } else {
+        toast.showError('Failed to export Excel file');
+      }
+    } catch (error) {
+      toast.showError('An error occurred while exporting');
+    } finally {
+      setIsExporting(false);
     }
+  }, [toast]);
+
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  const handleResetStats = useCallback((): void => {
+    setShowResetConfirm(true);
   }, []);
 
-  const handleResetStats = useCallback(async (): Promise<void> => {
-    if (confirm('Are you sure you want to reset all statistics?')) {
+  const handleConfirmReset = useCallback(async (): Promise<void> => {
+    setShowResetConfirm(false);
+    try {
       await window.electronAPI.resetStats();
       resetStats();
       resetMap();
       resetInventory();
+      toast.showSuccess('Statistics reset successfully');
+    } catch (error) {
+      toast.showError('Failed to reset statistics');
     }
-  }, [resetStats, resetMap, resetInventory]);
+  }, [resetStats, resetMap, resetInventory, toast]);
+
+  const handleCancelReset = useCallback((): void => {
+    setShowResetConfirm(false);
+  }, []);
 
   const handleSaveSettings = useCallback(
     async (updates: Partial<Config>): Promise<void> => {
@@ -155,6 +189,67 @@ function App(): JSX.Element {
   const overlayMode = config.overlayMode ?? false;
   const fontSize = config.fontSize ?? 14;
 
+  // Keyboard shortcuts
+  const shortcuts = useMemo(
+    () => [
+      {
+        key: 'i',
+        ctrl: true,
+        callback: () => {
+          if (!isInitialized && !isWaitingForInit && !overlayMode) {
+            void handleInitializeTracker();
+          }
+        },
+        description: 'Initialize Tracker',
+      },
+      {
+        key: 'e',
+        ctrl: true,
+        callback: () => {
+          if (!overlayMode) {
+            void handleExportExcel();
+          }
+        },
+        description: 'Export to Excel',
+      },
+      {
+        key: ',',
+        ctrl: true,
+        callback: () => {
+          if (!overlayMode) {
+            setShowSettings(true);
+          } else {
+            setShowOverlaySettings(true);
+          }
+        },
+        description: 'Open Settings',
+      },
+      {
+        key: 'r',
+        ctrl: true,
+        shift: true,
+        callback: () => {
+          if (!overlayMode) {
+            handleResetStats();
+          }
+        },
+        description: 'Reset Statistics',
+      },
+    ],
+    [
+      isInitialized,
+      isWaitingForInit,
+      overlayMode,
+      handleInitializeTracker,
+      handleExportExcel,
+      handleResetStats,
+      setShowSettings,
+      setShowOverlaySettings,
+    ]
+  );
+
+  useKeyboardShortcuts(shortcuts);
+
   return (
     <div
       className={`app ${overlayMode ? 'overlay-mode' : ''}`}
@@ -170,6 +265,44 @@ function App(): JSX.Element {
         <>
           <div className="header">
             <div className="window-controls-container">
+              <button
+                className="theme-toggle"
+                onClick={toggleTheme}
+                title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              >
+                {theme === 'dark' ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2"
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"
+                    />
+                  </svg>
+                )}
+              </button>
               <div className="window-controls">
                 <button
                   className="window-btn minimize"
@@ -236,6 +369,7 @@ function App(): JSX.Element {
                 onToggleOverlay={handleToggleOverlayMode}
                 onExportExcel={handleExportExcel}
                 onResetStats={handleResetStats}
+                isExporting={isExporting}
               />
             ) : activeView === 'inventory' ? (
               <InventoryPage />
@@ -277,6 +411,18 @@ function App(): JSX.Element {
 
       {showUpdateDialog && updateInfo && (
         <UpdateDialog updateInfo={updateInfo} onClose={handleCloseUpdateDialog} />
+      )}
+
+      {showResetConfirm && (
+        <ConfirmDialog
+          title="Reset Statistics"
+          message="Are you sure you want to reset all statistics? This action cannot be undone."
+          confirmText="Reset"
+          cancelText="Cancel"
+          confirmVariant="danger"
+          onConfirm={() => void handleConfirmReset()}
+          onCancel={handleCancelReset}
+        />
       )}
     </div>
   );

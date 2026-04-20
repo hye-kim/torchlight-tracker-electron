@@ -16,25 +16,25 @@
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  background-color: #363650;
-  border: 1px solid #4a4a5e;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   cursor: move;
   transition: all 0.2s ease;
 }
 
 .display-item:hover {
-  background-color: #3e3e56;
-  border-color: #5a5a6e;
+  background-color: var(--color-surface);
+  border-color: var(--color-border-hover);
 }
 
 .display-item.dragging {
   opacity: 0.5;
-  background-color: #8b5cf6;
+  background-color: var(--color-primary);
 }
 
 .drag-handle {
-  color: #94a3b8;
+  color: var(--color-text-secondary);
   font-size: 16px;
   cursor: grab;
   user-select: none;
@@ -60,7 +60,7 @@
 
 .display-item span {
   font-size: 14px;
-  color: #e2e8f0;
+  color: var(--color-text-primary);
 }
 
 .form-group label {
@@ -79,7 +79,7 @@
 .form-group input[type='range'] {
   width: 100%;
   height: 6px;
-  background: #363650;
+  background: var(--color-surface);
   border-radius: 3px;
   outline: none;
   -webkit-appearance: none;
@@ -90,20 +90,20 @@
   appearance: none;
   width: 18px;
   height: 18px;
-  background: #8b5cf6;
+  background: var(--color-primary);
   border-radius: 50%;
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
 .form-group input[type='range']::-webkit-slider-thumb:hover {
-  background: #9d70f7;
+  background: var(--color-primary);
 }
 
 .form-group input[type='range']::-moz-range-thumb {
   width: 18px;
   height: 18px;
-  background: #8b5cf6;
+  background: var(--color-primary);
   border-radius: 50%;
   cursor: pointer;
   border: none;
@@ -111,5 +111,5 @@
 }
 
 .form-group input[type='range']::-moz-range-thumb:hover {
-  background: #9d70f7;
+  background: var(--color-primary);
 }

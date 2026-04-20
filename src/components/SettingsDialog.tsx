@@ -79,11 +79,16 @@ function SettingsDialog({ config, onSave, onClose }: SettingsDialogProps): JSX.E
         <div className="dialog-body">
           <div className="form-group">
             <label htmlFor="tax">Tax Mode</label>
-            <select id="tax" value={tax} onChange={(e) => setTax(parseInt(e.target.value))}>
+            <select
+              id="tax"
+              value={tax}
+              onChange={(e) => setTax(parseInt(e.target.value))}
+              aria-describedby="tax-hint"
+            >
               <option value={0}>No Tax</option>
               <option value={1}>Apply Tax (12.5%)</option>
             </select>
-            <span className="form-hint">
+            <span id="tax-hint" className="form-hint">
               When enabled, prices will be calculated with 12.5% market tax
             </span>
           </div>
@@ -96,8 +101,11 @@ function SettingsDialog({ config, onSave, onClose }: SettingsDialogProps): JSX.E
               value={user}
               onChange={(e) => setUser(e.target.value)}
               placeholder="Enter your user ID"
+              aria-describedby="user-hint"
             />
-            <span className="form-hint">Used for tracking purposes</span>
+            <span id="user-hint" className="form-hint">
+              Used for tracking purposes
+            </span>
           </div>
 
           <div className="form-section-divider"></div>
@@ -114,13 +122,15 @@ function SettingsDialog({ config, onSave, onClose }: SettingsDialogProps): JSX.E
           <div className="form-group">
             <label className="checkbox-label">
               <input
+                id="autoCheck"
                 type="checkbox"
                 checked={updateConfig.autoCheck}
                 onChange={(e) => setUpdateConfig({ ...updateConfig, autoCheck: e.target.checked })}
+                aria-describedby="autocheck-hint"
               />
               <span>Check for updates on startup</span>
             </label>
-            <span className="form-hint">
+            <span id="autocheck-hint" className="form-hint">
               Automatically check for new versions when the application starts
             </span>
           </div>

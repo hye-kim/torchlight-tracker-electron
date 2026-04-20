@@ -1,7 +1,7 @@
 .nav-sidebar {
   width: 180px;
-  background-color: #1e1e2e;
-  border-right: 1px solid #2a2a3e;
+  background-color: var(--color-bg-primary);
+  border-right: 1px solid var(--color-bg-secondary);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -17,31 +17,31 @@
 }
 
 .nav-sidebar::-webkit-scrollbar-thumb {
-  background: #2a2a3e;
+  background: var(--color-bg-secondary);
   border-radius: 2px;
 }
 
 .nav-sidebar::-webkit-scrollbar-thumb:hover {
-  background: #363650;
+  background: var(--color-surface);
 }
 
 /* Branding Section */
 .nav-branding {
   padding: 20px 16px 24px;
-  border-bottom: 1px solid #1a1a2a;
+  border-bottom: 1px solid var(--color-bg-tertiary);
 }
 
 .nav-app-name {
   font-size: 16px;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--color-text-primary);
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
 
 .nav-version {
   font-size: 11px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
   margin-top: 4px;
 }
 
@@ -65,7 +65,7 @@
   transition: all 0.2s ease;
   width: calc(100% - 16px);
   text-align: left;
-  color: #94a3b8;
+  color: var(--color-text-secondary);
 }
 
 .nav-item:hover {
@@ -74,14 +74,14 @@
 }
 
 .nav-item.active {
-  background-color: #8b5cf6;
+  background-color: var(--color-primary);
   color: #ffffff;
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
 }
 
 .nav-item:focus-visible {
-  outline: 2px solid #8b5cf6;
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
