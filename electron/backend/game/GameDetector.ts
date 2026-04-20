@@ -93,34 +93,25 @@ export class GameDetector extends EventEmitter {
 
       logger.debug(`Found ${candidateProcesses.length} candidate processes to check`);
 
-      // Now only query WMIC for candidate processes
+      // Query executable path for candidate processes using PowerShell (wmic is deprecated on Windows 11)
       for (const { name, pid } of candidateProcesses) {
+        let exePath = '';
         try {
-          const wmicCmd = `wmic process where "ProcessId=${pid}" get ExecutablePath /format:csv`;
-          const wmicOutput = execSync(wmicCmd, {
+          const psCmd = `powershell -NoProfile -Command "(Get-Process -Id ${pid}).Path"`;
+          const psOutput = execSync(psCmd, {
             encoding: 'utf-8',
             windowsHide: true,
-            timeout: 1000,
-          });
+            timeout: 3000,
+          }).trim();
 
-          const wmicLines = wmicOutput.split('\n').filter((l: string) => l.trim());
-          if (wmicLines.length > 1) {
-            const line = wmicLines[1];
-            if (line) {
-              const parts = line.split(',');
-              const exePath = parts[1]?.trim();
-              if (exePath) {
-                processList.push({ pid, name, exePath });
-                continue;
-              }
-            }
+          if (psOutput && !psOutput.toLowerCase().includes('cannot find')) {
+            exePath = psOutput;
           }
         } catch {
-          // WMIC failed, continue
+          // PowerShell failed, continue without path
         }
 
-        // If WMIC fails, add process without path
-        processList.push({ pid, name, exePath: '' });
+        processList.push({ pid, name, exePath });
       }
 
       logger.info(`Found ${processList.length} torch-related processes`);
