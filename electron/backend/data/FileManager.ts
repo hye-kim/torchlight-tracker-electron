@@ -221,7 +221,17 @@ export class FileManager {
           price: updates.price,
           last_update: currentTime,
         };
-        const apiResult = await this.apiClient.updateItem(itemId, apiUpdates);
+        const existing = await this.apiClient.getItem(itemId);
+        let apiResult;
+        if (existing) {
+          apiResult = await this.apiClient.updateItem(itemId, apiUpdates);
+        } else {
+          logger.info(`Item ${itemId} not found in API, creating it`);
+          apiResult = await this.apiClient.createItem(itemId, {
+            ...fullTable[itemId],
+            ...apiUpdates,
+          });
+        }
         if (apiResult) {
           // Update last_api_sync timestamp after successful sync
           fullTable[itemId].last_api_sync = currentTime;
@@ -235,6 +245,24 @@ export class FileManager {
     }
 
     return localSuccess;
+  }
+
+  async registerItemInAPI(itemId: string, data: Partial<ItemData>): Promise<void> {
+    try {
+      const existing = await this.apiClient.getItem(itemId);
+      if (!existing) {
+        const info = this.getItemInfo(itemId);
+        const payload: ItemData = {
+          name: info?.name_en ?? info?.name ?? 'Unknown',
+          type: info?.type_en ?? info?.type ?? 'Unknown',
+          ...data,
+        };
+        logger.info(`Item ${itemId} not found in API, creating it`);
+        await this.apiClient.createItem(itemId, payload);
+      }
+    } catch (error) {
+      logger.error(`Error registering item ${itemId} in API:`, error);
+    }
   }
 
   getItemInfo(itemId: string): ItemData | null {
@@ -303,6 +331,14 @@ export class FileManager {
           this.saveFullTable(fullTable);
           logger.info(`Fetched price from API for ${itemId}: ${apiItem.price}`);
           return apiItem.price;
+        }
+      } else {
+        // Item not found in API — POST local data to register it
+        const fullTable = this.loadFullTable(true);
+        const localItem = fullTable[itemId];
+        if (localItem) {
+          logger.info(`Item ${itemId} not found in API, creating it`);
+          await this.apiClient.createItem(itemId, localItem);
         }
       }
     } catch (error) {

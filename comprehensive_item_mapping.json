@@ -4771,21 +4771,21 @@
   },
   "10290": {
     "id": "10290",
-    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Item/128/UI_Compass_GameplayPlague_1_1_Icon_128.webp",
-    "name_en": "Pig Iron Scalpel",
-    "type_en": "Season Compass"
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Compass/128/UI_Compass_GameplayVorax_1_1_Icon_128.webp",
+    "name_en": "Vorax Compass",
+    "type_en": "Compass"
   },
   "10291": {
     "id": "10291",
-    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Item/128/UI_Compass_GameplayPlague_2_2_Icon_128.webp",
-    "name_en": "Pure Silver Scalpel",
-    "type_en": "Season Compass"
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Compass/128/UI_Compass_GameplayVorax_2_2_Icon_128.webp",
+    "name_en": "Scavenger Vorax Compass",
+    "type_en": "Compass"
   },
   "10292": {
     "id": "10292",
-    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Item/128/UI_Compass_GameplayPlague_3_2_Icon_128.webp",
-    "name_en": "Titanium-Alloy Scalpel",
-    "type_en": "Season Compass"
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Compass/128/UI_Compass_GameplayVorax_3_2_Icon_128.webp",
+    "name_en": "Consultation Vorax Compass",
+    "type_en": "Compass"
   },
   "12000": {
     "id": "12000",
@@ -11019,5 +11019,71 @@
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Ticket/128/UI_TowerIcon_badge05_Icon_128.webp",
     "name_en": "Proof of the Brave V",
     "type_en": "Proof of Valor"
+  },
+  "391000": {
+    "id": "391000",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_BasicMaterial_01.webp",
+    "name_en": "Crude Lunar Dust",
+    "type_en": "Memory Revival Material"
+  },
+  "391001": {
+    "id": "391001",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_BasicMaterial_02.webp",
+    "name_en": "Luminous Lunar Dust",
+    "type_en": "Memory Revival Material"
+  },
+  "391002": {
+    "id": "391002",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_BasicMaterial_03.webp",
+    "name_en": "Flawless Lunar Dust",
+    "type_en": "Memory Revival Material"
+  },
+  "392036": {
+    "id": "392036",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_01.webp",
+    "name_en": "Artificial Moon: Origin",
+    "type_en": "Memory Revival Material"
+  },
+  "392037": {
+    "id": "392037",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_01.webp",
+    "name_en": "Artificial Moon: Discipline",
+    "type_en": "Memory Revival Material"
+  },
+  "392038": {
+    "id": "392038",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_01.webp",
+    "name_en": "Artificial Moon: Progress",
+    "type_en": "Memory Revival Material"
+  },
+  "393000": {
+    "id": "393000",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_01.webp",
+    "name_en": "Moonlit Thread - Epic",
+    "type_en": "Memory Revival Material"
+  },
+  "393003": {
+    "id": "393003",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_Exchange01.webp",
+    "name_en": "Lunar Fragment",
+    "type_en": "Memory Revival Material"
+  },
+  "10300": {
+    "id": "10300",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14Compass_Gameplay_1_Icon.webp",
+    "name_en": "Dim Lunar Stone",
+    "type_en": "Memory Revival Material"
+  },
+  "10301": {
+    "id": "10301",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14Compass_Gameplay_2_Icon.webp",
+    "name_en": "Bright Lunar Stone",
+    "type_en": "Memory Revival Material"
+  },
+  "10302": {
+    "id": "10302",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14Compass_Gameplay_3_Icon.webp",
+    "name_en": "Dazzling Lunar Stone",
+    "type_en": "Memory Revival Material"
   }
 }
