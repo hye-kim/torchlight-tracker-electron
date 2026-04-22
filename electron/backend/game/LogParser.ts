@@ -12,7 +12,7 @@ const logger = Logger.getInstance();
 // Constants
 const PATTERN_PRICE_ID = /XchgSearchPrice----SynId = (\d+).*?\+refer \[(\d+)\]/gs;
 const PATTERN_ITEM_CHANGE =
-  /\[.*?\]GameLog: Display: \[Game\] ItemChange@ (Add|Update|Remove|Delete) Id=(\d+_[^ ]+)(?: BagNum=(\d+))? in PageId=(\d+) SlotId=(\d+)/g;
+  /\[.*?\]\w+: Display: \[Game\] ItemChange@ (Add|Update|Remove|Delete) Id=(\d+_[^ ]+)(?: BagNum=(\d+))? in PageId=(\d+) SlotId=(\d+)/g;
 const PATTERN_RESET_ITEMS_START = /ItemChange@ ProtoName=ResetItemsLayout start/;
 const PATTERN_RESET_ITEMS_END = /ItemChange@ ProtoName=ResetItemsLayout end/;
 // const PATTERN_ITEM_CHANGE_RESET = /ItemChange@ Reset PageId=(\d+)/g; // Reserved for future use
@@ -94,6 +94,7 @@ export class LogParser {
           continue;
         }
 
+        logger.info(`Price check: item ID ${itemId}`);
         const price = this.extractPriceForItem(text, synid, itemId);
         if (price !== null) {
           // Extract identification status from filters (for Legendary Gear only)
@@ -112,7 +113,7 @@ export class LogParser {
     try {
       const pattern = new RegExp(
         `----Socket RecvMessage STT----XchgSearchPrice----SynId = ${synid}\\s+` +
-          `\\[.*?\\]\\s*GameLog: Display: \\[Game\\]\\s+` +
+          `\\[.*?\\]\\s*\\w+: Display: \\[Game\\]\\s+` +
           `(.*?)(?=----Socket RecvMessage STT----|$)`,
         's'
       );
@@ -198,7 +199,7 @@ export class LogParser {
       // Extract the SendMessage block with filters
       const sendPattern = new RegExp(
         `----Socket SendMessage STT----XchgSearchPrice----SynId = ${synid}\\s+` +
-          `\\[.*?\\]\\s*GameLog: Display: \\[Game\\]\\s+` +
+          `\\[.*?\\]\\s*\\w+: Display: \\[Game\\]\\s+` +
           `(.*?)(?=----Socket SendMessage End----|$)`,
         's'
       );
@@ -269,6 +270,15 @@ export class LogParser {
           logger.info(`Updated price: ${itemName} (ID:${itemId}) = ${price}${identifiedStr}`);
           updateCount++;
         }
+      } else {
+        const data: { price: number; last_update: number; identified?: boolean } = {
+          price,
+          last_update: currentTime,
+        };
+        if (identified !== undefined) {
+          data.identified = identified;
+        }
+        await this.fileManager.registerItemInAPI(itemId, data);
       }
     }
 
@@ -284,7 +294,7 @@ export class LogParser {
     return matches
       .filter((m) => m[1] && m[2] && m[4] && m[5]) // m[3] (BagNum) is optional for Delete events
       .map((m) => {
-        const fullId = m[2]!;
+        const fullId = m[2];
         const baseIdParts = fullId.split('_');
         const baseId = baseIdParts[0] ?? fullId; // Extract base ID from fullId
         const action = m[1] === 'Delete' ? 'Remove' : m[1];
@@ -294,8 +304,8 @@ export class LogParser {
         return {
           action: action as 'Add' | 'Update' | 'Remove',
           fullId: fullId,
-          pageId: m[4]!,
-          slotId: m[5]!,
+          pageId: m[4],
+          slotId: m[5],
           configBaseId: baseId,
           count: count,
         };
@@ -311,10 +321,10 @@ export class LogParser {
     return matches
       .filter((m) => m[1] && m[2] && m[3] && m[4])
       .map((m) => {
-        const pageId = m[1]!;
-        const slotId = m[2]!;
-        const configBaseId = m[3]!;
-        const count = parseInt(m[4]!);
+        const pageId = m[1];
+        const slotId = m[2];
+        const configBaseId = m[3];
+        const count = parseInt(m[4]);
         // Create synthetic fullId for bag data (will be replaced when real ItemChange@ appears)
         const syntheticFullId = `${configBaseId}_init_${pageId}_${slotId}`;
         return {
