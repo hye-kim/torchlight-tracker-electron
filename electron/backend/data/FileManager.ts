@@ -140,6 +140,10 @@ export class FileManager {
 
     // Enrich full table with item names and types from comprehensive database
     for (const [itemId, item] of Object.entries(data)) {
+      // Normalize stale 'Unknown' values so fallbacks in display code fire correctly
+      if (item.type === 'Unknown') {
+        item.type = undefined;
+      }
       const comprehensiveItem = this.itemDatabase[itemId];
       if (comprehensiveItem) {
         if (comprehensiveItem.name_en) {
@@ -148,6 +152,18 @@ export class FileManager {
         if (comprehensiveItem.type_en) {
           item.type = comprehensiveItem.type_en;
         }
+      }
+    }
+
+    // Backfill items added to the comprehensive DB after full_table.json was first created
+    for (const [itemId, comprehensiveItem] of Object.entries(this.itemDatabase)) {
+      if (!data[itemId]) {
+        data[itemId] = {
+          name: comprehensiveItem.name_en,
+          type: comprehensiveItem.type_en,
+          price: 0,
+          last_update: 0,
+        };
       }
     }
 

@@ -355,7 +355,7 @@ export class LogMonitor extends EventEmitter {
           name: itemName,
           quantity,
           price: itemData?.price ?? 0,
-          type: mappingData?.type_en ?? itemData?.type ?? 'Unknown',
+          type: mappingData?.type_en ?? itemData?.type ?? itemId,
           timestamp: Date.now(),
           imageUrl: getItemImageUrl(itemId),
         };
@@ -376,7 +376,7 @@ export class LogMonitor extends EventEmitter {
           name: itemName,
           quantity,
           price: itemData?.price ?? 0,
-          type: mappingData?.type_en ?? itemData?.type ?? 'Unknown',
+          type: mappingData?.type_en ?? itemData?.type ?? itemId,
           timestamp: Date.now(),
           imageUrl: getItemImageUrl(itemId),
         };
@@ -396,7 +396,7 @@ export class LogMonitor extends EventEmitter {
           name: itemData?.name ?? `Item ${itemId}`,
           quantity,
           price: itemData?.price ?? 0,
-          type: itemData?.type ?? 'Unknown',
+          type: itemData?.type ?? itemId,
           timestamp: Date.now(),
           imageUrl: getItemImageUrl(itemId),
         };
