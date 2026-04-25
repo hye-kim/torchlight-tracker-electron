@@ -307,7 +307,7 @@ ipcMain.handle('get-drops', () => {
       name: itemData?.name ?? `Item ${itemId}`,
       quantity,
       price: itemData?.price ?? 0,
-      type: itemData?.type ?? 'Unknown',
+      type: itemData?.type ?? itemId,
       timestamp: Date.now(),
     };
   });
@@ -331,7 +331,7 @@ ipcMain.handle('get-bag-state', () => {
       name: itemData?.name ?? `Item ${itemId}`,
       quantity,
       price: itemData?.price ?? 0,
-      type: itemData?.type ?? 'Unknown',
+      type: itemData?.type ?? itemId,
       imageUrl: itemData?.imageUrl,
     };
   });
@@ -391,7 +391,7 @@ ipcMain.handle('export-excel', async () => {
           name: itemData?.name ?? `Item ${itemId}`,
           quantity,
           price: itemData?.price ?? 0,
-          type: itemData?.type ?? 'Unknown',
+          type: itemData?.type ?? itemId,
           timestamp: Date.now(),
         };
       });
@@ -404,7 +404,7 @@ ipcMain.handle('export-excel', async () => {
           name: itemData?.name ?? `Item ${itemId}`,
           quantity,
           price: itemData?.price ?? 0,
-          type: itemData?.type ?? 'Unknown',
+          type: itemData?.type ?? itemId,
           timestamp: Date.now(),
         };
       });
@@ -671,7 +671,7 @@ ipcMain.handle('get-sessions', () => {
             name: itemData?.name ?? `Item ${drop.itemId}`,
             quantity: drop.quantity,
             price: drop.price, // Use stored historical price
-            type: itemData?.type ?? 'Unknown',
+            type: itemData?.type ?? drop.itemId,
             timestamp: mapLog.startTime,
             imageUrl: getItemImageUrl(drop.itemId),
           };
@@ -684,7 +684,7 @@ ipcMain.handle('get-sessions', () => {
             name: itemData?.name ?? `Item ${cost.itemId}`,
             quantity: cost.quantity,
             price: cost.price, // Use stored historical price
-            type: itemData?.type ?? 'Unknown',
+            type: itemData?.type ?? cost.itemId,
             timestamp: mapLog.startTime,
             imageUrl: getItemImageUrl(cost.itemId),
           };

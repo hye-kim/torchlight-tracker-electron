@@ -89,6 +89,12 @@
     "name_en": "Memory Scrap",
     "type_en": "Memory Scrap"
   },
+  "5141": {
+    "id": "5141",
+    "img": "",
+    "name_en": "Memory Thread - Normal",
+    "type_en": "Memory Thread"
+  },
   "5142": {
     "id": "5142",
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Item/128/UI_Item_ZhuiYiYouSi_Lan_Icon_128.webp",
@@ -1660,6 +1666,366 @@
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Item/UI_S12_LengJing_White01.webp",
     "name_en": "Precise: Ailment Amplification",
     "type_en": "Passive Skill"
+  },
+  "7231": {
+    "id": "7231",
+    "name_en": "Module: Goblin Priest",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularGeBuLinJiSi_Icon_128.webp"
+  },
+  "7232": {
+    "id": "7232",
+    "name_en": "Module: Trog 2nd General",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularDiMoErJiangJun_Icon_128.webp"
+  },
+  "7234": {
+    "id": "7234",
+    "name_en": "Module: Dwarven Automaton",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularAiRenJiJia_Icon_128.webp"
+  },
+  "7235": {
+    "id": "7235",
+    "name_en": "Module: Trog Mage",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularDiMoFaShi_Icon_128.webp"
+  },
+  "7236": {
+    "id": "7236",
+    "name_en": "Module: Goblin Priest of Elements",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularGeBuLinYuanSuDaZhangLao_Icon_128.webp"
+  },
+  "7237": {
+    "id": "7237",
+    "name_en": "Module: Medium Ember Automaton",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularZhongXingHuiJinJiJia_Icon_128.webp"
+  },
+  "7238": {
+    "id": "7238",
+    "name_en": "Module: Huge Ember Automaton",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularJuXingHuiJinJiJia_Icon_128.webp"
+  },
+  "7239": {
+    "id": "7239",
+    "name_en": "Module: Ent Great Elder",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularShuJingDaZhangLao_Icon_128.webp"
+  },
+  "7240": {
+    "id": "7240",
+    "name_en": "Module: Ratlin Stormer Captain",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularShuRenQiangXiDuiZhang_Icon_128.webp"
+  },
+  "7241": {
+    "id": "7241",
+    "name_en": "Module: Chief Machinist",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularShouXiJiXieShi_Icon_128.webp"
+  },
+  "7242": {
+    "id": "7242",
+    "name_en": "Module: Lean Phantom",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularLaiAnHuanYing_Icon_128.webp"
+  },
+  "7243": {
+    "id": "7243",
+    "name_en": "Module: God of Swords",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularJianShen_Icon_128.webp"
+  },
+  "7244": {
+    "id": "7244",
+    "name_en": "Module: Tyrant",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularBaoNueZhe_Icon_128.webp"
+  },
+  "7245": {
+    "id": "7245",
+    "name_en": "Module: Ichi Storm",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularYiJiKuangFeng_Icon_128.webp"
+  },
+  "7246": {
+    "id": "7246",
+    "name_en": "Module: Sand Giant",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularShaJuRen_Icon_128.webp"
+  },
+  "7247": {
+    "id": "7247",
+    "name_en": "Module: Einherjar Elder Sage",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularYingLingDaXianZhe_Icon_128.webp"
+  },
+  "7248": {
+    "id": "7248",
+    "name_en": "Module: Aember Winged Beast",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularZaiJinYiShou_Icon_128.webp"
+  },
+  "7249": {
+    "id": "7249",
+    "name_en": "Module: Punisher",
+    "type_en": "Module Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularChengFaZhe_Icon_128.webp"
+  },
+  "7252": {
+    "id": "7252",
+    "name_en": "Frostclaw",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularGeBuLinJiSi_Icon_128.webp"
+  },
+  "7253": {
+    "id": "7253",
+    "name_en": "Firebird",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularGeBuLinJiSi_Icon_128.webp"
+  },
+  "7255": {
+    "id": "7255",
+    "name_en": "Earthshatter",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularDiMoErJiangJun_Icon_128.webp"
+  },
+  "7257": {
+    "id": "7257",
+    "name_en": "Molten Barrage",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularAiRenJiJia_Icon_128.webp"
+  },
+  "7258": {
+    "id": "7258",
+    "name_en": "All-Out Volley",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularAiRenJiJia_Icon_128.webp"
+  },
+  "7259": {
+    "id": "7259",
+    "name_en": "Rockfall",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularDiMoFaShi_Icon_128.webp"
+  },
+  "7260": {
+    "id": "7260",
+    "name_en": "Thunderfall",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularGeBuLinYuanSuDaZhangLao_Icon_128.webp"
+  },
+  "7261": {
+    "id": "7261",
+    "name_en": "Kinetic Thrust",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularZhongXingHuiJinJiJia_Icon_128.webp"
+  },
+  "7262": {
+    "id": "7262",
+    "name_en": "Groundslam",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularZhongXingHuiJinJiJia_Icon_128.webp"
+  },
+  "7263": {
+    "id": "7263",
+    "name_en": "Overstrike",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularJuXingHuiJinJiJia_Icon_128.webp"
+  },
+  "7264": {
+    "id": "7264",
+    "name_en": "Searing Crush",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularJuXingHuiJinJiJia_Icon_128.webp"
+  },
+  "7265": {
+    "id": "7265",
+    "name_en": "Sweep",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularShuJingDaZhangLao_Icon_128.webp"
+  },
+  "7266": {
+    "id": "7266",
+    "name_en": "Rootsurge",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularShuJingDaZhangLao_Icon_128.webp"
+  },
+  "7267": {
+    "id": "7267",
+    "name_en": "Blitz Strike",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularShuRenQiangXiDuiZhang_Icon_128.webp"
+  },
+  "7268": {
+    "id": "7268",
+    "name_en": "Burst Hammer",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularShuRenQiangXiDuiZhang_Icon_128.webp"
+  },
+  "7269": {
+    "id": "7269",
+    "name_en": "Firebomb",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularShouXiJiXieShi_Icon_128.webp"
+  },
+  "7270": {
+    "id": "7270",
+    "name_en": "Pyromania",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularShouXiJiXieShi_Icon_128.webp"
+  },
+  "7271": {
+    "id": "7271",
+    "name_en": "Flickering Shadow",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularLaiAnHuanYing_Icon_128.webp"
+  },
+  "7272": {
+    "id": "7272",
+    "name_en": "Sin of the Fallen",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularLaiAnHuanYing_Icon_128.webp"
+  },
+  "7273": {
+    "id": "7273",
+    "name_en": "Blade of Glory",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularJianShen_Icon_128.webp"
+  },
+  "7274": {
+    "id": "7274",
+    "name_en": "High Court Covenant",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularJianShen_Icon_128.webp"
+  },
+  "7275": {
+    "id": "7275",
+    "name_en": "Ravaging Slash",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularBaoNueZhe_Icon_128.webp"
+  },
+  "7276": {
+    "id": "7276",
+    "name_en": "Auric Shot",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularYiJiKuangFeng_Icon_128.webp"
+  },
+  "7278": {
+    "id": "7278",
+    "name_en": "Gravelshot",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularShaJuRen_Icon_128.webp"
+  },
+  "7279": {
+    "id": "7279",
+    "name_en": "Divine Judgment",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularYingLingDaXianZhe_Icon_128.webp"
+  },
+  "7280": {
+    "id": "7280",
+    "name_en": "Javelin of Judgment",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularYingLingDaXianZhe_Icon_128.webp"
+  },
+  "7281": {
+    "id": "7281",
+    "name_en": "Spikeburst",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularZaiJinYiShou_Icon_128.webp"
+  },
+  "7282": {
+    "id": "7282",
+    "name_en": "Tailsweep",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularZaiJinYiShou_Icon_128.webp"
+  },
+  "7283": {
+    "id": "7283",
+    "name_en": "Impaling Thrust",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularChengFaZhe_Icon_128.webp"
+  },
+  "7284": {
+    "id": "7284",
+    "name_en": "Twinstrike",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_ModularChengFaZhe_Icon_128.webp"
+  },
+  "7286": {
+    "id": "7286",
+    "name_en": "Resistance Dew",
+    "type_en": "Elixir Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_dikangdilu_Icon_128.webp"
+  },
+  "7287": {
+    "id": "7287",
+    "name_en": "Steadfast Dew",
+    "type_en": "Elixir Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_jiangudilu_Icon_128.webp"
+  },
+  "7288": {
+    "id": "7288",
+    "name_en": "Nimbleness Dew",
+    "type_en": "Elixir Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_lingmindilu_Icon_128.webp"
+  },
+  "7289": {
+    "id": "7289",
+    "name_en": "Tenacity Dew",
+    "type_en": "Elixir Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_renxingdilu_Icon_128.webp"
+  },
+  "7290": {
+    "id": "7290",
+    "name_en": "Tortoise Shell Distillate",
+    "type_en": "Elixir Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_luguikeningcui_Icon_128.webp"
+  },
+  "7291": {
+    "id": "7291",
+    "name_en": "Scorpion Stinger Distillate",
+    "type_en": "Elixir Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_xieweizhenningcui_Icon_128.webp"
+  },
+  "7292": {
+    "id": "7292",
+    "name_en": "Putrid Toad Distillate",
+    "type_en": "Elixir Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_fuchanchuningcui_Icon_128.webp"
+  },
+  "7293": {
+    "id": "7293",
+    "name_en": "Saltpeter Mushroom Distillate",
+    "type_en": "Elixir Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_xiaoshiguningcui_Icon_128.webp"
+  },
+  "7294": {
+    "id": "7294",
+    "name_en": "Fire Lizard Distillate",
+    "type_en": "Elixir Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_huoxiyiningcui_Icon_128.webp"
+  },
+  "7295": {
+    "id": "7295",
+    "name_en": "White Rhino Distillate",
+    "type_en": "Elixir Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_baixiniuningcui_Icon_128.webp"
+  },
+  "7296": {
+    "id": "7296",
+    "name_en": "Thunder Wood Distillate",
+    "type_en": "Elixir Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_leijimuningcui_Icon_128.webp"
+  },
+  "7317": {
+    "id": "7317",
+    "name_en": "Ominous",
+    "type_en": "Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_SkillIcon_Skill_Blind_Icon_128.webp"
   },
   "7401": {
     "id": "7401",
@@ -3929,6 +4295,66 @@
     "name_en": "Spectral Slash: Synchrony (Noble)",
     "type_en": "Noble Support Skill"
   },
+  "7985": {
+    "id": "7985",
+    "name_en": "Frigid Transmission: Thin Ice (Noble)",
+    "type_en": "Noble Support Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_IceBlink_support01_Icon_128.webp"
+  },
+  "7986": {
+    "id": "7986",
+    "name_en": "Chromatic Shot: Lightchaser (Magnificent)",
+    "type_en": "Magnificent Support Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_Prismaticbolt_support01_Icon_128.webp"
+  },
+  "7987": {
+    "id": "7987",
+    "name_en": "Chromatic Shot: Splendor (Noble)",
+    "type_en": "Noble Support Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_Prismaticbolt_support02_Icon_128.webp"
+  },
+  "7988": {
+    "id": "7988",
+    "name_en": "Modularization: Shared Burden (Magnificent)",
+    "type_en": "Magnificent Support Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_Modular_support01_Icon_128.webp"
+  },
+  "7989": {
+    "id": "7989",
+    "name_en": "Modularization: Resonance (Magnificent)",
+    "type_en": "Magnificent Support Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_Modular_support02_Icon_128.webp"
+  },
+  "7990": {
+    "id": "7990",
+    "name_en": "Modularization: Cluster (Magnificent)",
+    "type_en": "Magnificent Support Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_Modular_support03_Icon_128.webp"
+  },
+  "7991": {
+    "id": "7991",
+    "name_en": "Modularization: Superconductivity (Noble)",
+    "type_en": "Noble Support Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_Modular_support04_Icon_128.webp"
+  },
+  "7992": {
+    "id": "7992",
+    "name_en": "Modularization: Calibrate (Noble)",
+    "type_en": "Noble Support Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_Modular_support05_Icon_128.webp"
+  },
+  "7993": {
+    "id": "7993",
+    "name_en": "Modularization: Compress (Noble)",
+    "type_en": "Noble Support Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_Modular_support06_Icon_128.webp"
+  },
+  "7994": {
+    "id": "7994",
+    "name_en": "Modularization: Sever (Noble)",
+    "type_en": "Noble Support Skill",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_Modular_support07_Icon_128.webp"
+  },
   "8000": {
     "id": "8000",
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Skill/CommonSkill/128/UI_Skill_CMPreparation_Icon_128.webp",
@@ -4095,6 +4521,12 @@
     "id": "8030",
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Item/UI_S12_LengJing_White01.webp",
     "name_en": "Activation Medium: Tangle",
+    "type_en": "Activation Medium Skill"
+  },
+  "8031": {
+    "id": "8031",
+    "img": "",
+    "name_en": "Activation Medium: Rejuvenation",
     "type_en": "Activation Medium Skill"
   },
   "8300": {
@@ -4511,6 +4943,18 @@
     "name_en": "Focus Fluorescent Compass",
     "type_en": "Compass"
   },
+  "10104": {
+    "id": "10104",
+    "name_en": "Colorful Fluorescent Compass (Artifact)",
+    "type_en": "Compass",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Compass/128/UI_Compass_MemoryFragment_3_2_Icon_128.webp"
+  },
+  "10109": {
+    "id": "10109",
+    "name_en": "Mystery Treasure Gods Compass",
+    "type_en": "Compass",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Compass/128/UI_Compass_GameplaySixGod_2_2_Icon_128.webp"
+  },
   "10110": {
     "id": "10110",
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Compass/128/UI_Compass_GameplaySixGod_3_2_Icon_128.webp",
@@ -4787,6 +5231,42 @@
     "name_en": "Consultation Vorax Compass",
     "type_en": "Compass"
   },
+  "10300": {
+    "id": "10300",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14Compass_Gameplay_1_Icon.webp",
+    "name_en": "Dim Lunar Stone",
+    "type_en": "Memory Revival Material"
+  },
+  "10301": {
+    "id": "10301",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14Compass_Gameplay_2_Icon.webp",
+    "name_en": "Bright Lunar Stone",
+    "type_en": "Memory Revival Material"
+  },
+  "10302": {
+    "id": "10302",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14Compass_Gameplay_3_Icon.webp",
+    "name_en": "Dazzling Lunar Stone",
+    "type_en": "Memory Revival Material"
+  },
+  "10310": {
+    "id": "10310",
+    "name_en": "Creation Compass",
+    "type_en": "Compass",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Compass/128/UI_Compass_GameplayAncientDevice_1_1_Icon_128.webp"
+  },
+  "10311": {
+    "id": "10311",
+    "name_en": "Derivative Creation Compass",
+    "type_en": "Compass",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Compass/128/UI_Compass_GameplayAncientDevice_2_2_Icon_128.webp"
+  },
+  "10312": {
+    "id": "10312",
+    "name_en": "Record Creation Compass",
+    "type_en": "Compass",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Compass/128/UI_Compass_GameplayAncientDevice_3_2_Icon_128.webp"
+  },
   "12000": {
     "id": "12000",
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Compass/128/UI_Probe_IIQ_1_Icon_128.webp",
@@ -4877,16 +5357,46 @@
     "name_en": "Outlaw Deep Space Probe",
     "type_en": "Probe"
   },
+  "71001": {
+    "id": "71001",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Item/128/UI_Item_ShouJiDeZhuiYi_Icon_128.webp",
+    "name_en": "Memory of Origin",
+    "type_en": "Hero Memory"
+  },
+  "71002": {
+    "id": "71002",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Item/128/UI_Item_ShouJiDeZhuiYi_Icon_128.webp",
+    "name_en": "Memory of Discipline",
+    "type_en": "Hero Memory"
+  },
+  "71003": {
+    "id": "71003",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Item/128/UI_Item_ShouJiDeZhuiYi_Icon_128.webp",
+    "name_en": "Memory of Progress",
+    "type_en": "Hero Memory"
+  },
   "100200": {
     "id": "100200",
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Item/128/UI_Item_chuhuolingshaV3_Icon_128.webp",
     "name_en": "Flame Sand",
     "type_en": "Fuel"
   },
+  "101200": {
+    "id": "101200",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Item/128/UI_Item_chuhuolingshaV3_Icon_128.webp",
+    "name_en": "Flame Sand - Bound",
+    "type_en": "Fuel"
+  },
   "100300": {
     "id": "100300",
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Item/128/UI_Item_chuhuoyuanzhiV3_Icon_128.webp",
     "name_en": "Flame Elementium",
+    "type_en": "Fuel"
+  },
+  "100400": {
+    "id": "100400",
+    "img": "",
+    "name_en": "Flame Residue",
     "type_en": "Fuel"
   },
   "110101": {
@@ -5816,6 +6326,18 @@
     "type_en": "Legendary Gear",
     "baseItemId": "3810"
   },
+  "112258": {
+    "id": "112258",
+    "name_en": "Ralph's Dreadcrest",
+    "type_en": "Legendary Gear",
+    "baseItemId": "3610"
+  },
+  "112259": {
+    "id": "112259",
+    "name_en": "Magmaskull",
+    "type_en": "Legendary Gear",
+    "baseItemId": "3610"
+  },
   "112303": {
     "id": "112303",
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_403_128.webp",
@@ -5880,6 +6402,12 @@
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_204_128.webp",
     "name_en": "Thunder Manipulator",
     "type_en": "Legendary Gear"
+  },
+  "112316": {
+    "id": "112316",
+    "name_en": "Malevolent Hand",
+    "type_en": "Legendary Gear",
+    "baseItemId": "3507"
   },
   "112317": {
     "id": "112317",
@@ -6071,6 +6599,12 @@
     "id": "112356",
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/EquipCommon/Gloves/128/Icon_Equip_Gloves_Epic_439_128.webp",
     "name_en": "Vendetta's Sleeve-Blade",
+    "type_en": "Legendary Gear",
+    "baseItemId": "3403"
+  },
+  "112357": {
+    "id": "112357",
+    "name_en": "Golden Touch",
     "type_en": "Legendary Gear",
     "baseItemId": "3403"
   },
@@ -6988,6 +7522,12 @@
     "type_en": "Legendary Gear",
     "baseItemId": "4722"
   },
+  "113342": {
+    "id": "113342",
+    "name_en": "Omni-Elixir Notes",
+    "type_en": "Legendary Gear",
+    "baseItemId": "4725"
+  },
   "140004": {
     "id": "140004",
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Item/128/UI_Item_QianBaiMengYuWuQi_Icon_128.webp",
@@ -7010,6 +7550,12 @@
     "id": "200003",
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Ash/128/UI_Ash_09StonelowXUNJIE_Icon_128.webp",
     "name_en": "Fine Ember",
+    "type_en": "Ember"
+  },
+  "201003": {
+    "id": "201003",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Ash/128/UI_Ash_09StonelowXUNJIE_Icon_128.webp",
+    "name_en": "Fine Ember - Bound",
     "type_en": "Ember"
   },
   "200021": {
@@ -8283,6 +8829,18 @@
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/DestinyFate/Destiny/128/UI_S9Pet_Destiny113_128.webp",
     "name_en": "Dual Kismet: Resentful Maiden",
     "type_en": "Fate"
+  },
+  "350758": {
+    "id": "350758",
+    "name_en": "Dual Kismet: Banshee",
+    "type_en": "Fate",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/DestinyFate/Destiny/128/UI_S9Pet_Destiny116_128.webp"
+  },
+  "350759": {
+    "id": "350759",
+    "name_en": "Dual Kismet: Shackles",
+    "type_en": "Fate",
+    "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/DestinyFate/Destiny/128/UI_S9Pet_Destiny5_128.webp"
   },
   "350900": {
     "id": "350900",
@@ -10642,6 +11200,306 @@
     "name_en": "Perfect Magnetic Pointer",
     "type_en": "Universal Item"
   },
+  "391000": {
+    "id": "391000",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_BasicMaterial_01.webp",
+    "name_en": "Crude Lunar Dust",
+    "type_en": "Memory Revival Material"
+  },
+  "391001": {
+    "id": "391001",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_BasicMaterial_02.webp",
+    "name_en": "Luminous Lunar Dust",
+    "type_en": "Memory Revival Material"
+  },
+  "391002": {
+    "id": "391002",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_BasicMaterial_03.webp",
+    "name_en": "Flawless Lunar Dust",
+    "type_en": "Memory Revival Material"
+  },
+  "392000": {
+    "id": "392000",
+    "name_en": "Omni-Elixir Side Effect",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_05.webp"
+  },
+  "392001": {
+    "id": "392001",
+    "name_en": "Basic Pharmacology Manuscript",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_06.webp"
+  },
+  "392002": {
+    "id": "392002",
+    "name_en": "Hero's Resourcefulness",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_07.webp"
+  },
+  "392003": {
+    "id": "392003",
+    "name_en": "Furious Roar",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_08.webp"
+  },
+  "392004": {
+    "id": "392004",
+    "name_en": "Ancestral Hate",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_09.webp"
+  },
+  "392005": {
+    "id": "392005",
+    "name_en": "Starfall Wasteland",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_10.webp"
+  },
+  "392006": {
+    "id": "392006",
+    "name_en": "Between the Holy Land and Hell",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_11.webp"
+  },
+  "392007": {
+    "id": "392007",
+    "name_en": "Apathy Blade",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_12.webp"
+  },
+  "392008": {
+    "id": "392008",
+    "name_en": "Mercury Purged",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_13.webp"
+  },
+  "392009": {
+    "id": "392009",
+    "name_en": "Royal Arsenal",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_28.webp"
+  },
+  "392010": {
+    "id": "392010",
+    "name_en": "Into the Night",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_29.webp"
+  },
+  "392011": {
+    "id": "392011",
+    "name_en": "Self-Imposed Shackles",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_30.webp"
+  },
+  "392012": {
+    "id": "392012",
+    "name_en": "Three-Chambered Heart",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_25.webp"
+  },
+  "392013": {
+    "id": "392013",
+    "name_en": "First Flake of Strange Snow",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_26.webp"
+  },
+  "392014": {
+    "id": "392014",
+    "name_en": "Sweet Pain",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_27.webp"
+  },
+  "392015": {
+    "id": "392015",
+    "name_en": "Cat's Night Safari",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_31.webp"
+  },
+  "392016": {
+    "id": "392016",
+    "name_en": "Charging Tail",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_32.webp"
+  },
+  "392017": {
+    "id": "392017",
+    "name_en": "Vengeful Wraith",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_33.webp"
+  },
+  "392018": {
+    "id": "392018",
+    "name_en": "Bing's Big Bang Pack",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_38.webp"
+  },
+  "392019": {
+    "id": "392019",
+    "name_en": "Genius Idea Generator",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_39.webp"
+  },
+  "392020": {
+    "id": "392020",
+    "name_en": "Telepathy Expert",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_14.webp"
+  },
+  "392021": {
+    "id": "392021",
+    "name_en": "Fifth Cosmic Velocity",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_15.webp"
+  },
+  "392022": {
+    "id": "392022",
+    "name_en": "To Myself in Another Spacetime",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_16.webp"
+  },
+  "392023": {
+    "id": "392023",
+    "name_en": "Private Universe",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_17.webp"
+  },
+  "392024": {
+    "id": "392024",
+    "name_en": "Immolating World",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_34.webp"
+  },
+  "392025": {
+    "id": "392025",
+    "name_en": "The Place of Oracle",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_35.webp"
+  },
+  "392026": {
+    "id": "392026",
+    "name_en": "Crossing the Divine Threshold",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_36.webp"
+  },
+  "392027": {
+    "id": "392027",
+    "name_en": "Inverted Shrine",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_37.webp"
+  },
+  "392028": {
+    "id": "392028",
+    "name_en": "Neural Synchronization Training",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_22.webp"
+  },
+  "392029": {
+    "id": "392029",
+    "name_en": "Machine's Joy",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_23.webp"
+  },
+  "392030": {
+    "id": "392030",
+    "name_en": "Peril of Synthetic Troops",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_24.webp"
+  },
+  "392031": {
+    "id": "392031",
+    "name_en": "Nourishing Spring Rain",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_18.webp"
+  },
+  "392032": {
+    "id": "392032",
+    "name_en": "Nature's Party",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_19.webp"
+  },
+  "392033": {
+    "id": "392033",
+    "name_en": "Soft Storm",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_20.webp"
+  },
+  "392034": {
+    "id": "392034",
+    "name_en": "Blowing Breeze",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_21.webp"
+  },
+  "392035": {
+    "id": "392035",
+    "name_en": "Ceaseless Tide",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_40.webp"
+  },
+  "392036": {
+    "id": "392036",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_01.webp",
+    "name_en": "Artificial Moon: Origin",
+    "type_en": "Memory Revival Material"
+  },
+  "392037": {
+    "id": "392037",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_01.webp",
+    "name_en": "Artificial Moon: Discipline",
+    "type_en": "Memory Revival Material"
+  },
+  "392038": {
+    "id": "392038",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_01.webp",
+    "name_en": "Artificial Moon: Progress",
+    "type_en": "Memory Revival Material"
+  },
+  "392039": {
+    "id": "392039",
+    "name_en": "Radical Evolution Theory: Cruelty",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_02.webp"
+  },
+  "392040": {
+    "id": "392040",
+    "name_en": "Radical Evolution Theory: Spell Amplification",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_02.webp"
+  },
+  "392041": {
+    "id": "392041",
+    "name_en": "Radical Evolution Theory: Radical Order",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_02.webp"
+  },
+  "392042": {
+    "id": "392042",
+    "name_en": "Radical Evolution Theory: Deep Pain",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_02.webp"
+  },
+  "392043": {
+    "id": "392043",
+    "name_en": "Discord of the Second Will",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_04.webp"
+  },
+  "392044": {
+    "id": "392044",
+    "name_en": "Reactive Rainbow",
+    "type_en": "Memory Revival Material",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_03.webp"
+  },
+  "393000": {
+    "id": "393000",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_01.webp",
+    "name_en": "Moonlit Thread - Epic",
+    "type_en": "Memory Revival Material"
+  },
+  "393003": {
+    "id": "393003",
+    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_Exchange01.webp",
+    "name_en": "Lunar Fragment",
+    "type_en": "Memory Revival Material"
+  },
   "400000": {
     "id": "400000",
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Ticket/128/UI_BeaconIcon_Ice_Icon_128.webp",
@@ -11019,71 +11877,5 @@
     "img": "https://cdn.tlidb.com/UI/Textures/Common/Icon/Ticket/128/UI_TowerIcon_badge05_Icon_128.webp",
     "name_en": "Proof of the Brave V",
     "type_en": "Proof of Valor"
-  },
-  "391000": {
-    "id": "391000",
-    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_BasicMaterial_01.webp",
-    "name_en": "Crude Lunar Dust",
-    "type_en": "Memory Revival Material"
-  },
-  "391001": {
-    "id": "391001",
-    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_BasicMaterial_02.webp",
-    "name_en": "Luminous Lunar Dust",
-    "type_en": "Memory Revival Material"
-  },
-  "391002": {
-    "id": "391002",
-    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_BasicMaterial_03.webp",
-    "name_en": "Flawless Lunar Dust",
-    "type_en": "Memory Revival Material"
-  },
-  "392036": {
-    "id": "392036",
-    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_01.webp",
-    "name_en": "Artificial Moon: Origin",
-    "type_en": "Memory Revival Material"
-  },
-  "392037": {
-    "id": "392037",
-    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_01.webp",
-    "name_en": "Artificial Moon: Discipline",
-    "type_en": "Memory Revival Material"
-  },
-  "392038": {
-    "id": "392038",
-    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_01.webp",
-    "name_en": "Artificial Moon: Progress",
-    "type_en": "Memory Revival Material"
-  },
-  "393000": {
-    "id": "393000",
-    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_01.webp",
-    "name_en": "Moonlit Thread - Epic",
-    "type_en": "Memory Revival Material"
-  },
-  "393003": {
-    "id": "393003",
-    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14AwakenMemory_SpMaterial_Exchange01.webp",
-    "name_en": "Lunar Fragment",
-    "type_en": "Memory Revival Material"
-  },
-  "10300": {
-    "id": "10300",
-    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14Compass_Gameplay_1_Icon.webp",
-    "name_en": "Dim Lunar Stone",
-    "type_en": "Memory Revival Material"
-  },
-  "10301": {
-    "id": "10301",
-    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14Compass_Gameplay_2_Icon.webp",
-    "name_en": "Bright Lunar Stone",
-    "type_en": "Memory Revival Material"
-  },
-  "10302": {
-    "id": "10302",
-    "img": "https://cdn.tlidb.com/UIV2/S14Gameplay/UI/Textures/NoAtlas/UI_S14Compass_Gameplay_3_Icon.webp",
-    "name_en": "Dazzling Lunar Stone",
-    "type_en": "Memory Revival Material"
   }
 }

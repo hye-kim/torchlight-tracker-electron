@@ -179,7 +179,7 @@ const HistoryView: React.FC = () => {
         name: item.name ?? existingDrop?.name ?? `Item ${item.itemId}`,
         quantity: item.quantity,
         price,
-        type: item.type ?? existingDrop?.type ?? 'Unknown',
+        type: item.type ?? existingDrop?.type ?? item.itemId,
         timestamp: selectedMapData.startTime,
         imageUrl: item.imageUrl ?? existingDrop?.imageUrl,
       };
@@ -207,7 +207,7 @@ const HistoryView: React.FC = () => {
         name: item.name ?? existingCost?.name ?? existingDrop?.name ?? `Item ${item.itemId}`,
         quantity: item.quantity,
         price,
-        type: item.type ?? existingCost?.type ?? existingDrop?.type ?? 'Unknown',
+        type: item.type ?? existingCost?.type ?? existingDrop?.type ?? item.itemId,
         timestamp: selectedMapData.startTime,
         imageUrl: item.imageUrl ?? existingCost?.imageUrl ?? existingDrop?.imageUrl,
       };

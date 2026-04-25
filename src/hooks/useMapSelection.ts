@@ -6,7 +6,9 @@ import { Drop, MapItemData, MapLog, CurrentMapData } from '../types';
  * Custom hook to handle map selection and retrieve map data
  * @param useCurrentPrices - If true, use current prices from price store; if false, use historical prices from map data
  */
-export const useMapSelection = (useCurrentPrices: boolean = true): {
+export const useMapSelection = (
+  useCurrentPrices: boolean = true
+): {
   selectedMapData: MapLog | CurrentMapData | null;
   selectedMapDrops: Drop[];
   selectedMapCosts: Drop[];
@@ -55,7 +57,7 @@ export const useMapSelection = (useCurrentPrices: boolean = true): {
         name: existingDrop?.name ?? `Item ${item.itemId}`,
         quantity: item.quantity,
         price,
-        type: existingDrop?.type ?? 'Unknown',
+        type: existingDrop?.type ?? item.itemId,
         timestamp: selectedMapData.startTime,
         imageUrl: existingDrop?.imageUrl,
       };
@@ -80,7 +82,7 @@ export const useMapSelection = (useCurrentPrices: boolean = true): {
         name: existingCost?.name ?? existingDrop?.name ?? `Item ${item.itemId}`,
         quantity: item.quantity,
         price,
-        type: existingCost?.type ?? existingDrop?.type ?? 'Unknown',
+        type: existingCost?.type ?? existingDrop?.type ?? item.itemId,
         timestamp: selectedMapData.startTime,
         imageUrl: existingCost?.imageUrl ?? existingDrop?.imageUrl,
       };
