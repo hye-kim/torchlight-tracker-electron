@@ -2,6 +2,8 @@ import { useEffect, useMemo } from 'react';
 import { useStatsStore, useMapStore, usePricesStore } from '../stores';
 import { Drop, MapItemData, MapLog, CurrentMapData } from '../types';
 
+const EXCLUDED_DROP_TYPES = new Set(['Hero Memory']);
+
 /**
  * Custom hook to handle map selection and retrieve map data
  * @param useCurrentPrices - If true, use current prices from price store; if false, use historical prices from map data
@@ -44,24 +46,29 @@ export const useMapSelection = (
   const selectedMapDrops = useMemo(() => {
     if (!selectedMapData?.drops) return [];
 
-    return selectedMapData.drops.map((item: MapItemData) => {
-      const existingDrop = drops.find((d) => d.itemId === item.itemId);
+    return selectedMapData.drops
+      .filter((item: MapItemData) => {
+        const existingDrop = drops.find((d) => d.itemId === item.itemId);
+        const type = existingDrop?.type ?? '';
+        return !EXCLUDED_DROP_TYPES.has(type);
+      })
+      .map((item: MapItemData) => {
+        const existingDrop = drops.find((d) => d.itemId === item.itemId);
 
-      // Use current prices if enabled, otherwise use historical price
-      const price = useCurrentPrices
-        ? (currentPrices[item.itemId]?.taxedPrice ?? item.price)
-        : item.price;
+        const price = useCurrentPrices
+          ? (currentPrices[item.itemId]?.taxedPrice ?? item.price)
+          : item.price;
 
-      return {
-        itemId: item.itemId,
-        name: existingDrop?.name ?? `Item ${item.itemId}`,
-        quantity: item.quantity,
-        price,
-        type: existingDrop?.type ?? item.itemId,
-        timestamp: selectedMapData.startTime,
-        imageUrl: existingDrop?.imageUrl,
-      };
-    });
+        return {
+          itemId: item.itemId,
+          name: existingDrop?.name ?? `Item ${item.itemId}`,
+          quantity: item.quantity,
+          price,
+          type: existingDrop?.type ?? item.itemId,
+          timestamp: selectedMapData.startTime,
+          imageUrl: existingDrop?.imageUrl,
+        };
+      });
   }, [selectedMapData, drops, useCurrentPrices, currentPrices]);
 
   // Get costs for the selected map
