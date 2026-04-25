@@ -7,6 +7,7 @@ import { ItemIdNormalizer } from './ItemIdNormalizer';
 import {
   API_UPDATE_THROTTLE,
   DEFAULT_API_URL,
+  EXCLUDED_ITEM_TYPES,
   FULL_TABLE_FILE,
   COMPREHENSIVE_ITEM_DATABASE_FILE,
   DROP_LOG_FILE,
@@ -328,6 +329,8 @@ export class FileManager {
    * Updates the local table if a price is found.
    */
   async fetchPriceFromAPI(itemId: string): Promise<number | null> {
+    if (EXCLUDED_ITEM_TYPES.has(this.itemDatabase?.[itemId]?.type_en ?? '')) return null;
+
     try {
       const apiItem = await this.apiClient.getItem(itemId);
       if (apiItem?.price !== undefined) {
@@ -382,6 +385,12 @@ export class FileManager {
       let updatedCount = 0;
 
       for (const [itemId, apiItem] of Object.entries(apiItems)) {
+        if (
+          EXCLUDED_ITEM_TYPES.has(this.itemDatabase?.[itemId]?.type_en ?? apiItem.type_en ?? '')
+        ) {
+          continue;
+        }
+
         const apiLastUpdate = apiItem.last_update ?? Math.floor(Date.now() / 1000);
 
         if (fullTable[itemId]) {
