@@ -15,6 +15,7 @@ export const DROP_LOG_FILE = 'drop.txt';
 export const TAX_RATE = 0.875; // 12.5% tax
 export const PRICE_SAMPLE_SIZE = 30;
 export const EXCLUDED_ITEM_ID = '100300';
+export const EXCLUDED_ITEM_TYPES = new Set(['Hero Memory']);
 
 // Initialization Configuration
 export const MIN_BAG_ITEMS_FOR_INIT = 20;

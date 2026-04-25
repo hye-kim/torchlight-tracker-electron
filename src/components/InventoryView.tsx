@@ -27,6 +27,8 @@ interface InventoryViewProps {
 
 type SortOption = 'name-asc' | 'name-desc' | 'value-desc' | 'value-asc' | 'quantity-desc' | 'type';
 
+const EXCLUDED_DISPLAY_TYPES = new Set(['Hero Memory']);
+
 const InventoryView: React.FC<InventoryViewProps> = ({ drops }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('value-desc');
@@ -38,6 +40,8 @@ const InventoryView: React.FC<InventoryViewProps> = ({ drops }) => {
     const itemMap = new Map<string, InventoryItem>();
 
     drops.forEach((drop) => {
+      if (EXCLUDED_DISPLAY_TYPES.has(drop.type)) return;
+
       const existing = itemMap.get(drop.itemId);
       if (existing) {
         existing.quantity += drop.quantity;
