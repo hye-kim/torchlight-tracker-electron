@@ -185,6 +185,7 @@ export class StatisticsTracker extends EventEmitter {
       const mapDrops: MapItemData[] = [];
       for (const [itemId, quantity] of this.dropList) {
         const item = fullTable[itemId];
+        if (EXCLUDED_ITEM_TYPES.has(item?.type_en ?? '')) continue;
         const basePrice = item?.price ?? 0.0;
         const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         mapDrops.push({ itemId, quantity, price });
@@ -394,8 +395,10 @@ export class StatisticsTracker extends EventEmitter {
       if (amount > 0) {
         // Positive = income (loot) - apply tax if enabled
         price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
-        this.income += price * amount;
-        this.incomeAll += price * amount;
+        if (!EXCLUDED_ITEM_TYPES.has(itemData.type_en ?? '')) {
+          this.income += price * amount;
+          this.incomeAll += price * amount;
+        }
       } else {
         // Negative = cost - use base price (no tax)
         price = basePrice;
