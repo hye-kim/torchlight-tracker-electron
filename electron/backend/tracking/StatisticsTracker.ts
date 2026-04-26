@@ -6,7 +6,7 @@
 import { EventEmitter } from 'events';
 import { FileManager, ItemData } from '../data/FileManager';
 import { ConfigManager } from '../core/ConfigManager';
-import { calculatePriceWithTax } from '../core/constants';
+import { calculatePriceWithTax, EXCLUDED_ITEM_TYPES } from '../core/constants';
 import { Logger } from '../core/Logger';
 
 const logger = Logger.getInstance();
@@ -262,7 +262,7 @@ export class StatisticsTracker extends EventEmitter {
     this.income = 0.0;
     for (const [itemId, quantity] of this.dropList) {
       const item = fullTable[itemId];
-      if (item) {
+      if (item && !EXCLUDED_ITEM_TYPES.has(item.type_en ?? '')) {
         const basePrice = item.price ?? 0.0;
         const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         this.income += price * quantity;
@@ -273,7 +273,7 @@ export class StatisticsTracker extends EventEmitter {
     this.incomeAll = 0.0;
     for (const [itemId, quantity] of this.dropListAll) {
       const item = fullTable[itemId];
-      if (item) {
+      if (item && !EXCLUDED_ITEM_TYPES.has(item.type_en ?? '')) {
         const basePrice = item.price ?? 0.0;
         const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         this.incomeAll += price * quantity;
@@ -305,7 +305,7 @@ export class StatisticsTracker extends EventEmitter {
       let revenue = 0.0;
       for (const drop of mapLog.drops) {
         const item = fullTable[drop.itemId];
-        if (item) {
+        if (item && !EXCLUDED_ITEM_TYPES.has(item.type_en ?? '')) {
           const basePrice = item.price ?? 0.0;
           const price = calculatePriceWithTax(basePrice, drop.itemId, taxEnabled);
           revenue += price * drop.quantity;
@@ -567,6 +567,7 @@ export class StatisticsTracker extends EventEmitter {
     const currentDrops: MapItemData[] = [];
     for (const [itemId, quantity] of this.dropList) {
       const item = fullTable[itemId];
+      if (EXCLUDED_ITEM_TYPES.has(item?.type_en ?? '')) continue;
       const basePrice = item?.price ?? 0.0;
       const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
       currentDrops.push({ itemId, quantity, price });
