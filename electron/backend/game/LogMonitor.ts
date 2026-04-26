@@ -396,7 +396,7 @@ export class LogMonitor extends EventEmitter {
           name: itemData?.name ?? `Item ${itemId}`,
           quantity,
           price: itemData?.price ?? 0,
-          type: itemData?.type ?? itemId,
+          type: itemData?.type_en ?? itemData?.type ?? itemId,
           timestamp: Date.now(),
           imageUrl: getItemImageUrl(itemId),
         };
