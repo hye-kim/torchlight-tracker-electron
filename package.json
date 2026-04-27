@@ -1,6 +1,6 @@
 {
   "name": "torchlight-tracker-electron",
-  "version": "1.5.9",
+  "version": "1.5.10",
   "description": "Torchlight Infinite Price Tracker - Electron Edition",
   "main": "dist-electron/electron/main.js",
   "author": "Hye Kim",
