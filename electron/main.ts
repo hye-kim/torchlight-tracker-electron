@@ -23,6 +23,7 @@ import {
   CONFIG_FILE,
   COMPREHENSIVE_ITEM_DATABASE_FILE,
   calculatePriceWithTax,
+  EXCLUDED_ITEM_TYPES,
 } from './backend/core/constants';
 
 const logger = Logger.getInstance();
@@ -664,18 +665,24 @@ ipcMain.handle('get-sessions', () => {
     mapLogs: session.mapLogs.map((mapLog) => ({
       ...mapLog,
       drops:
-        mapLog.drops?.map((drop) => {
-          const itemData = fullTable[drop.itemId];
-          return {
-            itemId: drop.itemId,
-            name: itemData?.name ?? `Item ${drop.itemId}`,
-            quantity: drop.quantity,
-            price: drop.price, // Use stored historical price
-            type: itemData?.type ?? drop.itemId,
-            timestamp: mapLog.startTime,
-            imageUrl: getItemImageUrl(drop.itemId),
-          };
-        }) ?? [],
+        mapLog.drops
+          ?.filter((drop) => {
+            const typeEn =
+              itemMapping[drop.itemId]?.type_en ?? fullTable[drop.itemId]?.type_en ?? '';
+            return !EXCLUDED_ITEM_TYPES.has(typeEn);
+          })
+          .map((drop) => {
+            const itemData = fullTable[drop.itemId];
+            return {
+              itemId: drop.itemId,
+              name: itemData?.name ?? `Item ${drop.itemId}`,
+              quantity: drop.quantity,
+              price: drop.price, // Use stored historical price
+              type: itemMapping[drop.itemId]?.type_en ?? itemData?.type ?? drop.itemId,
+              timestamp: mapLog.startTime,
+              imageUrl: getItemImageUrl(drop.itemId),
+            };
+          }) ?? [],
       costs:
         mapLog.costs?.map((cost) => {
           const itemData = fullTable[cost.itemId];

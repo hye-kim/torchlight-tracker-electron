@@ -377,9 +377,11 @@ export class StatisticsTracker extends EventEmitter {
 
     // Update drop lists or cost lists based on amount
     if (amount > 0) {
-      // Positive = loot/drops
-      this.dropList.set(itemId, (this.dropList.get(itemId) ?? 0) + amount);
-      this.dropListAll.set(itemId, (this.dropListAll.get(itemId) ?? 0) + amount);
+      // Positive = loot/drops - skip excluded types so they never enter statistics
+      if (!EXCLUDED_ITEM_TYPES.has(itemData.type_en ?? '')) {
+        this.dropList.set(itemId, (this.dropList.get(itemId) ?? 0) + amount);
+        this.dropListAll.set(itemId, (this.dropListAll.get(itemId) ?? 0) + amount);
+      }
     } else {
       // Negative = costs (items consumed)
       this.costList.set(itemId, (this.costList.get(itemId) ?? 0) + Math.abs(amount));

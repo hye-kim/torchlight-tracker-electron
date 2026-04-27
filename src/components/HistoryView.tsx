@@ -59,6 +59,8 @@ interface MapLog {
   sessionTitle?: string;
 }
 
+const EXCLUDED_DROP_TYPES = new Set(['Hero Memory']);
+
 const HistoryView: React.FC = () => {
   const { drops: globalDrops, costs: globalCosts } = useStatsStore();
   const [sessions, setSessions] = useState<HistorySession[]>([]);
@@ -168,22 +170,24 @@ const HistoryView: React.FC = () => {
     const session = sessions.find((s) => s.sessionId === selectedMapData.sessionId);
     const priceSnapshot = session?.priceSnapshotAtEnd;
 
-    return selectedMapData.drops.map((item: MapItemData) => {
-      const existingDrop = globalDrops.find((d) => d.itemId === item.itemId);
+    return selectedMapData.drops
+      .filter((item: MapItemData) => !EXCLUDED_DROP_TYPES.has(item.type ?? ''))
+      .map((item: MapItemData) => {
+        const existingDrop = globalDrops.find((d) => d.itemId === item.itemId);
 
-      // Use session-end price if available, otherwise use map-level price
-      const price = priceSnapshot?.[item.itemId]?.taxedPrice ?? item.price;
+        // Use session-end price if available, otherwise use map-level price
+        const price = priceSnapshot?.[item.itemId]?.taxedPrice ?? item.price;
 
-      return {
-        itemId: item.itemId,
-        name: item.name ?? existingDrop?.name ?? `Item ${item.itemId}`,
-        quantity: item.quantity,
-        price,
-        type: item.type ?? existingDrop?.type ?? item.itemId,
-        timestamp: selectedMapData.startTime,
-        imageUrl: item.imageUrl ?? existingDrop?.imageUrl,
-      };
-    });
+        return {
+          itemId: item.itemId,
+          name: item.name ?? existingDrop?.name ?? `Item ${item.itemId}`,
+          quantity: item.quantity,
+          price,
+          type: item.type ?? existingDrop?.type ?? item.itemId,
+          timestamp: selectedMapData.startTime,
+          imageUrl: item.imageUrl ?? existingDrop?.imageUrl,
+        };
+      });
   }, [selectedMapData, globalDrops, sessions]);
 
   // Get costs for the selected map, enriched with item metadata.
