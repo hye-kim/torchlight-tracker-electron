@@ -14,11 +14,12 @@ export const DROP_LOG_FILE = 'drop.txt';
 // Price Configuration
 export const TAX_RATE = 0.875; // 12.5% tax
 export const PRICE_SAMPLE_SIZE = 30;
-export const EXCLUDED_ITEM_ID = '100300';
+export const EXCLUDED_ITEM_ID = '100300'; // kept for tax exclusion in calculatePriceWithTax
+export const EXCLUDED_ITEM_IDS = new Set(['100300', '71001', '71002', '71003']);
 export const EXCLUDED_ITEM_TYPES = new Set(['Hero Memory']);
 
 export function isExcludedItem(itemId: string, typeEn: string | undefined): boolean {
-  return itemId === EXCLUDED_ITEM_ID || EXCLUDED_ITEM_TYPES.has(typeEn ?? '');
+  return EXCLUDED_ITEM_IDS.has(itemId) || EXCLUDED_ITEM_TYPES.has(typeEn ?? '');
 }
 
 // Initialization Configuration
@@ -76,7 +77,7 @@ export const AREA_LEVEL_NAMES: Record<number, string> = {
  * Calculate item price with tax applied if enabled.
  */
 export function calculatePriceWithTax(price: number, itemId: string, taxEnabled: boolean): number {
-  if (taxEnabled && itemId !== EXCLUDED_ITEM_ID) {
+  if (taxEnabled && !EXCLUDED_ITEM_IDS.has(itemId)) {
     return price * TAX_RATE;
   }
   return price;

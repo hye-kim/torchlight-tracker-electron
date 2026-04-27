@@ -3,7 +3,7 @@ import { Logger } from '../core/Logger';
 import {
   PATTERN_SUBREGION_ENTER,
   getSubregionDisplayName,
-  EXCLUDED_ITEM_ID,
+  EXCLUDED_ITEM_IDS,
   PRICE_SAMPLE_SIZE,
 } from '../core/constants';
 
@@ -90,7 +90,7 @@ export class LogParser {
           continue;
         }
 
-        if (itemId === EXCLUDED_ITEM_ID) {
+        if (EXCLUDED_ITEM_IDS.has(itemId)) {
           continue;
         }
 
