@@ -152,6 +152,7 @@ export class FileManager {
         }
         if (comprehensiveItem.type_en) {
           item.type = comprehensiveItem.type_en;
+          item.type_en = comprehensiveItem.type_en;
         }
       }
     }
@@ -162,6 +163,7 @@ export class FileManager {
         data[itemId] = {
           name: comprehensiveItem.name_en,
           type: comprehensiveItem.type_en,
+          type_en: comprehensiveItem.type_en,
           price: 0,
           last_update: 0,
         };
