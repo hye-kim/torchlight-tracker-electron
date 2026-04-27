@@ -17,6 +17,10 @@ export const PRICE_SAMPLE_SIZE = 30;
 export const EXCLUDED_ITEM_ID = '100300';
 export const EXCLUDED_ITEM_TYPES = new Set(['Hero Memory']);
 
+export function isExcludedItem(itemId: string, typeEn: string | undefined): boolean {
+  return itemId === EXCLUDED_ITEM_ID || EXCLUDED_ITEM_TYPES.has(typeEn ?? '');
+}
+
 // Initialization Configuration
 export const MIN_BAG_ITEMS_FOR_INIT = 20;
 export const MIN_BAG_ITEMS_LEGACY = 10;
