@@ -15,7 +15,7 @@ export const DROP_LOG_FILE = 'drop.txt';
 export const TAX_RATE = 0.875; // 12.5% tax
 export const PRICE_SAMPLE_SIZE = 30;
 export const EXCLUDED_ITEM_ID = '100300'; // kept for tax exclusion in calculatePriceWithTax
-export const EXCLUDED_ITEM_IDS = new Set(['100300', '71001', '71002', '71003']);
+export const EXCLUDED_ITEM_IDS = new Set(['71001', '71002', '71003']);
 export const EXCLUDED_ITEM_TYPES = new Set(['Hero Memory']);
 
 export function isExcludedItem(itemId: string, typeEn: string | undefined): boolean {
