@@ -6,7 +6,7 @@
 import { EventEmitter } from 'events';
 import { FileManager, ItemData } from '../data/FileManager';
 import { ConfigManager } from '../core/ConfigManager';
-import { calculatePriceWithTax, EXCLUDED_ITEM_TYPES } from '../core/constants';
+import { calculatePriceWithTax, isExcludedItem } from '../core/constants';
 import { Logger } from '../core/Logger';
 
 const logger = Logger.getInstance();
@@ -185,7 +185,7 @@ export class StatisticsTracker extends EventEmitter {
       const mapDrops: MapItemData[] = [];
       for (const [itemId, quantity] of this.dropList) {
         const item = fullTable[itemId];
-        if (EXCLUDED_ITEM_TYPES.has(item?.type_en ?? '')) continue;
+        if (isExcludedItem(itemId, item?.type_en)) continue;
         const basePrice = item?.price ?? 0.0;
         const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         mapDrops.push({ itemId, quantity, price });
@@ -263,7 +263,7 @@ export class StatisticsTracker extends EventEmitter {
     this.income = 0.0;
     for (const [itemId, quantity] of this.dropList) {
       const item = fullTable[itemId];
-      if (item && !EXCLUDED_ITEM_TYPES.has(item.type_en ?? '')) {
+      if (item && !isExcludedItem(itemId, item.type_en)) {
         const basePrice = item.price ?? 0.0;
         const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         this.income += price * quantity;
@@ -274,7 +274,7 @@ export class StatisticsTracker extends EventEmitter {
     this.incomeAll = 0.0;
     for (const [itemId, quantity] of this.dropListAll) {
       const item = fullTable[itemId];
-      if (item && !EXCLUDED_ITEM_TYPES.has(item.type_en ?? '')) {
+      if (item && !isExcludedItem(itemId, item.type_en)) {
         const basePrice = item.price ?? 0.0;
         const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
         this.incomeAll += price * quantity;
@@ -306,7 +306,7 @@ export class StatisticsTracker extends EventEmitter {
       let revenue = 0.0;
       for (const drop of mapLog.drops) {
         const item = fullTable[drop.itemId];
-        if (item && !EXCLUDED_ITEM_TYPES.has(item.type_en ?? '')) {
+        if (item && !isExcludedItem(drop.itemId, item.type_en)) {
           const basePrice = item.price ?? 0.0;
           const price = calculatePriceWithTax(basePrice, drop.itemId, taxEnabled);
           revenue += price * drop.quantity;
@@ -378,7 +378,7 @@ export class StatisticsTracker extends EventEmitter {
     // Update drop lists or cost lists based on amount
     if (amount > 0) {
       // Positive = loot/drops - skip excluded types so they never enter statistics
-      if (!EXCLUDED_ITEM_TYPES.has(itemData.type_en ?? '')) {
+      if (!isExcludedItem(itemId, itemData.type_en)) {
         this.dropList.set(itemId, (this.dropList.get(itemId) ?? 0) + amount);
         this.dropListAll.set(itemId, (this.dropListAll.get(itemId) ?? 0) + amount);
       }
@@ -397,7 +397,7 @@ export class StatisticsTracker extends EventEmitter {
       if (amount > 0) {
         // Positive = income (loot) - apply tax if enabled
         price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
-        if (!EXCLUDED_ITEM_TYPES.has(itemData.type_en ?? '')) {
+        if (!isExcludedItem(itemId, itemData.type_en)) {
           this.income += price * amount;
           this.incomeAll += price * amount;
         }
@@ -572,7 +572,7 @@ export class StatisticsTracker extends EventEmitter {
     const currentDrops: MapItemData[] = [];
     for (const [itemId, quantity] of this.dropList) {
       const item = fullTable[itemId];
-      if (EXCLUDED_ITEM_TYPES.has(item?.type_en ?? '')) continue;
+      if (isExcludedItem(itemId, item?.type_en)) continue;
       const basePrice = item?.price ?? 0.0;
       const price = calculatePriceWithTax(basePrice, itemId, taxEnabled);
       currentDrops.push({ itemId, quantity, price });
