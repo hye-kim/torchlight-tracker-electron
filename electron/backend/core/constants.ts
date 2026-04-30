@@ -27,7 +27,7 @@ export const MIN_BAG_ITEMS_FOR_INIT = 20;
 export const MIN_BAG_ITEMS_LEGACY = 10;
 
 // Threading Configuration
-export const LOG_POLL_INTERVAL = 1.0; // seconds
+export const LOG_POLL_INTERVAL = 0.5; // seconds
 export const LOG_BATCH_SIZE = 1000; // Number of lines to process in one batch
 export const LOG_BATCH_INTERVAL = 0.1; // seconds - Time between batch processing
 

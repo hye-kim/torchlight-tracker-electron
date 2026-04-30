@@ -285,18 +285,14 @@ export class FileManager {
   }
 
   getItemInfo(itemId: string): ItemData | null {
-    // First check comprehensive item database
-    const compDb = this.loadBundledJson<Record<string, ComprehensiveItemEntry>>(
+    this.itemDatabase ??= this.loadBundledJson<Record<string, ComprehensiveItemEntry>>(
       COMPREHENSIVE_ITEM_DATABASE_FILE,
       {}
     );
-    if (compDb[itemId]) {
-      return compDb[itemId] as unknown as ItemData;
+    if (this.itemDatabase[itemId]) {
+      return this.itemDatabase[itemId] as unknown as ItemData;
     }
-
-    // Fall back to full table
-    const fullTable = this.loadFullTable(true);
-    return fullTable[itemId] ?? null;
+    return this.loadFullTable(true)[itemId] ?? null;
   }
 
   getItemIdNormalizer(): ItemIdNormalizer {

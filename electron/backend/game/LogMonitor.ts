@@ -64,6 +64,12 @@ export class LogMonitor extends EventEmitter {
   // Hash of the last emitted display payload to skip redundant IPC emissions
   private lastPayloadHash: string = '';
 
+  // Cached comprehensive item mapping (loaded once, never changes at runtime)
+  private itemMapping: Record<
+    string,
+    { id: string; img?: string; name_en?: string; type_en?: string }
+  > | null = null;
+
   // Buffer for initialization (collects BagMgr@:InitBagData entries)
   private bagMgrBuffer: string[] = [];
 
@@ -331,9 +337,10 @@ export class LogMonitor extends EventEmitter {
       const currentStats = this.statisticsTracker.getCurrentMapStats();
       const totalStats = this.statisticsTracker.getTotalStats();
       const fullTable = this.fileManager.loadFullTable();
-      const itemMapping = this.fileManager.loadBundledJson<
+      this.itemMapping ??= this.fileManager.loadBundledJson<
         Record<string, { id: string; img?: string; name_en?: string; type_en?: string }>
       >(COMPREHENSIVE_ITEM_DATABASE_FILE, {});
+      const itemMapping = this.itemMapping;
 
       // Helper to get item image URL from comprehensive mapping
       const getItemImageUrl = (itemId: string): string | undefined => {
