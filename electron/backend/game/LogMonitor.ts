@@ -60,6 +60,9 @@ export class LogMonitor extends EventEmitter {
   private lastPriceCheck: number = Date.now();
   private readonly PRICE_BUFFER_INTERVAL = 1000; // Check price buffer every 1 second
   private insidePriceResponse: boolean = false; // Track if we're inside a price response block
+  private pendingSendSynIds: Set<string> = new Set(); // SynIds sent but not yet received
+  private lastSendTime: number = 0; // Time of last unmatched send
+  private readonly PRICE_QUERY_TIMEOUT = 10000; // Max wait for receive after send
 
   // Hash of the last emitted display payload to skip redundant IPC emissions
   private lastPayloadHash: string = '';
@@ -325,12 +328,19 @@ export class LogMonitor extends EventEmitter {
 
       // Process price buffer periodically
       const now = Date.now();
-      if (this.priceBuffer.length > 0 && now - this.lastPriceCheck >= this.PRICE_BUFFER_INTERVAL) {
+      const waitingForRecv =
+        this.pendingSendSynIds.size > 0 && now - this.lastSendTime < this.PRICE_QUERY_TIMEOUT;
+      if (
+        this.priceBuffer.length > 0 &&
+        !this.insidePriceResponse &&
+        !waitingForRecv &&
+        now - this.lastPriceCheck >= this.PRICE_BUFFER_INTERVAL
+      ) {
         this.lastPriceCheck = now;
         const bufferedText = this.priceBuffer.join('\n');
         void this.processPriceUpdates(bufferedText);
         this.priceBuffer = [];
-        this.insidePriceResponse = false; // Reset capture state after processing
+        this.pendingSendSynIds.clear();
       }
 
       // Update display with current stats, drops, costs, and map logs
@@ -484,8 +494,12 @@ export class LogMonitor extends EventEmitter {
       if (line.includes('XchgSearchPrice')) {
         this.priceBuffer.push(line);
 
-        // If this is a RecvMessage (response), start capturing all following lines
-        if (line.includes('Socket RecvMessage STT----XchgSearchPrice')) {
+        const synidMatch = line.match(/SynId = (\d+)/);
+        if (line.includes('Socket SendMessage STT----XchgSearchPrice') && synidMatch?.[1]) {
+          this.pendingSendSynIds.add(synidMatch[1]);
+          this.lastSendTime = Date.now();
+        } else if (line.includes('Socket RecvMessage STT----XchgSearchPrice')) {
+          if (synidMatch?.[1]) this.pendingSendSynIds.delete(synidMatch[1]);
           this.insidePriceResponse = true;
         }
       } else if (this.insidePriceResponse) {
