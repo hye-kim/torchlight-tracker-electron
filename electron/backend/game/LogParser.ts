@@ -125,6 +125,7 @@ export class LogParser {
       }
 
       const dataBlock = match[1];
+
       const values = Array.from(dataBlock.matchAll(PATTERN_VALUE))
         .map((m) => m[1])
         .filter((v): v is string => v !== undefined);
