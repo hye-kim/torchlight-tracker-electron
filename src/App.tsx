@@ -119,10 +119,10 @@ function App(): JSX.Element {
 
   const handleSaveOverlaySettings = useCallback(
     async (updates: Partial<Config>): Promise<void> => {
-      const newConfig = await window.electronAPI.updateConfig(updates);
-      setConfig(newConfig);
+      await window.electronAPI.updateConfig(updates);
+      updateConfig(updates);
     },
-    [setConfig]
+    [updateConfig]
   );
 
   // Use getState() to read current config without adding it as a dependency,

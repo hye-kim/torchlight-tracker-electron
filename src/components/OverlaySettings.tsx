@@ -36,6 +36,17 @@ function OverlaySettings({ config, onSave, onClose }: OverlaySettingsProps): JSX
   );
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
 
+  // Expand the Electron window to fit the dialog, then restore on close
+  useEffect(() => {
+    if (!window.electronAPI) return;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    void window.electronAPI.windowResize(w, Math.max(620, h));
+    return () => {
+      void window.electronAPI.windowResize(w, h);
+    };
+  }, []);
+
   // Apply changes in real-time
   useEffect(() => {
     if (window.electronAPI) {
