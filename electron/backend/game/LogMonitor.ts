@@ -332,7 +332,6 @@ export class LogMonitor extends EventEmitter {
         this.pendingSendSynIds.size > 0 && now - this.lastSendTime < this.PRICE_QUERY_TIMEOUT;
       if (
         this.priceBuffer.length > 0 &&
-        !this.insidePriceResponse &&
         !waitingForRecv &&
         now - this.lastPriceCheck >= this.PRICE_BUFFER_INTERVAL
       ) {
@@ -340,6 +339,7 @@ export class LogMonitor extends EventEmitter {
         const bufferedText = this.priceBuffer.join('\n');
         void this.processPriceUpdates(bufferedText);
         this.priceBuffer = [];
+        this.insidePriceResponse = false;
         this.pendingSendSynIds.clear();
       }
 
