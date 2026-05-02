@@ -522,6 +522,46 @@ export class StatisticsTracker extends EventEmitter {
   }
 
   /**
+   * Delete a completed map log by map number and undo its contribution to totals.
+   */
+  deleteMapLog(mapNumber: number): boolean {
+    const index = this.mapLogs.findIndex((m) => m.mapNumber === mapNumber);
+    if (index === -1) return false;
+
+    const mapLog = this.mapLogs[index];
+    if (!mapLog) return false;
+
+    for (const drop of mapLog.drops) {
+      const current = this.dropListAll.get(drop.itemId) ?? 0;
+      const next = current - drop.quantity;
+      if (next <= 0) {
+        this.dropListAll.delete(drop.itemId);
+      } else {
+        this.dropListAll.set(drop.itemId, next);
+      }
+    }
+
+    for (const cost of mapLog.costs) {
+      const current = this.costListAll.get(cost.itemId) ?? 0;
+      const next = current - cost.quantity;
+      if (next <= 0) {
+        this.costListAll.delete(cost.itemId);
+      } else {
+        this.costListAll.set(cost.itemId, next);
+      }
+    }
+
+    this.incomeAll = Math.max(0, this.incomeAll - mapLog.revenue);
+    this.totalCost = Math.max(0, this.totalCost - mapLog.cost);
+    this.totalTime = Math.max(0, this.totalTime - mapLog.duration);
+    this.mapCount = Math.max(0, this.mapCount - 1);
+    this.mapLogs.splice(index, 1);
+
+    logger.info(`Deleted map log #${mapNumber}`);
+    return true;
+  }
+
+  /**
    * Get current map costs as an array.
    */
   getCurrentCosts(): Array<{ itemId: string; quantity: number }> {

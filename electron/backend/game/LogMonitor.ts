@@ -67,6 +67,10 @@ export class LogMonitor extends EventEmitter {
   // Hash of the last emitted display payload to skip redundant IPC emissions
   private lastPayloadHash: string = '';
 
+  resetPayloadHash(): void {
+    this.lastPayloadHash = '';
+  }
+
   // Cached comprehensive item mapping (loaded once, never changes at runtime)
   private itemMapping: Record<
     string,

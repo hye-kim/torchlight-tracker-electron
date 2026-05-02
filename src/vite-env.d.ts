@@ -48,6 +48,7 @@ declare global {
       getSession: (sessionId: string) => Promise<Session | null>;
       getCurrentSession: () => Promise<Session | null>;
       deleteSessions: (sessionIds: string[]) => Promise<{ success: boolean }>;
+      deleteMap: (mapNumber: number) => Promise<{ success: boolean }>;
       onUpdateDisplay: (
         callback: (data: {
           stats: Stats;

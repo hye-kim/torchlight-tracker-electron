@@ -712,3 +712,15 @@ ipcMain.handle('delete-sessions', (_event: IpcMainInvokeEvent, sessionIds: strin
   sessionManager.deleteSessions(sessionIds);
   return { success: true };
 });
+
+ipcMain.handle('delete-map', (_event: IpcMainInvokeEvent, mapNumber: number) => {
+  const deletedFromTracker = statisticsTracker.deleteMapLog(mapNumber);
+  const deletedFromSession = sessionManager.deleteMapFromCurrentSession(mapNumber);
+  if (deletedFromTracker || deletedFromSession) {
+    sessionManager.saveSessions();
+    if (logMonitor) {
+      logMonitor.resetPayloadHash();
+    }
+  }
+  return { success: deletedFromTracker || deletedFromSession };
+});
