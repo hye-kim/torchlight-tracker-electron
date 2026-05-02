@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import StatsBar from '../components/StatsBar';
 import ControlsBar from '../components/ControlsBar';
 import MapLogTable from '../components/MapLogTable';
@@ -25,6 +25,9 @@ const OverviewPage: React.FC<OverviewPageProps> = ({
   const { currentMap, isInMap } = useMapStore();
   const { isInitialized, isWaitingForInit } = useInitStore();
   const { handleInitializeTracker } = useInitialization();
+  const handleDeleteMap = useCallback((mapNumber: number): void => {
+    void window.electronAPI.deleteMap(mapNumber);
+  }, []);
   const {
     selectedMapData,
     selectedMapDrops,
@@ -56,6 +59,7 @@ const OverviewPage: React.FC<OverviewPageProps> = ({
           mapCount={stats?.total.mapCount ?? 0}
           selectedMapNumber={selectedMapData ? selectedMapData.mapNumber : null}
           onSelectMap={setSelectedMapNumber}
+          onDeleteMap={handleDeleteMap}
         />
       </div>
 

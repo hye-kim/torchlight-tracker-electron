@@ -286,6 +286,29 @@ export class SessionManager {
   }
 
   /**
+   * Delete a map log from the current session by map number.
+   */
+  deleteMapFromCurrentSession(mapNumber: number): boolean {
+    const currentSession = this.getCurrentSession();
+    if (!currentSession) return false;
+
+    const index = currentSession.mapLogs.findIndex((m) => m.mapNumber === mapNumber);
+    if (index === -1) return false;
+
+    currentSession.mapLogs.splice(index, 1);
+    currentSession.duration = Math.floor((Date.now() - currentSession.startTime) / 1000);
+    currentSession.lastModified = Date.now();
+    currentSession.stats = this.calculateSessionStats(
+      currentSession.mapLogs,
+      currentSession.duration
+    );
+    currentSession.title = this.generateSessionTitle(currentSession);
+
+    logger.info(`Deleted map #${mapNumber} from session ${currentSession.sessionId}`);
+    return true;
+  }
+
+  /**
    * Add a completed map to the current session
    */
   addMapToCurrentSession(mapLog: MapLog): void {

@@ -64,6 +64,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getSession: (sessionId: string) => ipcRenderer.invoke('get-session', sessionId),
   getCurrentSession: () => ipcRenderer.invoke('get-current-session'),
   deleteSessions: (sessionIds: string[]) => ipcRenderer.invoke('delete-sessions', sessionIds),
+  deleteMap: (mapNumber: number) => ipcRenderer.invoke('delete-map', mapNumber),
 
   // Listen for updates
   onUpdateDisplay: (
@@ -219,6 +220,7 @@ declare global {
       getSession: (sessionId: string) => Promise<Session | null>;
       getCurrentSession: () => Promise<Session | null>;
       deleteSessions: (sessionIds: string[]) => Promise<{ success: boolean }>;
+      deleteMap: (mapNumber: number) => Promise<{ success: boolean }>;
       onUpdateDisplay: (
         callback: (data: {
           stats: Stats;

@@ -31,6 +31,7 @@ interface MapLogTableProps {
   selectedMapNumber: number | null;
   selectedSessionId?: string | null;
   onSelectMap: (mapNumber: number | null, sessionId?: string | null) => void;
+  onDeleteMap?: (mapNumber: number) => void;
 }
 
 type SortColumn = 'mapNumber' | 'revenue' | 'cost' | 'profit' | 'duration';
@@ -45,6 +46,7 @@ function MapLogTable({
   selectedMapNumber,
   selectedSessionId,
   onSelectMap,
+  onDeleteMap,
 }: MapLogTableProps): JSX.Element {
   const [sortColumn, setSortColumn] = useState<SortColumn>('mapNumber');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
@@ -178,6 +180,18 @@ function MapLogTable({
                   >
                     <td className="map-cell">
                       {isActive && <span className="active-indicator"></span>}
+                      {!isActive && onDeleteMap && (
+                        <button
+                          className="delete-map-btn"
+                          title="Delete map"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteMap(log.mapNumber);
+                          }}
+                        >
+                          ✕
+                        </button>
+                      )}
                       <div className="map-info">
                         <div className="map-name">{log.mapName || `Map ${log.mapNumber}`}</div>
                         <div className="map-time">{formatTimestamp(log.startTime)}</div>
