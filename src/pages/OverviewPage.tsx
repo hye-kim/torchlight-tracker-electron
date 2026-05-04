@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import StatsBar from '../components/StatsBar';
 import ControlsBar from '../components/ControlsBar';
 import MapLogTable from '../components/MapLogTable';
@@ -25,6 +25,10 @@ const OverviewPage: React.FC<OverviewPageProps> = ({
   const { currentMap, isInMap } = useMapStore();
   const { isInitialized, isWaitingForInit } = useInitStore();
   const { handleInitializeTracker } = useInitialization();
+  const [profitMode, setProfitMode] = useState<'perMinute' | 'perHour'>('perMinute');
+  const handleProfitModeToggle = useCallback(() => {
+    setProfitMode((prev) => (prev === 'perMinute' ? 'perHour' : 'perMinute'));
+  }, []);
   const handleDeleteMap = useCallback((mapNumber: number): void => {
     void window.electronAPI.deleteMap(mapNumber);
   }, []);
@@ -50,7 +54,11 @@ const OverviewPage: React.FC<OverviewPageProps> = ({
           isWaitingForInit={isWaitingForInit}
           isExporting={isExporting}
         />
-        <StatsBar stats={stats} />
+        <StatsBar
+          stats={stats}
+          profitMode={profitMode}
+          onProfitModeToggle={handleProfitModeToggle}
+        />
         <MapLogTable
           mapLogs={mapLogs}
           isInitialized={isInitialized}
