@@ -18,6 +18,8 @@ interface Stats {
 
 interface StatsBarProps {
   stats: Stats | null;
+  profitMode: 'perMinute' | 'perHour';
+  onProfitModeToggle: () => void;
 }
 
 const formatDuration = (seconds: number): string => {
@@ -41,15 +43,20 @@ const formatCurrency = (value: number): string => {
   return value.toFixed(2);
 };
 
-const StatsBar: React.FC<StatsBarProps> = ({ stats }) => {
+const StatsBar: React.FC<StatsBarProps> = ({ stats, profitMode, onProfitModeToggle }) => {
   if (!stats) {
     return null;
   }
 
   const currentProfit = stats.currentMap.feIncome;
-  const currentProfitPerMin = stats.currentMap.incomePerMinute;
+  const currentRate =
+    profitMode === 'perMinute'
+      ? stats.currentMap.incomePerMinute
+      : stats.currentMap.incomePerMinute * 60;
   const totalProfit = stats.total.feIncome;
-  const totalProfitPerMin = stats.total.incomePerMinute;
+  const totalRate =
+    profitMode === 'perMinute' ? stats.total.incomePerMinute : stats.total.incomePerMinute * 60;
+  const rateLabel = profitMode === 'perMinute' ? 'Profit / min' : 'Profit / hr';
 
   return (
     <div className="stats-bar" role="status" aria-live="polite" aria-label="Session statistics">
@@ -68,10 +75,13 @@ const StatsBar: React.FC<StatsBarProps> = ({ stats }) => {
             </span>
           </div>
           <span className="stat-separator">|</span>
-          <div className="stat-item">
-            <span className="stat-label">Profit / min:</span>
-            <span className={`stat-value ${currentProfitPerMin >= 0 ? 'positive' : 'negative'}`}>
-              {formatCurrency(currentProfitPerMin)} FE
+          <div className="stat-item clickable-stat" onClick={onProfitModeToggle}>
+            <span className="stat-label">
+              {rateLabel}
+              <span className="toggle-indicator">⇄</span>
+            </span>
+            <span className={`stat-value ${currentRate >= 0 ? 'positive' : 'negative'}`}>
+              {formatCurrency(currentRate)} FE
             </span>
           </div>
         </div>
@@ -97,10 +107,13 @@ const StatsBar: React.FC<StatsBarProps> = ({ stats }) => {
             </span>
           </div>
           <span className="stat-separator">|</span>
-          <div className="stat-item">
-            <span className="stat-label">Profit / min:</span>
-            <span className={`stat-value ${totalProfitPerMin >= 0 ? 'positive' : 'negative'}`}>
-              {formatCurrency(totalProfitPerMin)} FE
+          <div className="stat-item clickable-stat" onClick={onProfitModeToggle}>
+            <span className="stat-label">
+              {rateLabel}
+              <span className="toggle-indicator">⇄</span>
+            </span>
+            <span className={`stat-value ${totalRate >= 0 ? 'positive' : 'negative'}`}>
+              {formatCurrency(totalRate)} FE
             </span>
           </div>
         </div>

@@ -82,10 +82,37 @@
   opacity: 0.3;
 }
 
+.clickable-stat {
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 2px 4px;
+  margin: -2px -4px;
+  transition:
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+  border: 1px solid transparent;
+}
+
+.clickable-stat:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+.toggle-indicator {
+  color: var(--color-primary);
+  margin-left: 4px;
+  font-size: 11px;
+}
+
 /* Animate stat value changes */
 @keyframes statPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 .stat-value.updating {
